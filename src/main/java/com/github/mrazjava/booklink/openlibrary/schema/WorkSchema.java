@@ -22,8 +22,6 @@ public class WorkSchema extends BaseSchema {
     @Indexed
     private List<Author> authors;
 
-    private TypeValue created;
-
     @TextIndexed(weight = 2)
     private String title;
 

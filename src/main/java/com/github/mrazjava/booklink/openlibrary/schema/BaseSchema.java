@@ -16,6 +16,9 @@ abstract class BaseSchema {
     @JsonProperty("key")
     private String id;
 
+    @JsonProperty
+    private TypeValue<LocalDateTime> created;
+
     @JsonProperty("last_modified")
     private TypeValue<LocalDateTime> lastModified;
 

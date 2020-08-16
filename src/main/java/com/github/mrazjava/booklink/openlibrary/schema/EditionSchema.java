@@ -68,8 +68,6 @@ public class EditionSchema extends BaseSchema {
 
     private List<String> publishers;
 
-    private TypeValue created;
-
     private TypeValue stats;
 
     private TypeValue news;
