@@ -1,0 +1,25 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://${MONGO_USER:root}:${MONGO_PASSWORD:pass123}@${MONGO_HOST:localhost}:${MONGO_PORT:27017}/${MONGO_DB:openlibrary}?authSource=${MONGO_AUTH_DB:admin}
+      # try switching to full URL with admin db as auth
+      #database: ${MONGO_DB:openlibrary}
+      #host: ${MONGO_HOST:localhost}
+      #username: ${MONGO_USER:root}
+      #password: ${MONGO_PASSWORD:pass123}
+      #authentication-database: ${MONGO_AUTH_DB:admin}
+      auto-index-creation: true
+#  data:
+#    cassandra:
+#      keyspace-name: openlibrary
+#      contact-points: 127.0.0.1
+#      username: cassandra
+#      password: cassandra
+#      port: 9042
+#      schemaAction: CREATE_IF_NOT_EXISTS
+#      connect-timeout-millis: 10000ms
+#      read-timeout-millis: 10000ms
+#      connect-timeout: 10000ms
+#      read-timeout: 10000ms
+#      pool:
+#        pool-timeout: 10000ms

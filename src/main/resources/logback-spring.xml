@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+    <root level="info"/>
+    <logger name="ch.qos.logback" level="warn" />
+    <logger name="org.springframework " level="info" />
+    <logger name="org.apache" level="info" />
+    <logger name="org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator" level="error" />
+
+    <logger name="com.github.mrazjava.booklink" level="TRACE"/>
+    <logger name="org.hibernate.type.descriptor.sql" level="DEBUG" />
+    <logger name="org.springframework.jdbc.datasource.init" level="DEBUG" />
+
+</configuration>
