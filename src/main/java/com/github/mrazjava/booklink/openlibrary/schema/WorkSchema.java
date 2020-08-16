@@ -78,8 +78,6 @@ public class WorkSchema extends BaseSchema {
 
     private TypeValue notes;
 
-    private List<Link> links;
-
     @JsonProperty("dewey_number")
     private List<String> dweyNumbers;
 
@@ -88,9 +86,6 @@ public class WorkSchema extends BaseSchema {
     private String location;
 
     private Key permission;
-
-    @JsonProperty("remote_ids")
-    private RemoteIds remoteIds;
 
     @JsonProperty("translated_titles")
     private List<TranslatedTitle> translatedTitles;

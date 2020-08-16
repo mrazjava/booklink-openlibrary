@@ -74,9 +74,6 @@ public class EditionSchema extends BaseSchema {
 
     private TypeValue news;
 
-    @JsonProperty("remote_ids")
-    private RemoteIds remoteIds;
-
     private Dimensions dimensions;
 
     private TypeValue body;
@@ -190,8 +187,6 @@ public class EditionSchema extends BaseSchema {
 
     @JsonProperty("author_names")
     private List<String> authorNames;
-
-    private List<Link> links;
 
     @JsonAlias("work_title")
     @JsonProperty("work_titles")

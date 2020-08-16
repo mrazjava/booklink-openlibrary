@@ -1,13 +1,11 @@
 package com.github.mrazjava.booklink.openlibrary.schema;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -19,7 +17,7 @@ abstract class BaseSchema {
     private String id;
 
     @JsonProperty("last_modified")
-    private TypeValue<OffsetDateTime> lastModified;
+    private TypeValue<LocalDateTime> lastModified;
 
     @JsonProperty
     private Integer revision;
@@ -31,6 +29,12 @@ abstract class BaseSchema {
     @JsonAlias("lc_classification")
     @JsonProperty("lc_classifications")
     private List<String> lcClassifications;
+
+    @JsonProperty
+    private List<Link> links;
+
+    @JsonProperty("remote_ids")
+    private RemoteIds remoteIds;
 
     @JsonSetter("key")
     public void setKey(JsonNode jsonNode) {
