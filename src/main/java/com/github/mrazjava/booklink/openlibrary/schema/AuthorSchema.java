@@ -29,6 +29,8 @@ public class AuthorSchema extends BaseSchema {
 
     private TypeValue<String> bio;
 
+    private String website;
+
     @JsonProperty("birth_date")
     private String birthDate;
 

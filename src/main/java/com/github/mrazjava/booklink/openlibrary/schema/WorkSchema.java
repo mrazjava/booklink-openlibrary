@@ -59,7 +59,7 @@ public class WorkSchema extends BaseSchema {
     @JsonProperty("original_languages")
     private List<Key> originalLanguages;
 
-    @JsonProperty("first_publish_date")
+    @JsonProperty("first_publish_date") // can be a date or just a year
     private String firstPublishDate;
 
     @JsonProperty("cover_edition")
