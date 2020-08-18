@@ -28,9 +28,6 @@ public class WorkSchema extends BaseSchema {
     @TextIndexed(weight = 2)
     private String subtitle;
 
-    @Indexed
-    private List<Long> covers;
-
     @JsonProperty("number_of_editions")
     private Integer numberOfEditions;
 
@@ -44,9 +41,6 @@ public class WorkSchema extends BaseSchema {
 
     @JsonProperty("subject_times")
     private List<String> subjectTimes;
-
-    @TextIndexed(weight = 1)
-    private List<String> subjects;
 
     private Series series;
 

@@ -66,8 +66,6 @@ public class EditionSchema extends BaseSchema {
     @JsonProperty("openlibrary")
     private String openLibrary;
 
-    private List<String> publishers;
-
     private TypeValue stats;
 
     private TypeValue news;
@@ -126,8 +124,6 @@ public class EditionSchema extends BaseSchema {
 
     private String ocaid;
 
-    private String pagination;
-
     @JsonProperty("birth_date")
     private String birthDate;
 
@@ -167,12 +163,6 @@ public class EditionSchema extends BaseSchema {
     @JsonProperty("subject_people")
     private List<String> subjectPeople;
 
-    @JsonProperty("publish_places")
-    private List<String> publishPlaces;
-
-    @JsonProperty("publish_country")
-    private String publishCountry;
-
     @JsonProperty("dewey_decimal_class")
     private List<String> deweyDecimalClass;
 
@@ -209,8 +199,6 @@ public class EditionSchema extends BaseSchema {
 
     private String notes;
 
-    private List<Long> covers;
-
     @JsonProperty("translated_from")
     private List<Key> translatedFrom;
 
@@ -219,18 +207,8 @@ public class EditionSchema extends BaseSchema {
 
     private List<String> series;
 
-    @JsonAlias("oclc_number")
-    @JsonProperty("oclc_numbers")
-    private List<String> oclcNumbers;
-
-    @JsonAlias("language")
-    private List<String> languages;
-
     @JsonProperty("language_code")
     private String languageCode;
-
-    @TextIndexed(weight = 1)
-    private List<String> subjects;
 
     private Identifiers identifiers;
 
@@ -247,23 +225,6 @@ public class EditionSchema extends BaseSchema {
     @JsonProperty("volume_number")
     private Integer volumeNumber;
 
-
-    @JsonSetter("languages")
-    public void setLanguages(JsonNode json) {
-        if(json != null) {
-            if(CollectionUtils.isEmpty(languages)) {
-                languages = new LinkedList<>();
-            }
-            if(!json.isArray()) {
-                languages.add(fetchKey(json));
-            }
-            else {
-                for(JsonNode jn : json) {
-                    languages.add(fetchKey(jn));
-                }
-            }
-        }
-    }
 
     @JsonSetter("works")
     public void setWorks(JsonNode json) {
@@ -314,11 +275,6 @@ public class EditionSchema extends BaseSchema {
                 }
             }
         }
-    }
-
-    private String fetchKey(JsonNode json) {
-        String text = json.has("key") ? json.get("key").asText() : json.asText();
-        return text.contains("/") ? text.substring(text.lastIndexOf("/") + 1) : text;
     }
 
     @JsonSetter("notes")
