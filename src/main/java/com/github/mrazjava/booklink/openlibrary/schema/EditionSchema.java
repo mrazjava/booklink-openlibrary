@@ -17,13 +17,13 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Document(collection = "editions")
-public class EditionSchema extends BaseSchema {
+public class EditionSchema extends BaseSchemaEnhanced {
 
-    @Indexed
-    private List<String> authors; // IDs
+    @Indexed // IDs
+    private List<String> authors;
 
-    @Indexed
-    private List<String> works; // IDs
+    @Indexed // IDs
+    private List<String> works;
 
     @TextIndexed(weight = 3)
     private String title;
@@ -163,12 +163,7 @@ public class EditionSchema extends BaseSchema {
     @JsonProperty("subject_people")
     private List<String> subjectPeople;
 
-    @JsonProperty("dewey_decimal_class")
-    private List<String> deweyDecimalClass;
-
     private List<String> genres;
-
-    private List<String> lccn;
 
     @JsonProperty("source_records")
     private List<String> sourceRecords;

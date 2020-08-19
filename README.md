@@ -11,7 +11,7 @@ Import process for migrating raw data dumps from [openlibrary.org](https://openl
 ## Datasources
 Raw [data](https://openlibrary.org/data/) [dumps](https://archive.org/details/ol_exports?sort=-publicdate) are pulled from [openlibrary](https://openlibrary.org/developers/dumps). 
 These are large downloads (authors ~320mb, works ~1.7gb, editions 6.1gb) and big files once uncompressed (authors ~2.5gb, works ~10.6gb, editions ~29gb); 
-sizes as of May 2020. Row counts: works ~20M, editions ~26.7M
+sizes as of May 2020. Row counts (Aug 2020 dumps): authors ~7.4M, works ~19.2M, editions ~27.1M.
 > !!! Avoid working these files in a text editor.
 ```
 wget https://openlibrary.org/data/ol_dump_authors_latest.txt.gz

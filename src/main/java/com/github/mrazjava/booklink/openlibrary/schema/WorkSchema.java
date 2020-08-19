@@ -19,7 +19,7 @@ import java.util.List;
 @Document(collection = "works")
 public class WorkSchema extends BaseSchema {
 
-    @Indexed
+    @Indexed // IDs
     private List<Author> authors;
 
     @TextIndexed(weight = 2)
@@ -69,9 +69,6 @@ public class WorkSchema extends BaseSchema {
     private String ospid;
 
     private TypeValue notes;
-
-    @JsonProperty("dewey_number")
-    private List<String> dweyNumbers;
 
     private List<Excerpt> excerpts;
 

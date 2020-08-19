@@ -15,18 +15,40 @@ import java.util.List;
 
 @Slf4j
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(value = {
+        "m", "     _date",
+        "type",
+        "number_of_pages",
+        "publish_date",
+        "subject_place", "subject_time", // ? used in refs to actual author record (key to author provided)
+        "id_wikidata", "id_viaf" // RemoteId dupes
+})
 @Data
 @Document(collection = "authors")
-public class AuthorSchema extends BaseSchema {
+public class AuthorSchema extends BaseSchemaEnhanced {
 
     @TextIndexed(weight = 1)
     private String name;
 
-    @Indexed
+    @Indexed // IDs
     private List<Key> authors;
 
-    @Indexed
+    @Indexed // IDs
     private List<Key> works;
+
+    @JsonProperty("other_titles")
+    private List<String> otherTitles;
+
+    @JsonProperty("title_prefix")
+    private String titlePrefix;
+
+    @JsonProperty("subtitle")
+    private String subTitle;
+
+    /**
+     * @see <a href="http://www.loc.gov/marc/umb/um01to06.html">What is MARC record?</a>
+     */
+    private List<String> marc;
 
     @TextIndexed(weight = 2)
     @JsonProperty("fuller_name")
@@ -50,9 +72,20 @@ public class AuthorSchema extends BaseSchema {
 
     private String bio;
 
+    @JsonProperty("by_statement")
+    private String byStatement;
+
     private String website;
 
+    @JsonProperty("website_name")
+    private String websiteName;
+
     private String wikipedia;
+
+    private String tags;
+
+    @JsonProperty("id_librarything")
+    private String libraryThingId;
 
     private Long numeration;
 
@@ -82,9 +115,17 @@ public class AuthorSchema extends BaseSchema {
 
     private List<String> series;
 
+    private List<String> contributions;
+
     private String role;
 
+    private List<String> genres;
+
     private String comment;
+
+    private TypeValue<String> notes;
+
+    private TypeValue<String> body;
 
     /**
      * Eg: /static/files//599/OL4278213A_photograph_1218383628520599.jpg

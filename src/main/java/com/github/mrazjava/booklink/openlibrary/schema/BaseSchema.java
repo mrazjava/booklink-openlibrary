@@ -13,8 +13,12 @@ import java.time.OffsetDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
-@JsonIgnoreProperties({"m", "type"})
+import static com.github.mrazjava.booklink.openlibrary.schema.BaseSchema.JSON_IGNORE_PROPS;
+
+@JsonIgnoreProperties(value = {"m", "type"})
 abstract class BaseSchema {
+
+    public static final String[] JSON_IGNORE_PROPS = {"m", "type"};
 
     @Id
     @JsonProperty("key")
@@ -37,40 +41,16 @@ abstract class BaseSchema {
     private List<String> subjects;
 
     @Transient
-    @JsonAlias("lc_classification")
+    @JsonAlias({"lc_classification", "lccn"})
     @JsonProperty("lc_classifications")
     private List<String> lcClassifications;
 
     /**
-     * Author, Edition
+     * https://en.wikipedia.org/wiki/List_of_Dewey_Decimal_classes
      */
-    @JsonAlias("oclc_number")
-    @JsonProperty("oclc_numbers")
-    private List<String> oclcNumbers;
-
-    /**
-     * Author, Edition
-     */
-    @JsonProperty
-    private List<String> publishers;
-
-    /**
-     * Author, Edition
-     */
-    @JsonProperty("publish_country")
-    private String publishCountry;
-
-    /**
-     * Author, Edition
-     */
-    @JsonProperty("publish_places")
-    private List<String> publishPlaces;
-
-    /**
-     * Author, Edition
-     */
-    @JsonProperty
-    private String pagination;
+    @JsonAlias("dewey_number")
+    @JsonProperty("dewey_decimal_class")
+    private List<String> deweyClassification;
 
     @JsonProperty
     @Indexed

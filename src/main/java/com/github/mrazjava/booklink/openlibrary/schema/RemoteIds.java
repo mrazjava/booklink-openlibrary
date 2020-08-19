@@ -1,5 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.schema;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -11,10 +12,14 @@ import lombok.Data;
 public class RemoteIds {
 
     @JsonProperty("viaf")
-    String virtualInternationalAuthroityFile;
+    private String virtualInternationalAuthroityFile;
 
-    String wikidata;
+    private String wikidata;
 
     @JsonProperty("isni")
-    String internationalStandardNameIdentifier;
+    private String internationalStandardNameIdentifier;
+
+    @JsonAlias("id_librarything")
+    @JsonProperty("librarything")
+    private String libraryThing;
 }
