@@ -1,4 +1,4 @@
-# Booklink Import: openlibrary.org
+# Booklink Data Integration: openlibrary.org
 Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org) into [booklink-data-openlibrary](../booklink-data-openlibrary).
 
 ## Tech Stack

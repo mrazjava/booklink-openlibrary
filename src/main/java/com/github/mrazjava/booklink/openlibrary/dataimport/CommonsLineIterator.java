@@ -3,6 +3,7 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
@@ -13,6 +14,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -26,13 +28,18 @@ public class CommonsLineIterator implements FileImporter {
 
     private ObjectMapper objectMapper;
 
-    private int frequencyCheck = 10000;
+    @Value("${booklink.data-importer.frequency-check}")
+    private int frequencyCheck;
+
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Autowired
+    private WorkRepository workRepository;
 
     @Autowired
     private EditionRepository editionRepository;
 
-    @Autowired
-    private WorkRepository workRepository;
 
     public CommonsLineIterator() {
 
@@ -97,10 +104,5 @@ public class CommonsLineIterator implements FileImporter {
     private void processEdition(EditionSchema edition) {
         //log.debug("saving:\n{}", edition);
         //editionRepository.save(edition);
-    }
-
-    @Override
-    public void setFrequencyCheck(int rowsProcessed) {
-        frequencyCheck = rowsProcessed;
     }
 }
