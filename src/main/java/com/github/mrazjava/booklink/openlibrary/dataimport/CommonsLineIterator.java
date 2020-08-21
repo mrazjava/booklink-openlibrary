@@ -31,6 +31,9 @@ public class CommonsLineIterator implements FileImporter {
     @Value("${booklink.data-importer.frequency-check}")
     private int frequencyCheck;
 
+    @Value("${booklink.data-importer.persist}")
+    private boolean persistData;
+
     @Autowired
     private AuthorRepository authorRepository;
 
@@ -95,14 +98,20 @@ public class CommonsLineIterator implements FileImporter {
     }
 
     private void processAuthor(AuthorSchema author) {
+        if(persistData) {
+            authorRepository.save(author);
+        }
     }
 
     private void processWork(WorkSchema work) {
-        //workRepository.save(work);
+        if(persistData) {
+            workRepository.save(work);
+        }
     }
 
     private void processEdition(EditionSchema edition) {
-        //log.debug("saving:\n{}", edition);
-        //editionRepository.save(edition);
+        if(persistData) {
+            editionRepository.save(edition);
+        }
     }
 }

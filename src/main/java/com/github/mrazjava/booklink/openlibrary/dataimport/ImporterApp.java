@@ -47,6 +47,10 @@ public class ImporterApp implements ApplicationRunner {
 	@Value("${booklink.data-importer.frequency-check}")
 	private int frequencyCheck;
 
+	@Value("${booklink.data-importer.persist}")
+	private boolean persistData;
+
+
 	public static void main(String[] args) {
 
 		SpringApplication.run(ImporterApp.class, args);
@@ -74,7 +78,7 @@ public class ImporterApp implements ApplicationRunner {
 			importFile = new File(getClass().getResource(sampleFilePath).getFile());
 		}
 
-		log.info("starting...\n\n- importFile: {}\n- schemaClass: {}\n- frequencyCheck: {}\n", importFile.getAbsolutePath(), schemaClass.getCanonicalName(), frequencyCheck);
+		log.info("starting...\n\n- importFile: {}\n- schemaClass: {}\n- frequencyCheck: {}\n- persistData: {}\n", importFile.getAbsolutePath(), schemaClass.getCanonicalName(), frequencyCheck, persistData);
 
 		importer.runImport(importFile, schemaClass);
 	}

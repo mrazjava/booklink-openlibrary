@@ -20,6 +20,7 @@ import java.util.List;
         "type",
         "number_of_pages",
         "publish_date",
+        "edition_name",
         "subject_place", "subject_time", // ? used in refs to actual author record (key to author provided)
         "id_wikidata", "id_viaf" // RemoteId dupes
 })
@@ -82,15 +83,13 @@ public class AuthorSchema extends BaseSchemaEnhanced {
 
     private String wikipedia;
 
+    @TextIndexed(weight = 2)
     private String tags;
 
     @JsonProperty("id_librarything")
     private String libraryThingId;
 
     private Long numeration;
-
-    @JsonProperty("edition_name")
-    private String editionName;
 
     @JsonIgnore
     private String numerationText;
@@ -105,6 +104,18 @@ public class AuthorSchema extends BaseSchemaEnhanced {
 
     private String location;
 
+    /**
+     * The URL Pattern for accessing author photos is:
+     * http://covers.openlibrary.org/a/$key/$value-$size.jpg
+     *
+     * Where $key is OLID (prmary key of author record) or ID (numeric id from this collection). Size is S, M or L.
+     *
+     * Example for large image of author Pedro I Emperor of Brazil:
+     * http://covers.openlibrary.org/a/olid/OL1144407A-L.jpg
+     * http://covers.openlibrary.org/a/id/7244867-L.jpg
+     *
+     * NOTE: see openlibrary.org for their download policy!
+     */
     private List<Integer> photos;
 
     @JsonProperty("source_records")

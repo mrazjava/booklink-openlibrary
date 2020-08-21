@@ -31,34 +31,6 @@ Book records contain references to covers which are by far the largest download.
 small, medium and large. Details explained on [this](https://openlibrary.org/dev/docs/api/covers) openlibrary page 
 (towards the bottom). 
 
-## Architecture
-JSON file source is handled by Spark stream and fed into Kafka. From there, actual data implementation will consume 
-kafka events. Import is completely decoupled from actual data source.
-
-## JSON dump format
-Since each dump is a huge file, import must stream though rather than reading entire file into memory as is typically 
-done. With streaming, there are several ways to do this. We will work off of _JSON element_ strategy.
-
-#### array
-We could prepare entire file as one huge JSON array and import it with a custom java app and something like a stream 
-friendly GSON.
-
-#### list of elements (preferred)
-We could prepare dump file as list of individual JSON records (not an array) which technically speaking would render the 
-content of a file invalid JSON. Essentially all we would do is [remove line metadata](https://github.com/mrazjava/booklink/tree/master/booklink-import-openlibrary#remove-line-metadata). 
-
-Then again, we could use a custom java app with:
- 
- * something like [Apache Commons IO](https://commons.apache.org/proper/commons-io/) to stream though the import line 
- by line and use object mapper to produce individual json record off each line. There are plenty examples about this approach. 
-    - Here is [one](https://www.baeldung.com/java-read-lines-large-file).
- * use something like Apache Spark to do the heavy lifting.
-    - Example: [Consume list of json elements file w/ Apache Spark](https://aseigneurin.github.io/2018/08/14/kafka-tutorial-8-spark-structured-streaming.html)
-    - Example: [Spark structured streaming](https://medium.com/knoldus/basic-example-for-spark-structured-streaming-kafka-integration-a6d0b3ffc3bd)
- 
-In all cases, once individual record is fetched, it is published to kafka. From there, the actual data source will 
-consume messages and complete the import accordingly.
-
 ## Dump Processing
 Once uncompressed, data dumps must be prepared before parsing as they are not in JSON ready import format. They are JSON exports, but they contain additional metadata which must be stripped.
 
