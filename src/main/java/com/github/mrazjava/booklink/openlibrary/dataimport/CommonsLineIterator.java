@@ -65,12 +65,12 @@ public class CommonsLineIterator implements FileImporter {
                 counter++;
                 Object pojo = objectMapper.readValue(line, schema);
                 if(counter % frequencyCheck == 0) {
-                    //log.debug("raw JSON #{}:\n{}", counter, line);
+                    log.debug("raw JSON #{}:\n{}", counter, line);
                     log.info("JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
                 }
                 processLine(line, schema);
-                //log.info("raw JSON #{}:\n{}", counter, line);
-                //log.info("raw JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
+                log.trace("raw JSON #{}:\n{}", counter, line);
+                log.trace("raw JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
             }
             stopWatch.stop();
             log.info("TOTAL RECORDS: {}, time: {}", counter, stopWatch.getTime());
