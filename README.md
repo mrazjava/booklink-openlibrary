@@ -99,17 +99,5 @@ Dropping prefix types from dump files to produce JSON only:
 sed 's/^[^{]*//' ol_dump_authors_latest.txt > authors.txt
 ```
 
-#### OpenLibrary Schemas
-I found JSON schemas provided by OpenLibrary (`src/main/resources/openlibrary/schema/`) to be incomplete and error prone. Consequently I opted to write and use my own. Nonetheless, they are integrated into the project and Java classes can be generated off them. They are not used by booklink import in any way whatsoever.
-
-By default openlibrary java models don't exist. There are usually two ways to generate models. Command line:
-```
-mvn clean generate-sources
-```
-Or with an IDE. With IntelliJ for instance, right click `booklink-import-openlibrary`, choose _Maven_, then 
-_Generate Sources and Update Folders_.
- 
-JSON POJO models will be available in `target/generated-sources/jsonschema2pojo/`
-
 ## Links
-[Kafka Streams Quickstart](https://docs.confluent.io/current/streams/quickstart.html)
+
