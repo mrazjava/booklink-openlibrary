@@ -21,8 +21,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -55,11 +53,13 @@ public class CommonsLineIterator implements FileImporter {
 
     private File workingDirectory;
 
-    private File destinationAuthorImg;
+    private File authorImagesDestination;
 
     public static final char[] IMAGE_SIZES = {'S', 'M', 'L'};
 
     public static final String AUTHOR_OLID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/olid/%s-%s.jpg";
+
+    public static final String AUTHOR_PHOTOID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/id/%d-%s.jpg";
 
     public static final long AUTHOR_IMG_THROTTLE_MS = 3000;
 
@@ -82,15 +82,15 @@ public class CommonsLineIterator implements FileImporter {
 
             workingDirectory = new File(workingDir);
             if(StringUtils.isNotBlank(authorImgDir)) {
-                destinationAuthorImg = Path.of(authorImgDir).getParent() == null ?
+                authorImagesDestination = Path.of(authorImgDir).getParent() == null ?
                         Path.of(workingDir + File.separator + authorImgDir).toFile() :
                         Path.of(authorImgDir).toFile();
-                if(!destinationAuthorImg.exists()) {
-                    destinationAuthorImg.mkdir();
+                if(!authorImagesDestination.exists()) {
+                    authorImagesDestination.mkdir();
                 }
             }
 
-            log.info("destinationAuthorImg: {}", destinationAuthorImg);
+            log.info("destinationAuthorImg: {}", authorImagesDestination);
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -165,26 +165,31 @@ public class CommonsLineIterator implements FileImporter {
             return;
         }
 
+        Integer photoId = author.getPhotos().stream().filter(id -> id > 0).findFirst().orElse(0);
+
+        if(photoId == 0) {
+            return;
+        }
+
         for(char imgSize : IMAGE_SIZES) {
 
             File imgById = new File(
-                    destinationAuthorImg.getAbsolutePath() +
+                    authorImagesDestination.getAbsolutePath() +
                             File.separator +
-                            author.getId() +
-                            String.format("-%s.jpg", imgSize)
+                            String.format("%d-%s.jpg", photoId, imgSize)
             );
 
             if(imgById.exists()) {
                 log.debug("file exists, skipping: {}", imgById);
-                return;
+                continue;
             }
 
-            String imgUrl = String.format(AUTHOR_OLID_IMG_URL_TEMPLATE, author.getId(), imgSize);
+            String imgUrl = String.format(AUTHOR_PHOTOID_IMG_URL_TEMPLATE, photoId, imgSize);
 
             log.info("downloading.... {}", imgUrl);
 
             try {
-                FileUtils.copyURLToFile(new URL(imgUrl), imgById,1000,500);
+                FileUtils.copyURLToFile(new URL(imgUrl), imgById,2000,2000);
 
                 // only 100 requests/IP are allowed for every 5 minutes
                 // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
@@ -192,7 +197,7 @@ public class CommonsLineIterator implements FileImporter {
                 // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
                 //
                 // randomize sleep value within 1 second of a defined throttle value
-                long sleep = RandomUtils.nextLong(AUTHOR_IMG_THROTTLE_MS-1000, AUTHOR_IMG_THROTTLE_MS);
+                long sleep = RandomUtils.nextLong(AUTHOR_IMG_THROTTLE_MS-500, AUTHOR_IMG_THROTTLE_MS+500);
 
                 log.info("OK! {} | sleeping {}ms", imgUrl, sleep);
 
