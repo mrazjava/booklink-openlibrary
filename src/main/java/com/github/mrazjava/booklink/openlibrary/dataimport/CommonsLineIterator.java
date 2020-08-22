@@ -15,12 +15,15 @@ import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -139,11 +142,11 @@ public class CommonsLineIterator implements FileImporter {
     }
 
     private void processAuthor(AuthorSchema author) {
-        if(persistData) {
-            authorRepository.save(author);
-        }
         if(StringUtils.isNotBlank(authorImgDir)) {
             downloadAuthorImages(author);
+        }
+        if(persistData) {
+            authorRepository.save(author);
         }
     }
 
@@ -180,6 +183,7 @@ public class CommonsLineIterator implements FileImporter {
             );
 
             if(imgById.exists()) {
+                setAuthorImage(imgSize, author, imgById);
                 log.debug("file exists, skipping: {}", imgById);
                 continue;
             }
@@ -190,6 +194,7 @@ public class CommonsLineIterator implements FileImporter {
 
             try {
                 FileUtils.copyURLToFile(new URL(imgUrl), imgById,2000,2000);
+                setAuthorImage(imgSize, author, imgById);
 
                 // only 100 requests/IP are allowed for every 5 minutes
                 // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
@@ -205,6 +210,32 @@ public class CommonsLineIterator implements FileImporter {
             } catch (Exception e) {
                 log.error("download failed: {}", e.getMessage());
             }
+        }
+    }
+
+    private void setAuthorImage(char size, AuthorSchema author, File image) {
+
+        try {
+            setAuthorImage(size, author, FileUtils.readFileToByteArray(image));
+        } catch (IOException e) {
+            log.error("faild to set schema image: {}", e.getMessage());
+        }
+    }
+
+    private void setAuthorImage(char size, AuthorSchema author, byte[] imageBytes) {
+
+        Binary image = new Binary(BsonBinarySubType.BINARY, imageBytes);
+
+        switch(size) {
+            case 'S':
+                author.setImageSmall(image);
+                break;
+            case 'M':
+                author.setImageMedium(image);
+                break;
+            case 'L':
+                author.setImageLarge(image);
+                break;
         }
     }
 }

@@ -125,3 +125,6 @@ sed 's/^[^{]*//' ol_dump_authors_latest.txt > authors.txt
 
 ## Links
 
+[Base64 Image Converter](https://codebeautify.org/base64-to-image-converter)
+Downloader can optionally store default image in all three sizes diretly as a `Binary` mongo field in the 
+`AuthorSchema` encoded as Base64. This handy online tool can be used to check the bytes and see the rendered image.

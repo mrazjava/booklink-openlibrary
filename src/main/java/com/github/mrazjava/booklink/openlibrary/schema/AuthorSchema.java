@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.bson.types.Binary;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -115,6 +116,15 @@ public class AuthorSchema extends BaseSchemaEnhanced {
      * NOTE: see openlibrary.org for their download policy!
      */
     private List<Integer> photos;
+
+    @JsonIgnore
+    private Binary imageSmall;
+
+    @JsonIgnore
+    private Binary imageMedium;
+
+    @JsonIgnore
+    private Binary imageLarge;
 
     @JsonProperty("source_records")
     private List<String> sourceRecords;
