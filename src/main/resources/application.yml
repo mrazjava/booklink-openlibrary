@@ -19,3 +19,6 @@ booklink:
     # defined, then images will be downloaded to the same location + sub directory
     # where dump file is read from. If full path is defined, then that's the destination.
     author-image-dir: ${BOOKLINK_AUTHOR_IMG_DIR:}
+    # If enabled, implies enablement of author image download. Image will be stored as a Base64 encoded
+    # binary field in mongo author collection.
+    author-image-mongo: ${BOOKLINK_AUTHOR_IMG_MONGO:false}

@@ -12,6 +12,7 @@ import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -44,6 +45,9 @@ public class CommonsLineIterator implements FileImporter {
 
     @Value("${booklink.di.author-image-dir}")
     private String authorImgDir;
+
+    @Value("${booklink.di.author-image-mongo}")
+    private Boolean storeAuthorImgInMongo;
 
     @Autowired
     private AuthorRepository authorRepository;
@@ -215,6 +219,10 @@ public class CommonsLineIterator implements FileImporter {
 
     private void setAuthorImage(char size, AuthorSchema author, File image) {
 
+        if(BooleanUtils.isFalse(storeAuthorImgInMongo)) {
+            return;
+        }
+
         try {
             setAuthorImage(size, author, FileUtils.readFileToByteArray(image));
         } catch (IOException e) {
@@ -223,6 +231,10 @@ public class CommonsLineIterator implements FileImporter {
     }
 
     private void setAuthorImage(char size, AuthorSchema author, byte[] imageBytes) {
+
+        if(BooleanUtils.isFalse(storeAuthorImgInMongo)) {
+            return;
+        }
 
         Binary image = new Binary(BsonBinarySubType.BINARY, imageBytes);
 
