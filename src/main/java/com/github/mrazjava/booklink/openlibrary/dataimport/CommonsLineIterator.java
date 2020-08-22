@@ -52,6 +52,8 @@ public class CommonsLineIterator implements FileImporter {
 
     private File destinationAuthorImg;
 
+    private static final char[] IMAGE_SIZES = {'S', 'M', 'L'};
+
     public CommonsLineIterator() {
 
         objectMapper = new ObjectMapper();
@@ -150,24 +152,32 @@ public class CommonsLineIterator implements FileImporter {
 
     private void downloadAuthorImages(AuthorSchema author) {
 
-        File imgById = new File(destinationAuthorImg.getAbsolutePath() + File.separator + author.getId() + ".jpg");
+        for(char imgSize : IMAGE_SIZES) {
 
-        if(imgById.exists()) {
-            log.debug("file exists, skipping: {}", imgById);
-            return;
-        }
+            File imgById = new File(
+                    destinationAuthorImg.getAbsolutePath() +
+                            File.separator +
+                            author.getId() +
+                            String.format("-%s.jpg", imgSize)
+            );
 
-        log.info("downloading.... {}", imgById);
+            if(imgById.exists()) {
+                log.debug("file exists, skipping: {}", imgById);
+                return;
+            }
 
-        try {
-            // only 100 requests/IP are allowed for every 5 minutes
-            // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
-            //
-            // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
-            //
-            Thread.sleep(3000); // throttle to ensure no more than 100 requests per 5 min
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.info("downloading.... {}", imgById);
+
+            try {
+                // only 100 requests/IP are allowed for every 5 minutes
+                // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
+                //
+                // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
+                //
+                Thread.sleep(3000); // throttle to ensure no more than 100 requests per 5 min
+            } catch (InterruptedException e) {
+                log.error("download failed: {}", e.getMessage());
+            }
         }
     }
 }
