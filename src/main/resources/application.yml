@@ -5,8 +5,17 @@ spring:
       auto-index-creation: true
 booklink:
   di: # (d)ata-(i)import
+    # Full path to an openlibrary dump file to process. The dump file must be pre-processed
+    # according to the readme. Each line is expected as a valid JSON record.
     ol-dump-file: ${BOOKLINK_OL_DUMP_FILE:works-tail-n30.json}
+    # Schema class (just a name) to use for parsing the dump file.
     schema-class-name: ${BOOKLINK_SCHEMA:WorkSchema}
+    # Number of record to skip before a test record is logged as progress info
     frequency-check: ${BOOKLINK_FREQUENCY_CHECK:10}
+    # Persist processed data to mongo ?
     persist: ${BOOKLINK_PERSIST:false}
+    # Directory name of full path to where author images should be downloaded to.
+    # If not defined (default) download is disabled. If only directory name is
+    # defined, then images will be downloaded to the same location + sub directory
+    # where dump file is read from. If full path is defined, then that's the destination.
     author-image-dir: ${BOOKLINK_AUTHOR_IMG_DIR:}
