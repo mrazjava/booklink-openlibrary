@@ -14,7 +14,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.LinkedList;
 import java.util.List;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Document(collection = "works")
 public class WorkSchema extends BaseSchema {

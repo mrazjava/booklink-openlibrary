@@ -3,10 +3,12 @@ package com.github.mrazjava.booklink.openlibrary.schema;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
 import java.util.List;
 
 @JsonIgnoreProperties({"m", "type"})
+@Data
 abstract class BaseSchemaEnhanced extends BaseSchema {
 
     @JsonAlias("oclc_number")

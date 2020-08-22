@@ -13,8 +13,6 @@ import org.springframework.util.CollectionUtils;
 import java.util.LinkedList;
 import java.util.List;
 
-@Slf4j
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
 @Document(collection = "editions")
 public class EditionSchema extends BaseSchemaEnhanced {

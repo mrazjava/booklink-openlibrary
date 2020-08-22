@@ -13,8 +13,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@Slf4j
-@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(value = {
         "m", "     _date",
         "type",

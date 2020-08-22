@@ -12,12 +12,14 @@ import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * <a href="https://itnext.io/using-java-to-read-really-really-large-files-a6f8a3f44649">Benchmarks</a>
@@ -28,11 +30,14 @@ public class CommonsLineIterator implements FileImporter {
 
     private ObjectMapper objectMapper;
 
-    @Value("${booklink.data-importer.frequency-check}")
+    @Value("${booklink.di.frequency-check}")
     private int frequencyCheck;
 
-    @Value("${booklink.data-importer.persist}")
+    @Value("${booklink.di.persist}")
     private boolean persistData;
+
+    @Value("${booklink.di.author-image-dir}")
+    private String authorImgDir;
 
     @Autowired
     private AuthorRepository authorRepository;
@@ -43,6 +48,9 @@ public class CommonsLineIterator implements FileImporter {
     @Autowired
     private EditionRepository editionRepository;
 
+    private File workingDirectory;
+
+    private File destinationAuthorImg;
 
     public CommonsLineIterator() {
 
@@ -57,6 +65,21 @@ public class CommonsLineIterator implements FileImporter {
         long counter = 0;
         try {
             LineIterator iterator = FileUtils.lineIterator(jsonFile, "UTF-8");
+            final String workingDir = jsonFile.getParent();
+
+            log.info("workingDir: {}", workingDir);
+
+            workingDirectory = new File(workingDir);
+            if(StringUtils.isNotBlank(authorImgDir)) {
+                destinationAuthorImg = Path.of(authorImgDir).getParent() == null ?
+                        Path.of(workingDir + File.separator + authorImgDir).toFile() :
+                        Path.of(authorImgDir).toFile();
+                if(!destinationAuthorImg.exists()) {
+                    destinationAuthorImg.mkdir();
+                }
+            }
+
+            log.info("destinationAuthorImg: {}", destinationAuthorImg);
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -65,12 +88,19 @@ public class CommonsLineIterator implements FileImporter {
                 counter++;
                 Object pojo = objectMapper.readValue(line, schema);
                 if(counter % frequencyCheck == 0) {
-                    log.debug("raw JSON #{}:\n{}", counter, line);
-                    log.info("JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
+                    if(log.isDebugEnabled()) {
+                        log.debug("raw JSON #{}:\n{}", counter, line);
+                    }
+                    if(log.isInfoEnabled()) {
+                        log.info("JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
+                    }
                 }
                 processLine(line, schema);
-                log.trace("raw JSON #{}:\n{}", counter, line);
-                log.trace("raw JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
+
+                if(log.isTraceEnabled()) {
+                    log.trace("raw JSON #{}:\n{}", counter, line);
+                    log.trace("raw JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
+                }
             }
             stopWatch.stop();
             log.info("TOTAL RECORDS: {}, time: {}", counter, stopWatch.getTime());
@@ -101,6 +131,9 @@ public class CommonsLineIterator implements FileImporter {
         if(persistData) {
             authorRepository.save(author);
         }
+        if(StringUtils.isNotBlank(authorImgDir)) {
+            downloadAuthorImages(author);
+        }
     }
 
     private void processWork(WorkSchema work) {
@@ -112,6 +145,29 @@ public class CommonsLineIterator implements FileImporter {
     private void processEdition(EditionSchema edition) {
         if(persistData) {
             editionRepository.save(edition);
+        }
+    }
+
+    private void downloadAuthorImages(AuthorSchema author) {
+
+        File imgById = new File(destinationAuthorImg.getAbsolutePath() + File.separator + author.getId() + ".jpg");
+
+        if(imgById.exists()) {
+            log.debug("file exists, skipping: {}", imgById);
+            return;
+        }
+
+        log.info("downloading.... {}", imgById);
+
+        try {
+            // only 100 requests/IP are allowed for every 5 minutes
+            // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
+            //
+            // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
+            //
+            Thread.sleep(3000); // throttle to ensure no more than 100 requests per 5 min
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

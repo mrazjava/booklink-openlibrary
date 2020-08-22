@@ -1,12 +1,18 @@
 # Booklink Data Integration: openlibrary.org
 Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org) into [booklink-data-openlibrary](../booklink-data-openlibrary).
 
+## Quick Start
+See `application.yml` for available configuration options. Each spring boot config is driven by environment variable.
+```
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=50000 -DBOOKLINK_AUTHOR_IMG_DIR=author_imgs -DBOOKLINK_PERSIST=false"
+```
+
 ## Tech Stack
 * Spring Boot
 * [Jackson](https://github.com/FasterXML/jackson-docs)
 * Apache Commons IO
 * Lombok
-* [Apache Kafka](https://kafka.apache.org/)
+* MongoDB
 
 ## Datasources
 Raw [data](https://openlibrary.org/data/) [dumps](https://archive.org/details/ol_exports?sort=-publicdate) are pulled from [openlibrary](https://openlibrary.org/developers/dumps). 
@@ -26,10 +32,23 @@ pv ol_dump_works_latest.txt.gz | gunzip > works.txt
 pv ol_dump_editions_latest.txt.gz | gunzip > editions.txt
 ```
 
+## Images
+Openlibrary.org provides images for downloads. Usually, each image available through open library comes in three 
+sizes: (S)mall, (M)edium and (L)arge. Not all images can be downloaded in bulk, though.
+
+Book covers are available for bulk download. Author images must be download individually which makes obtaining them 
+much more difficult. 
+
 #### Covers
 Book records contain references to covers which are by far the largest download. Covers are available in three sizes, 
 small, medium and large. Details explained on [this](https://openlibrary.org/dev/docs/api/covers) openlibrary page 
 (towards the bottom). 
+
+#### Authors
+In the same [cover link](https://openlibrary.org/dev/docs/api/covers), there is a section about "Author Photos" 
+followed by "Rate Limiting" section which describes limits enforced: maximum 100 requests per IP per 5 min (as of 
+Aug 2020). The booklink importer throttles author image download to ensure that no more than 100 images are downloaded 
+in a 5 minute period.
 
 ## Dump Processing
 Once uncompressed, data dumps must be prepared before parsing as they are not in JSON ready import format. They are JSON exports, but they contain additional metadata which must be stripped.
