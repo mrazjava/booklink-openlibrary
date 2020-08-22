@@ -50,6 +50,11 @@ followed by "Rate Limiting" section which describes limits enforced: maximum 100
 Aug 2020). The booklink importer throttles author image download to ensure that no more than 100 images are downloaded 
 in a 5 minute period.
 
+Author images can be downloaded by primary key or by explicit photo ID (see openlibary.org for details). A download 
+by primary key is convenient but it's often just a copy of one of the photo IDs, may possibly be an alias to one of 
+the IDs. More reliable way is to download directly off photo ID. Not every author has a collection of photo IDs. 
+Booklink importer will download author photo off a first ID in a photo collection only.
+
 ## Dump Processing
 Once uncompressed, data dumps must be prepared before parsing as they are not in JSON ready import format. They are JSON exports, but they contain additional metadata which must be stripped.
 

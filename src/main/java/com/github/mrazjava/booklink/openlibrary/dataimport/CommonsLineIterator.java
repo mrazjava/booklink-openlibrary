@@ -12,13 +12,18 @@ import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 
 /**
@@ -52,7 +57,11 @@ public class CommonsLineIterator implements FileImporter {
 
     private File destinationAuthorImg;
 
-    private static final char[] IMAGE_SIZES = {'S', 'M', 'L'};
+    public static final char[] IMAGE_SIZES = {'S', 'M', 'L'};
+
+    public static final String AUTHOR_OLID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/olid/%s-%s.jpg";
+
+    public static final long AUTHOR_IMG_THROTTLE_MS = 3000;
 
     public CommonsLineIterator() {
 
@@ -152,6 +161,10 @@ public class CommonsLineIterator implements FileImporter {
 
     private void downloadAuthorImages(AuthorSchema author) {
 
+        if(CollectionUtils.isEmpty(author.getPhotos())) {
+            return;
+        }
+
         for(char imgSize : IMAGE_SIZES) {
 
             File imgById = new File(
@@ -166,16 +179,25 @@ public class CommonsLineIterator implements FileImporter {
                 return;
             }
 
-            log.info("downloading.... {}", imgById);
+            String imgUrl = String.format(AUTHOR_OLID_IMG_URL_TEMPLATE, author.getId(), imgSize);
+
+            log.info("downloading.... {}", imgUrl);
 
             try {
+                FileUtils.copyURLToFile(new URL(imgUrl), imgById,1000,500);
+
                 // only 100 requests/IP are allowed for every 5 minutes
                 // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
                 //
                 // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
                 //
-                Thread.sleep(3000); // throttle to ensure no more than 100 requests per 5 min
-            } catch (InterruptedException e) {
+                // randomize sleep value within 1 second of a defined throttle value
+                long sleep = RandomUtils.nextLong(AUTHOR_IMG_THROTTLE_MS-1000, AUTHOR_IMG_THROTTLE_MS);
+
+                log.info("OK! {} | sleeping {}ms", imgUrl, sleep);
+
+                Thread.sleep(sleep); // throttle to ensure no more than 100 requests per 5 min
+            } catch (Exception e) {
                 log.error("download failed: {}", e.getMessage());
             }
         }
