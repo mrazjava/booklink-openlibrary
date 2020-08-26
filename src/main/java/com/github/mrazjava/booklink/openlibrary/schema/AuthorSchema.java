@@ -3,15 +3,13 @@ package com.github.mrazjava.booklink.openlibrary.schema;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @JsonIgnoreProperties(value = {
@@ -25,7 +23,7 @@ import java.util.List;
 })
 @Data
 @Document(collection = "authors")
-public class AuthorSchema extends BaseSchemaEnhanced {
+public class AuthorSchema extends BaseSchemaEnhanced implements DefaultImageSupport {
 
     @TextIndexed(weight = 1)
     private String name;
@@ -174,5 +172,35 @@ public class AuthorSchema extends BaseSchemaEnhanced {
                 numeration = NumberUtils.createLong(json.get("value").asText());
             }
         }
+    }
+
+    @Override
+    public void setSmallImage(byte[] image) {
+        setImageSmall(new Binary(BsonBinarySubType.BINARY, image));
+    }
+
+    @Override
+    public boolean hasSmallImage() {
+        return getImageSmall() != null;
+    }
+
+    @Override
+    public void setMediumImage(byte[] image) {
+        setImageMedium(new Binary(BsonBinarySubType.BINARY, image));
+    }
+
+    @Override
+    public boolean hasMediumImage() {
+        return getImageMedium() != null;
+    }
+
+    @Override
+    public void setLargeImage(byte[] image) {
+        setImageLarge(new Binary(BsonBinarySubType.BINARY, image));
+    }
+
+    @Override
+    public boolean hasLargeImage() {
+        return getImageLarge() != null;
     }
 }

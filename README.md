@@ -105,13 +105,8 @@ Above we are splitting editions dump file which is almost 27 milion lines long a
 smaller chunks, 1 million lines each.
 
 ## Importing Dumps
-Once data dumps are processed, run the import:
-```
-mvn spring-boot:run -Dspring-boot.run.arguments="--dumpFile=/tmp/ol_dump_works_latest.json --schemaClassName=WorkSchema --frequencyCheck=5000"
-```
-Pass `schemaClassName` value according with the dump file being processed: `AuthorSchema`, `WorkSchema` or `EditionSchema`. The `frequencyCheck` is the modulo determining how often import will log progress.
-
-The import will read each line into a JSON object and feed it to a Kafka topic. From there it is consumed and processed further.
+Once data dumps are processed, run the import (see the quick start). Import can process only one file per process, and 
+it's recommended to prcess them in order, starting with author, followed by works and editions last.
 
 ## Notes
 To create short samples with specific content use `fgrep` as explained [here](https://stackoverflow.com/questions/13913014/grepping-a-huge-file-80gb-any-way-to-speed-it-up):

@@ -7,6 +7,7 @@ import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
+import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +24,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <a href="https://itnext.io/using-java-to-read-really-really-large-files-a6f8a3f44649">Benchmarks</a>
@@ -62,13 +74,11 @@ public class CommonsLineIterator implements FileImporter {
 
     private File authorImagesDestination;
 
-    public static final char[] IMAGE_SIZES = {'S', 'M', 'L'};
-
     public static final String AUTHOR_OLID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/olid/%s-%s.jpg";
 
-    public static final String AUTHOR_PHOTOID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/id/%d-%s.jpg";
+    public static final String AUTHOR_PHOTOID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/id/%s-%s.jpg";
 
-    public static final long AUTHOR_IMG_THROTTLE_MS = 3000;
+    public static final long AUTHOR_IMG_THROTTLE_MS = 2000;
 
     public CommonsLineIterator() {
 
@@ -123,7 +133,7 @@ public class CommonsLineIterator implements FileImporter {
             stopWatch.stop();
             log.info("TOTAL RECORDS: {}, time: {}", counter, stopWatch.getTime());
         } catch (Exception e) {
-            log.error("JSON #{} failed:\n{}\n\nERROR: {}", counter, line, e.getMessage());
+            log.error("JSON #{} failed:\n{}", counter, line, e);
         }
     }
 
@@ -146,8 +156,11 @@ public class CommonsLineIterator implements FileImporter {
     }
 
     private void processAuthor(AuthorSchema author) {
-        if(StringUtils.isNotBlank(authorImgDir)) {
+        try {
             downloadAuthorImages(author);
+        }
+        catch(IOException e) {
+            log.error("problem downloading author images: {}", e.getMessage());
         }
         if(persistData) {
             authorRepository.save(author);
@@ -166,7 +179,7 @@ public class CommonsLineIterator implements FileImporter {
         }
     }
 
-    private void downloadAuthorImages(AuthorSchema author) {
+    private void downloadAuthorImages(AuthorSchema author) throws IOException {
 
         if(CollectionUtils.isEmpty(author.getPhotos())) {
             return;
@@ -178,76 +191,112 @@ public class CommonsLineIterator implements FileImporter {
             return;
         }
 
-        for(char imgSize : IMAGE_SIZES) {
+        Map<ImageSize, File> imgFiles = StringUtils.isNotBlank(authorImgDir) ?
+            downloadImageToFile(String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE) :
+            Map.of();
 
+        if(BooleanUtils.isTrue(storeAuthorImgInMongo)) {
+            downloadImageToBinary(String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE, author, imgFiles);
+        }
+    }
+
+    private Map<ImageSize, File> downloadImageToFile(String imgId, String imgTemplate) throws IOException {
+
+        Map<ImageSize, File> files = new HashMap<>();
+
+        for(ImageSize imgSize : ImageSize.values()) {
             File imgById = new File(
                     authorImagesDestination.getAbsolutePath() +
                             File.separator +
-                            String.format("%d-%s.jpg", photoId, imgSize)
+                            String.format("%s-%s.jpg", imgId, imgSize)
             );
 
+            files.put(imgSize, imgById);
+
             if(imgById.exists()) {
-                setAuthorImage(imgSize, author, imgById);
                 log.debug("file exists, skipping: {}", imgById);
                 continue;
             }
-
-            String imgUrl = String.format(AUTHOR_PHOTOID_IMG_URL_TEMPLATE, photoId, imgSize);
+            String imgUrl = String.format(imgTemplate, imgId, imgSize);
 
             log.info("downloading.... {}", imgUrl);
 
-            try {
-                FileUtils.copyURLToFile(new URL(imgUrl), imgById,2000,2000);
-                setAuthorImage(imgSize, author, imgById);
+            FileUtils.copyToFile(new ByteArrayInputStream(downloadImage(imgUrl)), imgById);
+        }
 
-                // only 100 requests/IP are allowed for every 5 minutes
-                // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
-                //
-                // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
-                //
-                // randomize sleep value within 1 second of a defined throttle value
-                long sleep = RandomUtils.nextLong(AUTHOR_IMG_THROTTLE_MS-500, AUTHOR_IMG_THROTTLE_MS+500);
+        return files;
+    }
 
-                log.info("OK! {} | sleeping {}ms", imgUrl, sleep);
+    private void downloadImageToBinary(
+            String imgId, String imgTemplate, DefaultImageSupport imgSupport, Map<ImageSize, File> cache) throws IOException {
 
-                Thread.sleep(sleep); // throttle to ensure no more than 100 requests per 5 min
-            } catch (Exception e) {
-                log.error("download failed: {}", e.getMessage());
+        if(!imgSupport.hasSmallImage()) {
+            byte[] image = cache.containsKey(ImageSize.S) ?
+                    FileUtils.readFileToByteArray(cache.get(ImageSize.S)) :
+                    downloadImage(String.format(imgTemplate, imgId, ImageSize.S));
+            imgSupport.setSmallImage(image);
+        }
+        else {
+            log.info("skipping binary image[{}]-{}; already exists", imgId, ImageSize.S);
+        }
+
+        if(!imgSupport.hasMediumImage()) {
+            byte[] image = cache.containsKey(ImageSize.M) ?
+                    FileUtils.readFileToByteArray(cache.get(ImageSize.M)) :
+                    downloadImage(String.format(imgTemplate, imgId, ImageSize.M));
+            imgSupport.setMediumImage(image);
+        }
+        else {
+            log.info("skipping binary image[{}]-{}; already exists", imgId, ImageSize.M);
+        }
+
+        if(!imgSupport.hasLargeImage()) {
+            byte[] image = cache.containsKey(ImageSize.L) ?
+                    FileUtils.readFileToByteArray(cache.get(ImageSize.L)) :
+                    downloadImage(String.format(imgTemplate, imgId, ImageSize.L));
+            imgSupport.setLargeImage(image);
+        }
+        else {
+            log.info("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
+        }
+    }
+
+    private byte[] downloadImage(String imgUrl) throws IOException {
+
+        URL remoteImg = new URL(imgUrl);
+
+        ByteBuffer byteBuffer = ByteBuffer.allocateDirect(4096); // 1000000/2
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        try(
+                ReadableByteChannel inChannel = Channels.newChannel(remoteImg.openStream());
+                WritableByteChannel outChannel = Channels.newChannel(baos);
+        ) {
+            int read;
+            while((read = inChannel.read(byteBuffer)) > 0) {
+                byteBuffer.rewind();
+                byteBuffer.limit(read);
+                while(read > 0) {
+                    read = outChannel.write(byteBuffer);
+                }
+                byteBuffer.clear();
             }
-        }
-    }
 
-    private void setAuthorImage(char size, AuthorSchema author, File image) {
+            // only 100 requests/IP are allowed for every 5 minutes
+            // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
+            //
+            // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
+            //
+            // randomize sleep value within 1 second of a defined throttle value
+            long sleep = RandomUtils.nextLong(AUTHOR_IMG_THROTTLE_MS-500, AUTHOR_IMG_THROTTLE_MS+500);
 
-        if(BooleanUtils.isFalse(storeAuthorImgInMongo)) {
-            return;
-        }
+            log.info("OK! {} | sleeping {}ms", imgUrl, sleep);
+            Thread.sleep(sleep); // throttle to ensure no more than 100 requests per 5 min
 
-        try {
-            setAuthorImage(size, author, FileUtils.readFileToByteArray(image));
-        } catch (IOException e) {
-            log.error("faild to set schema image: {}", e.getMessage());
-        }
-    }
-
-    private void setAuthorImage(char size, AuthorSchema author, byte[] imageBytes) {
-
-        if(BooleanUtils.isFalse(storeAuthorImgInMongo)) {
-            return;
+        } catch (InterruptedException e) {
+            log.error("invalid url[{}]: {}", imgUrl, e.getMessage());
         }
 
-        Binary image = new Binary(BsonBinarySubType.BINARY, imageBytes);
-
-        switch(size) {
-            case 'S':
-                author.setImageSmall(image);
-                break;
-            case 'M':
-                author.setImageMedium(image);
-                break;
-            case 'L':
-                author.setImageLarge(image);
-                break;
-        }
+        return baos.toByteArray();
     }
 }
