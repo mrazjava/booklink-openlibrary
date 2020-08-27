@@ -26,6 +26,9 @@ abstract class BaseSchema {
     @JsonProperty
     private String id;
 
+    @Indexed // IDs
+    private List<String> authors;
+
     @JsonProperty
     private TypeValue<LocalDateTime> created;
 
@@ -67,6 +70,24 @@ abstract class BaseSchema {
     @JsonAlias("language")
     @JsonProperty
     private List<String> languages;
+
+
+    @JsonSetter("authors")
+    public void setAuthors(JsonNode json) {
+        if(json != null) {
+            if(CollectionUtils.isEmpty(authors)) {
+                authors = new LinkedList<>();
+            }
+            if(!json.isArray()) {
+                authors.add(fetchKey(json));
+            }
+            else {
+                for(JsonNode jn : json) {
+                    authors.add(fetchKey(jn));
+                }
+            }
+        }
+    }
 
     @JsonSetter("languages")
     public void setLanguages(JsonNode json) {

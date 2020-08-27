@@ -18,9 +18,6 @@ import java.util.List;
 public class EditionSchema extends BaseSchemaEnhanced {
 
     @Indexed // IDs
-    private List<String> authors;
-
-    @Indexed // IDs
     private List<String> works;
 
     @TextIndexed(weight = 3)
@@ -248,23 +245,6 @@ public class EditionSchema extends BaseSchemaEnhanced {
             else {
                 for(JsonNode jn : json) {
                     collections.add(fetchKey(jn));
-                }
-            }
-        }
-    }
-
-    @JsonSetter("authors")
-    public void setAuthors(JsonNode json) {
-        if(json != null) {
-            if(CollectionUtils.isEmpty(authors)) {
-                authors = new LinkedList<>();
-            }
-            if(!json.isArray()) {
-                authors.add(fetchKey(json));
-            }
-            else {
-                for(JsonNode jn : json) {
-                    authors.add(fetchKey(jn));
                 }
             }
         }

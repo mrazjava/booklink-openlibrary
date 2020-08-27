@@ -6,10 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
-import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
-import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
-import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
-import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
+import com.github.mrazjava.booklink.openlibrary.schema.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
@@ -39,6 +36,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * <a href="https://itnext.io/using-java-to-read-really-really-large-files-a6f8a3f44649">Benchmarks</a>
@@ -174,18 +172,17 @@ public class CommonsLineIterator implements FileImporter {
 
     private void processAuthor(AuthorSchema author) {
 
-        if(authorRepository.findById(author.getId()).isPresent()) {
-            return;
+        AuthorSchema saved = null;
+
+        if(persistData) {
+            saved = authorRepository.findById(author.getId()).orElse(authorRepository.save(author));
         }
 
         try {
-            downloadAuthorImages(author);
+            downloadAuthorImages(Optional.ofNullable(saved).orElse(author));
         }
         catch(IOException e) {
             log.error("problem downloading author images: {}", e.getMessage());
-        }
-        if(persistData) {
-            authorRepository.save(author);
         }
     }
 
@@ -195,12 +192,10 @@ public class CommonsLineIterator implements FileImporter {
 
     private void processWork(WorkSchema work) {
 
-        if(workRepository.findById(work.getId()).isPresent()) {
-            return;
-        }
+        WorkSchema saved = null;
 
         if(persistData) {
-            workRepository.save(work);
+            saved = workRepository.findById(work.getId()).orElse(workRepository.save(work));
         }
     }
 
@@ -210,12 +205,10 @@ public class CommonsLineIterator implements FileImporter {
 
     private void processEdition(EditionSchema edition) {
 
-        if(editionRepository.findById(edition.getId()).isPresent()) {
-            return;
-        }
+        EditionSchema saved = null;
 
         if(persistData) {
-            editionRepository.save(edition);
+            saved = editionRepository.findById(edition.getId()).orElse(editionRepository.save(edition));
         }
     }
 
@@ -233,10 +226,14 @@ public class CommonsLineIterator implements FileImporter {
 
         Map<ImageSize, File> imgFiles = StringUtils.isNotBlank(authorImgDir) ?
             downloadImageToFile(String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE) :
-            Map.of();
+            null;
 
         if(BooleanUtils.isTrue(storeAuthorImgInMongo)) {
-            downloadImageToBinary(String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE, author, imgFiles);
+            downloadImageToBinary(
+                    String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE,
+                    author,
+                    imgFiles == null ? Map.of() : imgFiles
+            );
         }
     }
 

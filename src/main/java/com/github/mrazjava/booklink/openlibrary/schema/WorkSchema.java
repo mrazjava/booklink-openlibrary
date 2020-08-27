@@ -2,10 +2,7 @@ package com.github.mrazjava.booklink.openlibrary.schema;
 
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,9 +14,6 @@ import java.util.List;
 @Data
 @Document(collection = "works")
 public class WorkSchema extends BaseSchema {
-
-    @Indexed // IDs
-    private List<Author> authors;
 
     @TextIndexed(weight = 2)
     private String title;
@@ -80,6 +74,7 @@ public class WorkSchema extends BaseSchema {
 
     @JsonProperty("table_of_contents")
     private List<TableOfContent> toc;
+
 
     @JsonSetter("description")
     public void setJsonDescription(JsonNode json) {
