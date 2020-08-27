@@ -54,6 +54,9 @@ public class ImporterApp implements ApplicationRunner {
 	@Value("${booklink.di.persist}")
 	private boolean persistData;
 
+	@Value("${booklink.di.persist-override}")
+	private boolean persistDataOverride;
+
 	@Value("${booklink.di.author-image-dir}")
 	private String authorImgDir;
 
@@ -84,21 +87,21 @@ public class ImporterApp implements ApplicationRunner {
 		}
 
 		if(log.isInfoEnabled()) {
+			StringBuilder msg = new StringBuilder("starting...\n\n- importFile: {}\n- schemaClass: {}\n- frequencyCheck: {}\n- persistData: {}\n -persistDataOverride: {}");
+
 			if(schemaClass.equals(AuthorSchema.class)) {
-				log.info("starting...\n\n- importFile: {}\n- schemaClass: {}\n- frequencyCheck: {}\n- persistData: {}\n- authorImgDir: {}\n",
-						importFile.getAbsolutePath(),
-						schemaClass.getCanonicalName(),
-						frequencyCheck,
-						persistData,
-						StringUtils.isBlank(authorImgDir) ? "feature DISABLED" : authorImgDir);
+				msg.append("\n- authorImgDir: ");
+				msg.append(StringUtils.isBlank(authorImgDir) ? "feature DISABLED" : authorImgDir);
 			}
-			else {
-				log.info("starting...\n\n- importFile: {}\n- schemaClass: {}\n- frequencyCheck: {}\n- persistData: {}\n",
-						importFile.getAbsolutePath(),
-						schemaClass.getCanonicalName(),
-						frequencyCheck,
-						persistData);
-			}
+
+			msg.append("\n");
+
+			log.info(msg.toString(),
+					importFile.getAbsolutePath(),
+					schemaClass.getCanonicalName(),
+					frequencyCheck,
+					persistData,
+					persistDataOverride);
 		}
 
 		importer.runImport(importFile, schemaClass);

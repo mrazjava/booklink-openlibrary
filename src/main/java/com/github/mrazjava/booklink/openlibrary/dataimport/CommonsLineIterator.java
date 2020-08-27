@@ -53,6 +53,9 @@ public class CommonsLineIterator implements FileImporter {
     @Value("${booklink.di.persist}")
     private boolean persistData;
 
+    @Value("${booklink.di.persist-override}")
+    private boolean persistDataOverride;
+
     @Value("${booklink.di.author-image-dir}")
     private String authorImgDir;
 
@@ -175,7 +178,9 @@ public class CommonsLineIterator implements FileImporter {
         AuthorSchema saved = null;
 
         if(persistData) {
-            saved = authorRepository.findById(author.getId()).orElse(authorRepository.save(author));
+            saved = BooleanUtils.isTrue(persistDataOverride) ?
+                    authorRepository.save(author) :
+                    authorRepository.findById(author.getId()).orElse(authorRepository.save(author));
         }
 
         try {

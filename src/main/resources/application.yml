@@ -14,6 +14,8 @@ booklink:
     frequency-check: ${BOOKLINK_FREQUENCY_CHECK:10}
     # Persist processed data to mongo ?
     persist: ${BOOKLINK_PERSIST:false}
+    # Override existing records when persisting ? (slower)
+    persist-override: ${BOOKLINK_PERSIST_OVERRIDE:false}
     # Directory name of full path to where author images should be downloaded to.
     # If not defined (default) download is disabled. If only directory name is
     # defined, then images will be downloaded to the same location + sub directory
