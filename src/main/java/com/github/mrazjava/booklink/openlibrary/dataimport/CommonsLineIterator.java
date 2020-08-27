@@ -98,16 +98,7 @@ public class CommonsLineIterator implements FileImporter {
             log.info("workingDir: {}", workingDir);
 
             workingDirectory = new File(workingDir);
-            if(StringUtils.isNotBlank(authorImgDir)) {
-                authorImagesDestination = Path.of(authorImgDir).getParent() == null ?
-                        Path.of(workingDir + File.separator + authorImgDir).toFile() :
-                        Path.of(authorImgDir).toFile();
-                if(!authorImagesDestination.exists()) {
-                    authorImagesDestination.mkdir();
-                }
-            }
-
-            log.info("destinationAuthorImg: {}", authorImagesDestination);
+            prepareImport(schema);
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -141,13 +132,13 @@ public class CommonsLineIterator implements FileImporter {
 
         Object pojo = objectMapper.readValue(line, schema);
 
-        if(AuthorSchema.class.equals(schema)) {
+        if(isAuthor(schema)) {
             processAuthor((AuthorSchema)pojo);
         }
-        else if(WorkSchema.class.equals(schema)) {
+        else if(isWork(schema)) {
             processWork((WorkSchema)pojo);
         }
-        else if(EditionSchema.class.equals(schema)) {
+        else if(isEdition(schema)) {
             processEdition((EditionSchema)pojo);
         }
         else {
@@ -155,7 +146,38 @@ public class CommonsLineIterator implements FileImporter {
         }
     }
 
+    private void prepareImport(Class schema) {
+        if (isAuthor(schema)) {
+            prepareAuthorImport();
+        }
+        else if(isWork(schema)) {
+            prepareWorkImport();
+        }
+        else if(isEdition(schema)) {
+            prepareEditionImport();
+        }
+    }
+
+    private void prepareAuthorImport() {
+
+        if(StringUtils.isNotBlank(authorImgDir)) {
+            authorImagesDestination = Path.of(authorImgDir).getParent() == null ?
+                    Path.of(workingDirectory.getAbsolutePath() + File.separator + authorImgDir).toFile() :
+                    Path.of(authorImgDir).toFile();
+            if(!authorImagesDestination.exists()) {
+                authorImagesDestination.mkdir();
+            }
+        }
+
+        log.info("destinationAuthorImg: {}", authorImagesDestination);
+    }
+
     private void processAuthor(AuthorSchema author) {
+
+        if(authorRepository.findById(author.getId()).isPresent()) {
+            return;
+        }
+
         try {
             downloadAuthorImages(author);
         }
@@ -167,13 +189,31 @@ public class CommonsLineIterator implements FileImporter {
         }
     }
 
+    private void prepareWorkImport() {
+
+    }
+
     private void processWork(WorkSchema work) {
+
+        if(workRepository.findById(work.getId()).isPresent()) {
+            return;
+        }
+
         if(persistData) {
             workRepository.save(work);
         }
     }
 
+    private void prepareEditionImport() {
+
+    }
+
     private void processEdition(EditionSchema edition) {
+
+        if(editionRepository.findById(edition.getId()).isPresent()) {
+            return;
+        }
+
         if(persistData) {
             editionRepository.save(edition);
         }
@@ -298,5 +338,17 @@ public class CommonsLineIterator implements FileImporter {
         }
 
         return baos.toByteArray();
+    }
+
+    private boolean isAuthor(Class schema) {
+        return AuthorSchema.class.equals(schema);
+    }
+
+    private boolean isWork(Class schema) {
+        return WorkSchema.class.equals(schema);
+    }
+
+    private boolean isEdition(Class schema) {
+        return EditionSchema.class.equals(schema);
     }
 }
