@@ -7,7 +7,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
-import com.github.mrazjava.booklink.openlibrary.schema.*;
+import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
+import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
+import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
+import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
@@ -15,8 +18,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
-import org.bson.BsonBinarySubType;
-import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -26,18 +27,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.net.*;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema.AUTHOR_PHOTOID_IMG_URL_TEMPLATE;
 
 /**
  * <a href="https://itnext.io/using-java-to-read-really-really-large-files-a6f8a3f44649">Benchmarks</a>
@@ -45,6 +45,15 @@ import java.util.Optional;
 @Slf4j
 @Component
 public class CommonsLineIterator implements FileImporter {
+
+    /**
+     * When downloading images individually from Openlibrary.org, wlow down the
+     * frequency of image requests to avoid blokade from openlibrary which limits
+     * the number of requests allowed per a specific time period.
+     *
+     * Number of milliseconds to wait after downloading an image.
+     */
+    public static final long OPENLIB_IMG_THROTTLE_MS = 2000;
 
     private ObjectMapper objectMapper;
 
@@ -75,12 +84,6 @@ public class CommonsLineIterator implements FileImporter {
     private File workingDirectory;
 
     private File authorImagesDestination;
-
-    public static final String AUTHOR_OLID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/olid/%s-%s.jpg";
-
-    public static final String AUTHOR_PHOTOID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/id/%s-%s.jpg";
-
-    public static final long AUTHOR_IMG_THROTTLE_MS = 2000;
 
     public CommonsLineIterator() {
 
@@ -332,7 +335,7 @@ public class CommonsLineIterator implements FileImporter {
             // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
             //
             // randomize sleep value within 1 second of a defined throttle value
-            long sleep = RandomUtils.nextLong(AUTHOR_IMG_THROTTLE_MS-500, AUTHOR_IMG_THROTTLE_MS+500);
+            long sleep = RandomUtils.nextLong(OPENLIB_IMG_THROTTLE_MS -500, OPENLIB_IMG_THROTTLE_MS +500);
 
             log.info("OK! {} | sleeping {}ms", imgUrl, sleep);
             Thread.sleep(sleep); // throttle to ensure no more than 100 requests per 5 min
