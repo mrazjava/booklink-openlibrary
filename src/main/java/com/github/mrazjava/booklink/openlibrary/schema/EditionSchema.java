@@ -17,9 +17,6 @@ import java.util.List;
 @Document(collection = "editions")
 public class EditionSchema extends BaseSchemaEnhanced {
 
-    @Indexed // IDs
-    private List<String> works;
-
     @TextIndexed(weight = 3)
     private String title;
 
@@ -215,23 +212,6 @@ public class EditionSchema extends BaseSchemaEnhanced {
     @JsonProperty("volume_number")
     private Integer volumeNumber;
 
-
-    @JsonSetter("works")
-    public void setWorks(JsonNode json) {
-        if(json != null) {
-            if(CollectionUtils.isEmpty(works)) {
-                works = new LinkedList<>();
-            }
-            if(!json.isArray()) {
-                works.add(fetchKey(json));
-            }
-            else {
-                for(JsonNode jn : json) {
-                    works.add(fetchKey(jn));
-                }
-            }
-        }
-    }
 
     @JsonSetter("collections")
     public void setCollections(JsonNode json) {

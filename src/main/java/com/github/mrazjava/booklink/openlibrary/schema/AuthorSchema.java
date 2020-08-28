@@ -28,9 +28,6 @@ public class AuthorSchema extends BaseSchemaEnhanced implements DefaultImageSupp
     @TextIndexed(weight = 1)
     private String name;
 
-    @Indexed // IDs
-    private List<Key> works;
-
     @JsonProperty("other_titles")
     private List<String> otherTitles;
 
