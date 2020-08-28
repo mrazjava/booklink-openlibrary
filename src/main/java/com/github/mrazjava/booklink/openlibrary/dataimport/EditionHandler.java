@@ -21,7 +21,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     }
 
     @Override
-    protected void handle(EditionSchema record) {
+    public void handle(EditionSchema record) {
 
         EditionSchema saved = null;
 

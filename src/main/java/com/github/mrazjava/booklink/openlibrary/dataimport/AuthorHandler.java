@@ -52,18 +52,18 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     }
 
     @Override
-    protected void handle(AuthorSchema author) {
+    public void handle(AuthorSchema record) {
 
         AuthorSchema saved = null;
 
         if(persistData) {
             saved = BooleanUtils.isTrue(persistDataOverride) ?
-                    authorRepository.save(author) :
-                    authorRepository.findById(author.getId()).orElse(authorRepository.save(author));
+                    authorRepository.save(record) :
+                    authorRepository.findById(record.getId()).orElse(authorRepository.save(record));
         }
 
         try {
-            downloadImages(Optional.ofNullable(saved).orElse(author));
+            downloadImages(Optional.ofNullable(saved).orElse(record));
         }
         catch(IOException e) {
             log.error("problem downloading author images: {}", e.getMessage());

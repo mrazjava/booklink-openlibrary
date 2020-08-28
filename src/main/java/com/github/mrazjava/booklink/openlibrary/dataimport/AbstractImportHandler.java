@@ -2,12 +2,14 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
 
-abstract class AbstractImportHandler<T> implements ImportHandler<File> {
+@Slf4j
+abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -20,17 +22,25 @@ abstract class AbstractImportHandler<T> implements ImportHandler<File> {
 
 
     @Override
-    public void processRecord(String line) {
+    public R toRecord(String line) {
 
         try {
-            T pojo = objectMapper.readValue(line,  getSchemaType());
-            handle(pojo);
+            return objectMapper.readValue(line, getSchemaType());
         } catch (JsonProcessingException e) {
+            log.warn("failed line:\n{}", line);
             throw new RuntimeException("problem reading record", e);
         }
     }
 
-    protected abstract void handle(T record);
+    @Override
+    public String toText(R record) {
+        try {
+            return objectMapper.writeValueAsString(record);
+        } catch (JsonProcessingException e) {
+            log.warn("failed record:\n{}", record);
+            throw new RuntimeException("problem writing record", e);
+        }
+    }
 
-    protected abstract Class<T> getSchemaType();
+    protected abstract Class<R> getSchemaType();
 }

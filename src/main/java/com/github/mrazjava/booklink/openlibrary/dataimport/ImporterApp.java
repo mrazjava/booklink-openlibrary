@@ -89,7 +89,7 @@ public class ImporterApp implements ApplicationRunner {
 		}
 
 		if(log.isInfoEnabled()) {
-			StringBuilder msg = new StringBuilder("starting...\n\n- importFile: {}\n- schemaClass: {}\n- frequencyCheck: {}\n- persistData: {}\n -persistDataOverride: {}");
+			StringBuilder msg = new StringBuilder("starting...\n\n- importFile: {}\n- schemaClass: {}\n- frequencyCheck: {}\n- persistData: {}\n- persistDataOverride: {}");
 
 			if(schemaClass.equals(AuthorSchema.class)) {
 				msg.append("\n- authorImgDir: ");

@@ -1,6 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +18,6 @@ import java.io.File;
 @Slf4j
 @Component
 public class CommonsLineIterator implements FileImporter {
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private ImportHandlingResolution handlingResolver;
@@ -56,20 +52,24 @@ public class CommonsLineIterator implements FileImporter {
             while(iterator.hasNext()) {
                 line = iterator.next();
                 counter++;
-                Object pojo = objectMapper.readValue(line, schema);
+
+                Object pojo = importHandler.toRecord(line);
+
                 if(counter % frequencyCheck == 0) {
+
                     if(log.isDebugEnabled()) {
                         log.debug("raw JSON #{}:\n{}", counter, line);
                     }
                     if(log.isInfoEnabled()) {
-                        log.info("JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
+                        log.info("JSON #{}:\n{}", counter, importHandler.toText(pojo));
                     }
                 }
-                importHandler.processRecord(line);
+
+                importHandler.handle(pojo);
 
                 if(log.isTraceEnabled()) {
                     log.trace("raw JSON #{}:\n{}", counter, line);
-                    log.trace("raw JSON #{}:\n{}", counter, objectMapper.writeValueAsString(pojo));
+                    log.trace("raw JSON #{}:\n{}", counter, importHandler.toText(pojo));
                 }
             }
             stopWatch.stop();

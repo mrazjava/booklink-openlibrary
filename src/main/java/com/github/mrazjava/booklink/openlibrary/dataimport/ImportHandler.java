@@ -1,6 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-public interface ImportHandler<T> {
+public interface ImportHandler<T, R> {
 
     /**
      * Prepares the import process. This is a one time operation invoked prior to the
@@ -10,5 +10,9 @@ public interface ImportHandler<T> {
      */
     void prepare(T dataSource);
 
-    void processRecord(String line);
+    void handle(R record);
+
+    R toRecord(String text);
+
+    String toText(R record);
 }
