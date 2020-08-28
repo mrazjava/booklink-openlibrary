@@ -83,6 +83,9 @@ abstract class BaseSchema {
             }
             else {
                 for(JsonNode jn : json) {
+                    if(jn.has("author")) {
+                        jn = jn.get("author");
+                    }
                     authors.add(fetchKey(jn));
                 }
             }
