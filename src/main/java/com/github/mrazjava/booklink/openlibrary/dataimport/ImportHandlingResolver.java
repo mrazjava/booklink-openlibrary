@@ -1,4 +1,4 @@
-package com.github.mrazjava.booklink.openlibrary;
+package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.github.mrazjava.booklink.openlibrary.dataimport.*;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
