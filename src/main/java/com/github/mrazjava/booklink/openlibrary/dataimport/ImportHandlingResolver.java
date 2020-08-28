@@ -1,6 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.dataimport.*;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;

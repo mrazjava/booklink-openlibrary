@@ -50,7 +50,6 @@ public class CommonsLineIterator implements FileImporter {
             File workingDirectory = new File(workingDir);
             ImportHandler importHandler = handlingResolver.resolve(schema);
             importHandler.prepare(workingDirectory);
-            //prepareImport(schema);
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -67,7 +66,6 @@ public class CommonsLineIterator implements FileImporter {
                     }
                 }
                 importHandler.processRecord(line);
-                //processLine(line, schema);
 
                 if(log.isTraceEnabled()) {
                     log.trace("raw JSON #{}:\n{}", counter, line);
