@@ -9,15 +9,16 @@ import lombok.Data;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.util.CollectionUtils;
 
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @JsonIgnoreProperties({"m", "type"})
 @Data
 abstract class BaseSchemaEnhanced extends BaseSchema {
 
     @Indexed // IDs
-    private List<String> works;
+    private Set<String> works;
 
     @JsonAlias("oclc_number")
     @JsonProperty("oclc_numbers")
@@ -40,7 +41,7 @@ abstract class BaseSchemaEnhanced extends BaseSchema {
     public void setWorks(JsonNode json) {
         if(json != null) {
             if(CollectionUtils.isEmpty(works)) {
-                works = new LinkedList<>();
+                works = new LinkedHashSet<>();
             }
             if(!json.isArray()) {
                 works.add(fetchKey(json));

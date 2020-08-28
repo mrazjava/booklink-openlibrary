@@ -11,8 +11,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.mrazjava.booklink.openlibrary.schema.BaseSchema.JSON_IGNORE_PROPS;
 
@@ -27,7 +29,7 @@ abstract class BaseSchema {
     private String id;
 
     @Indexed // IDs
-    private List<String> authors;
+    private Set<String> authors;
 
     @JsonProperty
     private TypeValue<LocalDateTime> created;
@@ -76,7 +78,7 @@ abstract class BaseSchema {
     public void setAuthors(JsonNode json) {
         if(json != null) {
             if(CollectionUtils.isEmpty(authors)) {
-                authors = new LinkedList<>();
+                authors = new LinkedHashSet<>();
             }
             if(!json.isArray()) {
                 authors.add(fetchKey(json));
