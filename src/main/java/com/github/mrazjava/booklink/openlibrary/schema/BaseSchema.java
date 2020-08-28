@@ -1,6 +1,9 @@
 package com.github.mrazjava.booklink.openlibrary.schema;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -10,19 +13,14 @@ import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.mrazjava.booklink.openlibrary.schema.BaseSchema.JSON_IGNORE_PROPS;
-
 @JsonIgnoreProperties(value = {"m", "type"})
 @Data
 abstract class BaseSchema {
-
-    public static final String[] JSON_IGNORE_PROPS = {"m", "type"};
 
     @Id
     @JsonProperty
