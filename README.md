@@ -1,6 +1,13 @@
 # Booklink Data Integration: openlibrary.org
 Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org) into [booklink-data-openlibrary](../booklink-data-openlibrary).
 
+## Tech Stack
+* Spring Boot
+* [Jackson](https://github.com/FasterXML/jackson-docs)
+* Apache Commons IO
+* Lombok
+* MongoDB
+
 ## Quick Start
 See `application.yml` for available configuration options. Each spring boot config is driven by environment variable.
 
@@ -20,12 +27,11 @@ every 1000th row:*
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=1000 -DBOOKLINK_AUTHOR_IMG_DIR=bronco -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_AUTHOR_IMG_MONGO=true"
 ```
 
-## Tech Stack
-* Spring Boot
-* [Jackson](https://github.com/FasterXML/jackson-docs)
-* Apache Commons IO
-* Lombok
-* MongoDB
+## Features
+#### Author Filtering
+If a file called `author-ids.txt` exists in the working directory (same location as dump file), then only authors 
+listed in that file will be handled (persisted, etc). The format of this file is one author ID per line. Comment is 
+allowed and must start with a `#`. Empty lines are also allowed and are ignored.
 
 ## Datasources
 Raw [data](https://openlibrary.org/data/) [dumps](https://archive.org/details/ol_exports?sort=-publicdate) are pulled from [openlibrary](https://openlibrary.org/developers/dumps). 
@@ -120,12 +126,6 @@ smaller chunks, 1 million lines each.
 ## Importing Dumps
 Once data dumps are processed, run the import (see the quick start). Import can process only one file per process, and 
 it's recommended to prcess them in order, starting with author, followed by works and editions last.
-
-## Features
-#### Author Filtering
-If a file called `author-ids.txt` exists in the working directory (same location as dump file), then only authors 
-listed in that file will be handled (persisted, etc). The format of this file is one author ID per line. Comment is 
-allowed and must start with a `#`. Empty lines are also allowed and are ignored.
 
 ## Notes
 To create short samples with specific content use `fgrep` as explained [here](https://stackoverflow.com/questions/13913014/grepping-a-huge-file-80gb-any-way-to-speed-it-up):
