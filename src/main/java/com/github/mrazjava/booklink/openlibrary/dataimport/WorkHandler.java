@@ -20,7 +20,7 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
     }
 
     @Override
-    public void handle(WorkSchema record) {
+    public void handle(WorkSchema record, long sequenceNo) {
 
         WorkSchema saved = null;
 

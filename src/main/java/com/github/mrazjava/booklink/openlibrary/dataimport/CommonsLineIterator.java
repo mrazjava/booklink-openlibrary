@@ -65,7 +65,7 @@ public class CommonsLineIterator implements FileImporter {
                     }
                 }
 
-                importHandler.handle(pojo);
+                importHandler.handle(pojo, counter);
 
                 if(log.isTraceEnabled()) {
                     log.trace("raw JSON #{}:\n{}", counter, line);

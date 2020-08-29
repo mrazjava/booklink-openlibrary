@@ -3,6 +3,7 @@ package com.github.mrazjava.booklink.openlibrary.schema;
 import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;

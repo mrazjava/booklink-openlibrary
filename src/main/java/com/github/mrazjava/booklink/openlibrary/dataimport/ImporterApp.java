@@ -62,6 +62,9 @@ public class ImporterApp implements ApplicationRunner {
 	@Value("${booklink.di.author-image-dir}")
 	private String authorImgDir;
 
+	@Value("${booklink.di.author-image-mongo}")
+	private Boolean storeAuthorImgInMongo;
+
 
 	public static void main(String[] args) {
 
@@ -94,6 +97,8 @@ public class ImporterApp implements ApplicationRunner {
 			if(schemaClass.equals(AuthorSchema.class)) {
 				msg.append("\n- authorImgDir: ");
 				msg.append(StringUtils.isBlank(authorImgDir) ? "feature DISABLED" : authorImgDir);
+				msg.append("\n- storeAuthorImgInMongo: ");
+				msg.append(storeAuthorImgInMongo);
 			}
 
 			msg.append("\n");

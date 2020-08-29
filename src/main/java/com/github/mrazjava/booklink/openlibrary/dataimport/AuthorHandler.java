@@ -23,7 +23,7 @@ import static com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema.AUTHO
 public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
     @Autowired
-    private AuthorRepository authorRepository;
+    private AuthorRepository repository;
 
     @Autowired
     private ImageDownloader imageDownloader;
@@ -52,22 +52,43 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     }
 
     @Override
-    public void handle(AuthorSchema record) {
+    public void handle(AuthorSchema record, long sequenceNo) {
+
+        if(record == null || !persistData) {
+            return;
+        }
 
         AuthorSchema saved = null;
 
-        if(persistData) {
-            saved = BooleanUtils.isTrue(persistDataOverride) ?
-                    authorRepository.save(record) :
-                    authorRepository.findById(record.getId()).orElse(authorRepository.save(record));
+        if(!persistDataOverride || BooleanUtils.isTrue(storeAuthorImgInMongo)) {
+            saved = repository.findById(record.getId()).orElse(null);
+            if(!persistDataOverride && saved != null) {
+                return;
+            }
+        }
+
+        AuthorSchema author = null;
+
+        if(persistDataOverride) {
+            author = record;
+            if(saved != null) {
+                author.setImageSmall(saved.getImageSmall());
+                author.setImageMedium(saved.getImageMedium());
+                author.setImageLarge(saved.getImageLarge());
+            }
+        }
+        else {
+            author = Optional.ofNullable(saved).orElse(record);
         }
 
         try {
-            downloadImages(Optional.ofNullable(saved).orElse(record));
+            downloadImages(author, sequenceNo);
         }
         catch(IOException e) {
             log.error("problem downloading author images: {}", e.getMessage());
         }
+
+        repository.save(author);
     }
 
     @Override
@@ -75,7 +96,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         return AuthorSchema.class;
     }
 
-    private void downloadImages(AuthorSchema record) throws IOException {
+    private void downloadImages(AuthorSchema record, long sequenceNo) throws IOException {
 
         if(CollectionUtils.isEmpty(record.getPhotos())) {
             return;
@@ -87,13 +108,20 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             return;
         }
 
-        Map<ImageSize, File> imgFiles = StringUtils.isNotBlank(authorImgDir) ?
+        boolean downloadToFile = StringUtils.isNotBlank(authorImgDir);
+        boolean downloadToBinary = BooleanUtils.isTrue(storeAuthorImgInMongo);
+
+        if(downloadToFile || downloadToBinary) {
+            log.info("author #{} [{}]; fetching images ...", sequenceNo, record.getId());
+        }
+
+        Map<ImageSize, File> imgFiles = downloadToFile ?
                 imageDownloader.downloadImageToFile(
                         authorImagesDestination.getAbsolutePath(),
                         String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE) :
                 null;
 
-        if(BooleanUtils.isTrue(storeAuthorImgInMongo)) {
+        if(downloadToBinary) {
             imageDownloader.downloadImageToBinary(
                     String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE,
                     record,

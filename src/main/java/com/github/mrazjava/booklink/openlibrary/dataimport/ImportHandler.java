@@ -10,7 +10,11 @@ public interface ImportHandler<T, R> {
      */
     void prepare(T dataSource);
 
-    void handle(R record);
+    /**
+     * @param record to handle
+     * @param sequenceNo number in the sequence in which it is handled
+     */
+    void handle(R record, long sequenceNo);
 
     R toRecord(String text);
 

@@ -31,6 +31,10 @@ public class ImageDownloader {
      */
     public static final long OPENLIB_IMG_THROTTLE_MS = 2000;
 
+    static final String MSG_EXISTS = "\u2612";
+
+    static final String MSG_DOWNLOADED = "\u2611";
+
     public Map<ImageSize, File> downloadImageToFile(String destinationDir, String imgId, String imgTemplate) throws IOException {
 
         Map<ImageSize, File> files = new HashMap<>();
@@ -61,34 +65,48 @@ public class ImageDownloader {
     public void downloadImageToBinary(
             String imgId, String imgTemplate, DefaultImageSupport imgSupport, Map<ImageSize, File> cache) throws IOException {
 
-        if(!imgSupport.hasSmallImage()) {
+        boolean smallExists = imgSupport.hasSmallImage();
+
+        if(!smallExists) {
             byte[] image = cache.containsKey(ImageSize.S) ?
                     FileUtils.readFileToByteArray(cache.get(ImageSize.S)) :
                     downloadImage(String.format(imgTemplate, imgId, ImageSize.S));
             imgSupport.setSmallImage(image);
         }
         else {
-            log.info("skipping binary image[{}]-{}; already exists", imgId, ImageSize.S);
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.S);
         }
 
-        if(!imgSupport.hasMediumImage()) {
+        boolean mediumExists = imgSupport.hasMediumImage();
+
+        if(!mediumExists) {
             byte[] image = cache.containsKey(ImageSize.M) ?
                     FileUtils.readFileToByteArray(cache.get(ImageSize.M)) :
                     downloadImage(String.format(imgTemplate, imgId, ImageSize.M));
             imgSupport.setMediumImage(image);
         }
         else {
-            log.info("skipping binary image[{}]-{}; already exists", imgId, ImageSize.M);
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.M);
         }
 
-        if(!imgSupport.hasLargeImage()) {
+        boolean largeExists = imgSupport.hasLargeImage();
+
+        if(!largeExists) {
             byte[] image = cache.containsKey(ImageSize.L) ?
                     FileUtils.readFileToByteArray(cache.get(ImageSize.L)) :
                     downloadImage(String.format(imgTemplate, imgId, ImageSize.L));
             imgSupport.setLargeImage(image);
         }
         else {
-            log.info("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
+        }
+
+        if(log.isInfoEnabled()) {
+            log.info("--- mongo ? S{} M{} L{}",
+                    smallExists ? MSG_EXISTS : MSG_DOWNLOADED,
+                    mediumExists ? MSG_EXISTS : MSG_DOWNLOADED,
+                    largeExists ? MSG_EXISTS : MSG_DOWNLOADED
+            );
         }
     }
 
