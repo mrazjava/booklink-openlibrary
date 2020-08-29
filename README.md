@@ -52,12 +52,6 @@ sizes: (S)mall, (M)edium and (L)arge. Not all images can be downloaded in bulk, 
 Book covers are available for bulk download. Author images must be download individually which makes obtaining them 
 much more difficult. 
 
-## Features
-#### Author Filtering
-If a file called `author-ids.txt` exists in the working directory (same location as dump file), then only authors 
-listed in that file will be handled (persisted, etc). The format of this file is one author ID per line. Comment is 
-allowed and must start with a `#`. Empty lines are also allowed and are ignored.
-
 #### Covers
 Book records contain references to covers which are by far the largest download. Covers are available in three sizes, 
 small, medium and large. Details explained on [this](https://openlibrary.org/dev/docs/api/covers) openlibrary page 
@@ -126,6 +120,12 @@ smaller chunks, 1 million lines each.
 ## Importing Dumps
 Once data dumps are processed, run the import (see the quick start). Import can process only one file per process, and 
 it's recommended to prcess them in order, starting with author, followed by works and editions last.
+
+## Features
+#### Author Filtering
+If a file called `author-ids.txt` exists in the working directory (same location as dump file), then only authors 
+listed in that file will be handled (persisted, etc). The format of this file is one author ID per line. Comment is 
+allowed and must start with a `#`. Empty lines are also allowed and are ignored.
 
 ## Notes
 To create short samples with specific content use `fgrep` as explained [here](https://stackoverflow.com/questions/13913014/grepping-a-huge-file-80gb-any-way-to-speed-it-up):
