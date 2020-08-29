@@ -102,7 +102,7 @@ public class ImageDownloader {
         }
 
         if(log.isInfoEnabled()) {
-            log.info("--- mongo ? S{} M{} L{}",
+            log.info("--- binary ? S{} M{} L{}",
                     smallExists ? MSG_EXISTS : MSG_DOWNLOADED,
                     mediumExists ? MSG_EXISTS : MSG_DOWNLOADED,
                     largeExists ? MSG_EXISTS : MSG_DOWNLOADED
