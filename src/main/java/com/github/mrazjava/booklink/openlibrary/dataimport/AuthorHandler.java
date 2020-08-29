@@ -3,6 +3,8 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +15,10 @@ import org.springframework.util.CollectionUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema.AUTHOR_PHOTOID_IMG_URL_TEMPLATE;
 
@@ -36,15 +40,43 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Value("${booklink.di.author-image-mongo}")
     private Boolean storeAuthorImgInMongo;
 
+    /**
+     * Optional file; if exists, only authors in that list will be persisted.
+     * One ID per line. Comments are allowed and start with a #. Empty lines
+     * are allowed and ignored.
+     */
+    public static final String FILENAME_ALLOWED_IDS = "author-ids.txt";
+
+    private Set<String> allowedIds = new HashSet<>();
+
 
     @Override
     public void prepare(File workingDirectory) {
+
         if(StringUtils.isNotBlank(authorImgDir)) {
             authorImagesDestination = Path.of(authorImgDir).getParent() == null ?
                     Path.of(workingDirectory.getAbsolutePath() + File.separator + authorImgDir).toFile() :
                     Path.of(authorImgDir).toFile();
             if(!authorImagesDestination.exists()) {
                 authorImagesDestination.mkdir();
+            }
+        }
+
+        File allowedIdsFile = new File(workingDirectory.getAbsolutePath() + File.separator + FILENAME_ALLOWED_IDS);
+        if(allowedIdsFile.exists()) {
+            log.info("detected author IDs file: {}", allowedIdsFile.getAbsoluteFile());
+            try {
+                LineIterator iterator = FileUtils.lineIterator(allowedIdsFile, "UTF-8");
+                while(iterator.hasNext()) {
+                    String line = iterator.next();
+                    if(StringUtils.isNotBlank(line) && !line.startsWith("#")) {
+                        allowedIds.add(line);
+                    }
+                }
+                log.info("loaded {} allowed IDs:\n{}", allowedIds.size(), allowedIds);
+            } catch (IOException e) {
+                log.error("problem loading author id file: {}", e.getMessage());
+                allowedIds.clear();
             }
         }
 
@@ -56,6 +88,15 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         if(record == null || !persistData) {
             return;
+        }
+
+        if(!allowedIds.isEmpty()) {
+            if (allowedIds.contains(record.getId())) {
+                log.info("ALLOWED ID AUTHOR:\n{}", toText(record));
+            } else {
+                return;
+            }
+
         }
 
         AuthorSchema saved = null;
