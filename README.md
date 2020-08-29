@@ -27,12 +27,6 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FIL
 * Lombok
 * MongoDB
 
-## Features
-### Author Filtering
-If a file called `author-ids.txt` exists in the working directory (same location as dump file), then only authors 
-listed in that file will be handled (persisted, etc). The format of this file is one author ID per line. Comment is 
-allowed and must start with a `#`. Empty lines are also allowed and are ignored.
-
 ## Datasources
 Raw [data](https://openlibrary.org/data/) [dumps](https://archive.org/details/ol_exports?sort=-publicdate) are pulled from [openlibrary](https://openlibrary.org/developers/dumps). 
 These are large downloads (authors ~320mb, works ~1.7gb, editions 6.1gb) and big files once uncompressed (authors ~2.5gb, works ~10.6gb, editions ~29gb); 
@@ -57,6 +51,12 @@ sizes: (S)mall, (M)edium and (L)arge. Not all images can be downloaded in bulk, 
 
 Book covers are available for bulk download. Author images must be download individually which makes obtaining them 
 much more difficult. 
+
+## Features
+#### Author Filtering
+If a file called `author-ids.txt` exists in the working directory (same location as dump file), then only authors 
+listed in that file will be handled (persisted, etc). The format of this file is one author ID per line. Comment is 
+allowed and must start with a `#`. Empty lines are also allowed and are ignored.
 
 #### Covers
 Book records contain references to covers which are by far the largest download. Covers are available in three sizes, 
