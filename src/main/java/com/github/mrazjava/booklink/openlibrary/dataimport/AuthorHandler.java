@@ -40,15 +40,8 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Value("${booklink.di.author-image-mongo}")
     private Boolean storeAuthorImgInMongo;
 
-    /**
-     * Optional file; if exists, only authors in that list will be persisted.
-     * One ID per line. Comments are allowed and start with a #. Empty lines
-     * are allowed and ignored.
-     */
-    public static final String FILENAME_ALLOWED_IDS = "author-ids.txt";
-
-    private Set<String> allowedIds = new HashSet<>();
-
+    @Autowired
+    private AuthorIdFilter authorIdFilter;
 
     @Override
     public void prepare(File workingDirectory) {
@@ -62,23 +55,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             }
         }
 
-        File allowedIdsFile = new File(workingDirectory.getAbsolutePath() + File.separator + FILENAME_ALLOWED_IDS);
-        if(allowedIdsFile.exists()) {
-            log.info("detected author IDs file: {}", allowedIdsFile.getAbsoluteFile());
-            try {
-                LineIterator iterator = FileUtils.lineIterator(allowedIdsFile, "UTF-8");
-                while(iterator.hasNext()) {
-                    String line = iterator.next();
-                    if(StringUtils.isNotBlank(line) && !line.startsWith("#")) {
-                        allowedIds.add(line);
-                    }
-                }
-                log.info("loaded {} allowed IDs:\n{}", allowedIds.size(), allowedIds);
-            } catch (IOException e) {
-                log.error("problem loading author id file: {}", e.getMessage());
-                allowedIds.clear();
-            }
-        }
+        authorIdFilter.load(workingDirectory);
 
         log.info("destinationAuthorImg: {}", authorImagesDestination);
     }
@@ -90,13 +67,12 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             return;
         }
 
-        if(!allowedIds.isEmpty()) {
-            if (allowedIds.contains(record.getId())) {
+        if(authorIdFilter.isEnabled()) {
+            if (authorIdFilter.exists(record.getId())) {
                 log.info("ALLOWED ID AUTHOR:\n{}", toText(record));
             } else {
                 return;
             }
-
         }
 
         AuthorSchema saved = null;
