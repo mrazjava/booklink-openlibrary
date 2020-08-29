@@ -11,6 +11,11 @@ Import process for migrating raw data dumps from [openlibrary.org](https://openl
 ## Quick Start
 See `application.yml` for available configuration options. Each spring boot config is driven by environment variable.
 
+Dependencies (mongo) are provided via docker:
+```
+docker-compose up
+```
+
 Examples:
 
 *Process authors dump without persisting data, but if image is available, download it to a file and 
