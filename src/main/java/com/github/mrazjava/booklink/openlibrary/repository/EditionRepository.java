@@ -5,5 +5,5 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.Optional;
 
-public interface EditionRepository extends MongoRepository<EditionSchema, String> {
+public interface EditionRepository extends OpenLibraryMongoRepository<EditionSchema> {
 }

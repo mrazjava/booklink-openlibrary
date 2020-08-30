@@ -3,7 +3,6 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -50,14 +49,14 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
 
         Optional<WorkSchema> saved = Optional.empty();
 
-        if(!persistDataOverride) {
-            saved = repository.findById(record.getId());
-            if(saved.isPresent()) {
-                return;
-            }
-        }
-
         if(persistData) {
+            if(!persistDataOverride) {
+                saved = repository.findById(record.getId());
+                if(saved.isPresent()) {
+                    return;
+                }
+            }
+
             repository.save(saved.orElse(record));
         }
     }

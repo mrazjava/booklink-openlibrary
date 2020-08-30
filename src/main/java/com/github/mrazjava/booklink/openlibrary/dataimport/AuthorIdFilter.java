@@ -1,19 +1,26 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
+import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Slf4j
 @Component
 public class AuthorIdFilter {
+
+    @Autowired
+    private AuthorRepository authorRepository;
+
 
     /**
      * Optional file; if exists, only authors in that list will be persisted.
@@ -41,6 +48,13 @@ public class AuthorIdFilter {
             } catch (IOException e) {
                 log.error("problem loading author id filter file: {}", e.getMessage());
                 allowedIds.clear();
+            }
+        }
+        else {
+            List<String> ids = authorRepository.findAllIds();
+            if(!ids.isEmpty()) {
+                log.info("detected {} author IDs in mongo", ids.size());
+                allowedIds.addAll(ids);
             }
         }
     }
