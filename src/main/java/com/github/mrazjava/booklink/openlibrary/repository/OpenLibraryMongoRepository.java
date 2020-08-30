@@ -7,7 +7,7 @@ import org.springframework.data.repository.NoRepositoryBean;
 import java.util.List;
 
 @NoRepositoryBean
-interface OpenLibraryMongoRepository<T> extends MongoRepository<T, String> {
+public interface OpenLibraryMongoRepository<T> extends MongoRepository<T, String> {
 
     @Query(value = "{}", fields = "{'_id': 1}")
     List<String> findAllIds();
