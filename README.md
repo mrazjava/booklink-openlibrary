@@ -34,7 +34,7 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FIL
 
 ## Features
 #### Author Filtering
-If a file called `author-id-filter` exists in the working directory (same location as dump file), then only authors 
+If a file called `author-id-filter.txt` exists in the working directory (same location as dump file), then only authors 
 listed in that file will be handled (persisted, etc). The format of this file is one author ID per line. Comment is 
 allowed and must start with a `#`. Empty lines are also allowed and are ignored.
 
