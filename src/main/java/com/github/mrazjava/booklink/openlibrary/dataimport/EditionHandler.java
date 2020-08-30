@@ -15,9 +15,14 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     @Autowired
     private EditionRepository repository;
 
+    @Autowired
+    private AuthorIdFilter authorIdFilter;
+
 
     @Override
-    public void prepare(File dataSource) {
+    public void prepare(File workingDirectory) {
+
+        authorIdFilter.load(workingDirectory);
     }
 
     @Override

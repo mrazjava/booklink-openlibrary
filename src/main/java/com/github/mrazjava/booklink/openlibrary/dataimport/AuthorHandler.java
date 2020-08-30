@@ -69,7 +69,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         if(authorIdFilter.isEnabled()) {
             if (authorIdFilter.exists(record.getId())) {
-                log.info("ALLOWED ID AUTHOR:\n{}", toText(record));
+                log.info("FILTER: author # {} matched author ID[{}]:\n{}", sequenceNo, record.getId(), toText(record));
             } else {
                 return;
             }
