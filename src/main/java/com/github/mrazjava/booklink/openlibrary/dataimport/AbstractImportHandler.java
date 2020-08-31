@@ -20,6 +20,9 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     @Value("${booklink.di.persist-override}")
     protected boolean persistDataOverride;
 
+    @Value("${booklink.di.frequency-check}")
+    protected int frequencyCheck;
+
 
     @Override
     public R toRecord(String line) {

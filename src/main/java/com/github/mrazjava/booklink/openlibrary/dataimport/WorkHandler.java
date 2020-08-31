@@ -20,6 +20,8 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
     @Autowired
     private AuthorIdFilter authorIdFilter;
 
+    private int authorMatchCount = 0;
+
 
     @Override
     public void prepare(File workingDirectory) {
@@ -28,6 +30,12 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
 
     @Override
     public void handle(WorkSchema record, long sequenceNo) {
+
+        if((sequenceNo % frequencyCheck) == 0) {
+            log.info("FILTER MATCHES -- {}: {}",
+                    authorIdFilter.getFilterName(), authorMatchCount);
+            authorMatchCount = 0;
+        }
 
         if(authorIdFilter.isEnabled()) {
 
@@ -40,7 +48,8 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
                     .findFirst();
 
             if(matchedId.isPresent()) {
-                log.info("FILTER: work # {} matched author ID[{}]\n{}", sequenceNo, matchedId.get(), toText(record));
+                log.debug("FILTER: work # {} matched author ID[{}]\n{}", sequenceNo, matchedId.get(), toText(record));
+                authorMatchCount++;
             }
             else {
                 return;

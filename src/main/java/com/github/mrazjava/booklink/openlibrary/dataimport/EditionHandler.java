@@ -5,6 +5,7 @@ import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -25,6 +26,10 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     @Autowired
     private WorkIdFilter workIdFilter;
 
+    private int authorMatchCount = 0;
+
+    private int workMatchCount = 0;
+
 
     @Override
     public void prepare(File workingDirectory) {
@@ -36,12 +41,25 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     @Override
     public void handle(EditionSchema record, long sequenceNo) {
 
+        if((sequenceNo % frequencyCheck) == 0) {
+            log.info("FILTER MATCHES -- {}: {}, {}: {}",
+                    authorIdFilter.getFilterName(), authorMatchCount,
+                    workIdFilter.getFilterName(), workMatchCount);
+            authorMatchCount = workMatchCount = 0;
+        }
+
         String matchedId = runFilter(record, authorIdFilter, sequenceNo);
         if(StringUtils.isBlank(matchedId)) {
             matchedId = runFilter(record, workIdFilter, sequenceNo);
+            if(StringUtils.isBlank(matchedId)) {
+                return;
+            }
+            else {
+                workMatchCount++;
+            }
         }
-        if(StringUtils.isBlank(matchedId)) {
-            return;
+        else {
+            authorMatchCount++;
         }
 
         Optional<EditionSchema> saved = Optional.empty();
@@ -72,7 +90,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
 
         if(matchedId != null) {
-            log.info("[{} FILTER] edition # {} matched ID[{}]\n{}",
+            log.debug("[{} FILTER] edition # {} matched ID[{}]\n{}",
                     filter.getFilterName(), sequenceNo, matchedId, toText(record));
         }
 
