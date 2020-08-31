@@ -42,10 +42,11 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     public void handle(EditionSchema record, long sequenceNo) {
 
         if((sequenceNo % frequencyCheck) == 0) {
-            log.info("FILTER MATCHES -- {}: {}, {}: {}",
+            log.info("FILTER MATCHES -- {}: {}, {}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount,
-                    workIdFilter.getFilterName(), workMatchCount);
-            authorMatchCount = workMatchCount = 0;
+                    workIdFilter.getFilterName(), workMatchCount,
+                    savedCount);
+            savedCount = authorMatchCount = workMatchCount = 0;
         }
 
         String matchedId = runFilter(record, authorIdFilter, sequenceNo);
@@ -62,17 +63,14 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
             authorMatchCount++;
         }
 
-        Optional<EditionSchema> saved = Optional.empty();
-
         if(persistData) {
             if(!persistDataOverride) {
-                saved = repository.findById(record.getId());
-                if(saved.isPresent()) {
+                if(repository.findById(record.getId()).isPresent()) {
                     return;
                 }
             }
-
-            repository.save(saved.orElse(record));
+            repository.save(record);
+            savedCount++;
         }
     }
 

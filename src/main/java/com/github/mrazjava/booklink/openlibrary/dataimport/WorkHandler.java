@@ -32,8 +32,8 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
     public void handle(WorkSchema record, long sequenceNo) {
 
         if((sequenceNo % frequencyCheck) == 0) {
-            log.info("FILTER MATCHES -- {}: {}",
-                    authorIdFilter.getFilterName(), authorMatchCount);
+            log.info("FILTER MATCHES -- {}: {}, SAVED: {}",
+                    authorIdFilter.getFilterName(), authorMatchCount, savedCount);
             authorMatchCount = 0;
         }
 
@@ -56,17 +56,15 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
             }
         }
 
-        Optional<WorkSchema> saved = Optional.empty();
-
         if(persistData) {
             if(!persistDataOverride) {
-                saved = repository.findById(record.getId());
-                if(saved.isPresent()) {
+                if(repository.findById(record.getId()).isPresent()) {
                     return;
                 }
             }
 
-            repository.save(saved.orElse(record));
+            repository.save(record);
+            savedCount++;
         }
     }
 

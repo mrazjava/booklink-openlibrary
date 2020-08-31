@@ -43,6 +43,8 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Autowired
     private AuthorIdFilter authorIdFilter;
 
+    private int authorMatchCount = 0;
+
     @Override
     public void prepare(File workingDirectory) {
 
@@ -63,13 +65,21 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Override
     public void handle(AuthorSchema record, long sequenceNo) {
 
+        if((sequenceNo % frequencyCheck) == 0) {
+            log.info("FILTER MATCHES -- {}: {}, SAVED: {}",
+                    authorIdFilter.getFilterName(), authorMatchCount,
+                    savedCount);
+            savedCount = authorMatchCount = 0;
+        }
+
         if(record == null || !persistData) {
             return;
         }
 
         if(authorIdFilter.isEnabled()) {
             if (authorIdFilter.exists(record.getId())) {
-                log.info("FILTER: author # {} matched author ID[{}]:\n{}", sequenceNo, record.getId(), toText(record));
+                log.debug("FILTER: author # {} matched author ID[{}]:\n{}", sequenceNo, record.getId(), toText(record));
+                authorMatchCount++;
             } else {
                 return;
             }
@@ -106,6 +116,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         }
 
         repository.save(author);
+        savedCount++;
     }
 
     @Override

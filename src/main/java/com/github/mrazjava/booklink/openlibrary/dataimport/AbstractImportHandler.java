@@ -23,6 +23,7 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     @Value("${booklink.di.frequency-check}")
     protected int frequencyCheck;
 
+    protected int savedCount = 0;
 
     @Override
     public R toRecord(String line) {
