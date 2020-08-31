@@ -15,7 +15,7 @@ import java.util.Set;
 
 @JsonIgnoreProperties({"m", "type"})
 @Data
-abstract class BaseSchemaEnhanced extends BaseSchema {
+public abstract class BaseSchemaEnhanced extends BaseSchema {
 
     @Indexed // IDs
     private Set<String> works;

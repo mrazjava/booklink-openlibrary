@@ -20,7 +20,7 @@ import java.util.Set;
 
 @JsonIgnoreProperties(value = {"m", "type"})
 @Data
-abstract class BaseSchema {
+public abstract class BaseSchema {
 
     @Id
     @JsonProperty

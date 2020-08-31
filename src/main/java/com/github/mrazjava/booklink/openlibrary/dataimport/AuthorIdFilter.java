@@ -1,12 +1,15 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
+import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class AuthorIdFilter extends AbstractIdFilter {
+public class AuthorIdFilter extends AbstractIdFilter<AuthorSchema> {
+
+    public static final String FILTER_NAME = "AUTHOR";
 
     /**
      * Optional file; if exists, only authors in that list will be persisted.
@@ -22,6 +25,6 @@ public class AuthorIdFilter extends AbstractIdFilter {
 
     @Override
     protected String getFilterName() {
-        return "AUTHOR";
+        return FILTER_NAME;
     }
 }
