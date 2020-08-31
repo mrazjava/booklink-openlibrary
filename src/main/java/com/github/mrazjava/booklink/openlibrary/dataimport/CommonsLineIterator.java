@@ -1,7 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
-import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
@@ -24,12 +22,6 @@ public class CommonsLineIterator implements FileImporter {
 
     @Value("${booklink.di.frequency-check}")
     private int frequencyCheck;
-
-    @Autowired
-    private WorkRepository workRepository;
-
-    @Autowired
-    private EditionRepository editionRepository;
 
 
     @Override
