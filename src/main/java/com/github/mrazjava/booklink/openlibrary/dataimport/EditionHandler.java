@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -41,7 +42,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     @Override
     public void handle(EditionSchema record, long sequenceNo) {
 
-        if((sequenceNo % frequencyCheck) == 0) {
+        if(sequenceNo % frequencyCheck == 0) {
             log.info("FILTER MATCHES -- {}: {}, {}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount,
                     workIdFilter.getFilterName(), workMatchCount,
@@ -88,8 +89,10 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
 
         if(matchedId != null) {
-            log.debug("[{} FILTER] edition # {} matched ID[{}]\n{}",
-                    filter.getFilterName(), sequenceNo, matchedId, toText(record));
+            if(log.isDebugEnabled()) {
+                log.debug("[{} FILTER] edition # {} matched ID[{}]\n{}",
+                        filter.getFilterName(), sequenceNo, matchedId, toText(record));
+            }
         }
 
         return matchedId;
