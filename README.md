@@ -4,7 +4,7 @@ Import process for migrating raw data dumps from [openlibrary.org](https://openl
 ## Tech Stack
 * Spring Boot
 * [Jackson](https://github.com/FasterXML/jackson-docs)
-* Apache Commons IO
+* Apache Commons: LANG3, IO, VFS
 * Lombok
 * MongoDB
 
