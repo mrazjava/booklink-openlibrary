@@ -61,6 +61,9 @@ public class ImageDownloader {
         }
 
         for(ImageSize imgSize : ImageSize.values()) {
+
+            if(imgSize == O && BooleanUtils.isFalse(fetchOriginalImages)) continue;
+
             File imgById = new File(
                     destinationDir +
                             File.separator +
@@ -131,15 +134,17 @@ public class ImageDownloader {
 
         boolean originalExistedB4 = imgSupport.hasImage(O);
 
-        if(!originalExistedB4) {
-            ImageSize size = O;
-            byte[] image = cache.containsKey(size) ?
-                    FileUtils.readFileToByteArray(cache.get(size)) :
-                    downloadImage(String.format(imgTemplate, imgId, size));
-            imgSupport.setImage(buildImage(imgId, image), size);
-        }
-        else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
+        if(BooleanUtils.isTrue(fetchOriginalImages)) {
+
+            if (!originalExistedB4) {
+                ImageSize size = O;
+                byte[] image = cache.containsKey(size) ?
+                        FileUtils.readFileToByteArray(cache.get(size)) :
+                        downloadImage(String.format(imgTemplate, imgId, size));
+                imgSupport.setImage(buildImage(imgId, image), size);
+            } else {
+                log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
+            }
         }
 
         if(log.isInfoEnabled()) {

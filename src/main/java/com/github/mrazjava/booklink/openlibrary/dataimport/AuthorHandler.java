@@ -54,7 +54,9 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Override
     public void handle(AuthorSchema record, long sequenceNo) {
 
-        if((sequenceNo % frequencyCheck) == 0) {
+        if(record == null) return;
+
+        if((sequenceNo % frequencyCheck) == 0 && authorIdFilter.isEnabled()) {
             log.info("FILTER MATCHES -- {}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount,
                     savedCount);
@@ -70,31 +72,31 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             }
         }
 
-        if(record == null || !persistData) {
-            return;
-        }
-
-        AuthorSchema saved = null;
-
-        if(!persistDataOverride || BooleanUtils.isTrue(storeImagesInMongo)) {
-            saved = repository.findById(record.getId()).orElse(null);
-            if(!persistDataOverride && saved != null) {
-                return;
-            }
-        }
-
         AuthorSchema author = null;
 
-        if(persistDataOverride) {
-            author = record;
-            if(saved != null) {
-                author.setImageSmall(saved.getImageSmall());
-                author.setImageMedium(saved.getImageMedium());
-                author.setImageLarge(saved.getImageLarge());
+        if(persistData) {
+            AuthorSchema saved = null;
+
+            if (!persistDataOverride || BooleanUtils.isTrue(storeImagesInMongo)) {
+                saved = repository.findById(record.getId()).orElse(null);
+                if (!persistDataOverride && saved != null) {
+                    return;
+                }
             }
+
+            if (persistDataOverride) {
+                author = record;
+                if (saved != null) {
+                    author.setImageSmall(saved.getImageSmall());
+                    author.setImageMedium(saved.getImageMedium());
+                    author.setImageLarge(saved.getImageLarge());
+                }
+            }
+
+            author = Optional.ofNullable(saved).orElse(record);
         }
         else {
-            author = Optional.ofNullable(saved).orElse(record);
+            author = record;
         }
 
         if(BooleanUtils.isTrue(downloadImages)) {
@@ -105,8 +107,10 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             }
         }
 
-        repository.save(author);
-        savedCount++;
+        if(persistData) {
+            repository.save(author);
+            savedCount++;
+        }
     }
 
     @Override
@@ -130,7 +134,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         boolean downloadToBinary = BooleanUtils.isTrue(storeImagesInMongo);
 
         if(downloadToFile || downloadToBinary) {
-            log.info("author #{} [{}]; fetching images ...", sequenceNo, record.getId());
+            log.info("author #{} [{}]; checking images ...", sequenceNo, record.getId());
         }
 
         Map<ImageSize, File> imgFiles = downloadToFile ?

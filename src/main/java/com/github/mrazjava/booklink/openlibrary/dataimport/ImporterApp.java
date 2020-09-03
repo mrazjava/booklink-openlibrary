@@ -19,11 +19,6 @@ import java.io.File;
  * Read json, row by row, from openlibrary dump file. Assumes file had been prepped to contain
  * exactly one JSON record per line. The {@code dumpFile} argument can be just the name of a
  * (sample) file, or a full path to a real import file.
- *
- * Sample invocations:
- * mvn spring-boot:run -Dspring-boot.run.arguments="--dumpFile=/tmp/ol_dump_works_latest.json --schemaClassName=WorkSchema --frequencyCheck=5000"
- * mvn spring-boot:run -Dspring-boot.run.arguments="--dumpFile=authors-tail-n1000.json --schemaClassName=AuthorSchema --frequencyCheck=100"
- * mvn clean spring-boot:run -Dspring-boot.run.arguments="--dumpFile=works-head-n1000.json"
  */
 @Slf4j
 @SpringBootApplication(scanBasePackageClasses = {
@@ -51,10 +46,13 @@ public class ImporterApp implements ApplicationRunner {
 	private int frequencyCheck;
 
 	@Value("${booklink.di.persist}")
-	private boolean persistData;
+	private Boolean persistData;
 
 	@Value("${booklink.di.persist-override}")
-	private boolean persistDataOverride;
+	private Boolean persistDataOverride;
+
+	@Value("${booklink.di.image-download}")
+	private Boolean imageDownload;
 
 	@Value("${booklink.di.image-dir}")
 	private String imageDir;
@@ -100,6 +98,7 @@ public class ImporterApp implements ApplicationRunner {
 					" frequency-check: {}\n" +
 					" persist: {}\n" +
 					" persist-override: {}\n" +
+					" image-download: {}\n" +
 					" image-dir: {}\n" +
 					" image-mongo: {}\n" +
 					" fetch-original-images: {}\n",
@@ -108,6 +107,7 @@ public class ImporterApp implements ApplicationRunner {
 					frequencyCheck,
 					persistData,
 					persistDataOverride,
+					imageDownload,
 					StringUtils.isBlank(imageDir) ? "feature DISABLED" : imageDir,
 					storeImagesInMongo,
 					fetchOriginalImages
