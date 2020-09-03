@@ -1,9 +1,14 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
+import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.ByteArrayInputStream;
@@ -17,6 +22,8 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
 @Slf4j
 @Component
@@ -33,17 +40,31 @@ public class ImageDownloader {
 
     static final String MSG_EXISTS = "\u2612";
 
+    static final String MSG_BLOCKED = "blocked";
+
     static final String MSG_DOWNLOADED = "\u2611";
+
+    static final String MSG_FAILURE = "failed";
+
+    @Value("${booklink.di.image-download}")
+    private Boolean downloadImages;
+
+    @Value("${booklink.di.fetch-original-images}")
+    private Boolean fetchOriginalImages;
 
     public Map<ImageSize, File> downloadImageToFile(String destinationDir, String imgId, String imgTemplate) throws IOException {
 
         Map<ImageSize, File> files = new HashMap<>();
 
+        if(BooleanUtils.isFalse(downloadImages)) {
+            return files;
+        }
+
         for(ImageSize imgSize : ImageSize.values()) {
             File imgById = new File(
                     destinationDir +
                             File.separator +
-                            String.format("%s-%s.jpg", imgId, imgSize)
+                            (imgSize == O ? String.format("%s.jpg", imgId) : String.format("%s-%s.jpg", imgId, imgSize))
             );
 
             files.put(imgSize, imgById);
@@ -65,49 +86,79 @@ public class ImageDownloader {
     public void downloadImageToBinary(
             String imgId, String imgTemplate, DefaultImageSupport imgSupport, Map<ImageSize, File> cache) throws IOException {
 
-        boolean smallExists = imgSupport.hasSmallImage();
+        if(BooleanUtils.isFalse(downloadImages)) {
+            return;
+        }
 
-        if(!smallExists) {
-            byte[] image = cache.containsKey(ImageSize.S) ?
-                    FileUtils.readFileToByteArray(cache.get(ImageSize.S)) :
-                    downloadImage(String.format(imgTemplate, imgId, ImageSize.S));
-            imgSupport.setSmallImage(image);
+        boolean smallExistedB4 = imgSupport.hasImage(S);
+
+        if(!smallExistedB4) {
+            ImageSize size = S;
+            byte[] image = cache.containsKey(size) ?
+                    FileUtils.readFileToByteArray(cache.get(size)) :
+                    downloadImage(String.format(imgTemplate, imgId, size));
+            imgSupport.setImage(buildImage(imgId, image), size);
         }
         else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.S);
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, S);
         }
 
-        boolean mediumExists = imgSupport.hasMediumImage();
+        boolean mediumExistedB4 = imgSupport.hasImage(M);
 
-        if(!mediumExists) {
-            byte[] image = cache.containsKey(ImageSize.M) ?
-                    FileUtils.readFileToByteArray(cache.get(ImageSize.M)) :
-                    downloadImage(String.format(imgTemplate, imgId, ImageSize.M));
-            imgSupport.setMediumImage(image);
+        if(!mediumExistedB4) {
+            ImageSize size = M;
+            byte[] image = cache.containsKey(size) ?
+                    FileUtils.readFileToByteArray(cache.get(size)) :
+                    downloadImage(String.format(imgTemplate, imgId, size));
+            imgSupport.setImage(buildImage(imgId, image), size);
         }
         else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.M);
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, M);
         }
 
-        boolean largeExists = imgSupport.hasLargeImage();
+        boolean largeExistedB4 = imgSupport.hasImage(ImageSize.L);
 
-        if(!largeExists) {
-            byte[] image = cache.containsKey(ImageSize.L) ?
-                    FileUtils.readFileToByteArray(cache.get(ImageSize.L)) :
-                    downloadImage(String.format(imgTemplate, imgId, ImageSize.L));
-            imgSupport.setLargeImage(image);
+        if(!largeExistedB4) {
+            ImageSize size = ImageSize.L;
+            byte[] image = cache.containsKey(size) ?
+                    FileUtils.readFileToByteArray(cache.get(size)) :
+                    downloadImage(String.format(imgTemplate, imgId, size));
+            imgSupport.setImage(buildImage(imgId, image), size);
         }
         else {
             log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
         }
 
+        boolean originalExistedB4 = imgSupport.hasImage(O);
+
+        if(!originalExistedB4) {
+            ImageSize size = O;
+            byte[] image = cache.containsKey(size) ?
+                    FileUtils.readFileToByteArray(cache.get(size)) :
+                    downloadImage(String.format(imgTemplate, imgId, size));
+            imgSupport.setImage(buildImage(imgId, image), size);
+        }
+        else {
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
+        }
+
         if(log.isInfoEnabled()) {
-            log.info("--- binary ? S{} M{} L{}",
-                    smallExists ? MSG_EXISTS : MSG_DOWNLOADED,
-                    mediumExists ? MSG_EXISTS : MSG_DOWNLOADED,
-                    largeExists ? MSG_EXISTS : MSG_DOWNLOADED
+            log.info("--- binary ? S{} M{} L{} O{}",
+                    smallExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(S) ? MSG_DOWNLOADED : MSG_FAILURE),
+                    mediumExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(M) ? MSG_DOWNLOADED : MSG_FAILURE),
+                    largeExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(L) ? MSG_DOWNLOADED : MSG_FAILURE),
+                    originalExistedB4 ? MSG_EXISTS : (fetchOriginalImages ? (imgSupport.hasImage(O) ? MSG_DOWNLOADED : MSG_FAILURE) : MSG_BLOCKED)
             );
         }
+    }
+
+    private CoverImage buildImage(String id, byte[] image) {
+        return CoverImage.builder()
+                .id(id)
+                .image(new Binary(BsonBinarySubType.BINARY, image))
+                .sizeBytes(image.length)
+                .sizeText(FileUtils.byteCountToDisplaySize(image.length))
+                .build();
     }
 
     private byte[] downloadImage(String imgUrl) throws IOException {

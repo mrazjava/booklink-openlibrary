@@ -12,11 +12,8 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 
 import java.io.File;
-import java.nio.file.Path;
 
 /**
  * Read json, row by row, from openlibrary dump file. Assumes file had been prepped to contain
@@ -59,11 +56,14 @@ public class ImporterApp implements ApplicationRunner {
 	@Value("${booklink.di.persist-override}")
 	private boolean persistDataOverride;
 
-	@Value("${booklink.di.author-image-dir}")
-	private String authorImgDir;
+	@Value("${booklink.di.image-dir}")
+	private String imageDir;
 
-	@Value("${booklink.di.author-image-mongo}")
-	private Boolean storeAuthorImgInMongo;
+	@Value("${booklink.di.image-mongo}")
+	private Boolean storeImagesInMongo;
+
+	@Value("${booklink.di.fetch-original-images}")
+	private Boolean fetchOriginalImages;
 
 
 	public static void main(String[] args) {
@@ -92,23 +92,26 @@ public class ImporterApp implements ApplicationRunner {
 		}
 
 		if(log.isInfoEnabled()) {
-			StringBuilder msg = new StringBuilder("starting...\n\n- importFile: {}\n- schemaClass: {}\n- frequencyCheck: {}\n- persistData: {}\n- persistDataOverride: {}");
 
-			if(schemaClass.equals(AuthorSchema.class)) {
-				msg.append("\n- authorImgDir: ");
-				msg.append(StringUtils.isBlank(authorImgDir) ? "feature DISABLED" : authorImgDir);
-				msg.append("\n- storeAuthorImgInMongo: ");
-				msg.append(storeAuthorImgInMongo);
-			}
-
-			msg.append("\n");
-
-			log.info(msg.toString(),
+			log.info("starting...\n\n" +
+					"booklink.di:\n" +
+					" ol-dump-file: {}\n" +
+					" schema-class-name: {}\n" +
+					" frequency-check: {}\n" +
+					" persist: {}\n" +
+					" persist-override: {}\n" +
+					" image-dir: {}\n" +
+					" image-mongo: {}\n" +
+					" fetch-original-images: {}\n",
 					importFile.getAbsolutePath(),
 					schemaClass.getCanonicalName(),
 					frequencyCheck,
 					persistData,
-					persistDataOverride);
+					persistDataOverride,
+					StringUtils.isBlank(imageDir) ? "feature DISABLED" : imageDir,
+					storeImagesInMongo,
+					fetchOriginalImages
+			);
 		}
 
 		importer.runImport(importFile, schemaClass);

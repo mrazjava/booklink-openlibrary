@@ -22,14 +22,19 @@ Examples:
 store it in author_imgs subdirectory of the location where the dump file is read from. Sample record 
 is printed every 50,000th row:*
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=50000 -DBOOKLINK_AUTHOR_IMG_DIR=author_imgs -DBOOKLINK_PERSIST=false"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=50000 -DBOOKLINK_IMG_DIR=author_imgs -DBOOKLINK_PERSIST=false"
 ```
 *Process authors dump and persist each record in mongo. If avilable, download author images to a file 
 and store them in bronco subdirectory of the location where the dump file is read from. In addition, 
 store a copy of an image as a binary property of author mongo record. Sample record is printed out 
 every 1000th row:*
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=1000 -DBOOKLINK_AUTHOR_IMG_DIR=bronco -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_AUTHOR_IMG_MONGO=true"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=1000 -DBOOKLINK_IMG_DIR=bronco -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_IMG_MONGO=true"
+```
+*Process works dump without persisting data or downloading any images. This is a simple scan through of a dump file - 
+useful for checking the parser.*
+```
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/works.json -DBOOKLINK_SCHEMA=WorkSchema -DBOOKLINK_FREQUENCY_CHECK=100000"
 ```
 
 ## Features

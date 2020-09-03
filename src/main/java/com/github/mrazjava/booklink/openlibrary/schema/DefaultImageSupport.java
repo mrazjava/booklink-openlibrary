@@ -1,14 +1,11 @@
 package com.github.mrazjava.booklink.openlibrary.schema;
 
 
+import com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize;
+
 public interface DefaultImageSupport {
 
-    void setSmallImage(byte[] image);
-    boolean hasSmallImage();
+    void setImage(CoverImage image, ImageSize size);
 
-    void setMediumImage(byte[] image);
-    boolean hasMediumImage();
-
-    void setLargeImage(byte[] image);
-    boolean hasLargeImage();
+    boolean hasImage(ImageSize size);
 }

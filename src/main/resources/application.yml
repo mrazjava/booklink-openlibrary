@@ -14,13 +14,24 @@ booklink:
     frequency-check: ${BOOKLINK_FREQUENCY_CHECK:10}
     # Persist processed data to mongo ?
     persist: ${BOOKLINK_PERSIST:false}
-    # Override existing records when persisting ? (slower)
-    persist-override: ${BOOKLINK_PERSIST_OVERRIDE:false}
-    # Directory name of full path to where author images should be downloaded to.
-    # If not defined (default) download is disabled. If only directory name is
-    # defined, then images will be downloaded to the same location + sub directory
-    # where dump file is read from. If full path is defined, then that's the destination.
-    author-image-dir: ${BOOKLINK_AUTHOR_IMG_DIR:}
-    # If enabled, implies enablement of author image download. Image will be stored as a Base64 encoded
-    # binary field in mongo author collection.
-    author-image-mongo: ${BOOKLINK_AUTHOR_IMG_MONGO:false}
+    # Override existing records when persisting ? If disabled (false), import is much slower because for each imported
+    # record a mongo query by id is issued to check if record exists.
+    persist-override: ${BOOKLINK_PERSIST_OVERRIDE:true}
+    # If enabled, image download will be attempted for each record if it provides photo ids and if there is no file
+    # source (cache; see BOOKLINK_IMG_DIR)
+    image-download: ${BOOKLINK_IMAGE_DOWNLOAD:false}
+    # Directory name of full path to where images should be downloaded to. If just a directory name is provided, it
+    # is expected to live in the same location as the dump file. This directory can be empty or it can contain images.
+    # If it contains the images following the naming convention established by Openlibrary.org, then these images are
+    # used as a source (cache) when mongo image import is enabled. For works and editions, cover images downloaded via
+    # bulk (*.tar) archives would be provided in this directory. *.tar archives do not need to be extracted. Importer
+    # will read from them directly.
+    image-dir: ${BOOKLINK_IMG_DIR:}
+    # If enabled, implies enablement of image download. First, attempt will be made to fetch an image from a file if
+    # it exists locally. For author images, exact image will be checked for and used if available. For work and edition,
+    # *.tar archive will be checked. Image will be stored as a Base64 encoded binary field in mongo.
+    # collection.
+    image-mongo: ${BOOKLINK_IMG_MONGO:false}
+    # If enabled, original images will be fetched. These images are large in size (often approaching 1MB).
+    # Often large size is sufficient enough while much smaller in size.
+    fetch-original-images: ${BOOKLINK_FETCH_ORIG_IMGS:false}

@@ -24,7 +24,7 @@ import java.util.List;
 })
 @Data
 @Document(collection = "authors")
-public class AuthorSchema extends BaseSchemaEnhanced implements DefaultImageSupport {
+public class AuthorSchema extends BaseSchemaEnhanced {
 
     public static final String AUTHOR_OLID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/olid/%s-%s.jpg";
 
@@ -114,15 +114,6 @@ public class AuthorSchema extends BaseSchemaEnhanced implements DefaultImageSupp
      */
     private List<Integer> photos;
 
-    @JsonIgnore
-    private Binary imageSmall;
-
-    @JsonIgnore
-    private Binary imageMedium;
-
-    @JsonIgnore
-    private Binary imageLarge;
-
     @JsonProperty("source_records")
     private List<String> sourceRecords;
 
@@ -171,35 +162,5 @@ public class AuthorSchema extends BaseSchemaEnhanced implements DefaultImageSupp
                 numeration = NumberUtils.createLong(json.get("value").asText());
             }
         }
-    }
-
-    @Override
-    public void setSmallImage(byte[] image) {
-        setImageSmall(new Binary(BsonBinarySubType.BINARY, image));
-    }
-
-    @Override
-    public boolean hasSmallImage() {
-        return getImageSmall() != null;
-    }
-
-    @Override
-    public void setMediumImage(byte[] image) {
-        setImageMedium(new Binary(BsonBinarySubType.BINARY, image));
-    }
-
-    @Override
-    public boolean hasMediumImage() {
-        return getImageMedium() != null;
-    }
-
-    @Override
-    public void setLargeImage(byte[] image) {
-        setImageLarge(new Binary(BsonBinarySubType.BINARY, image));
-    }
-
-    @Override
-    public boolean hasLargeImage() {
-        return getImageLarge() != null;
     }
 }

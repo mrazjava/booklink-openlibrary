@@ -20,6 +20,15 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     @Value("${booklink.di.persist-override}")
     protected boolean persistDataOverride;
 
+    @Value("${booklink.di.image-download}")
+    protected Boolean downloadImages;
+
+    @Value("${booklink.di.image-dir}")
+    protected String imageDir;
+
+    @Value("${booklink.di.image-mongo}")
+    protected Boolean storeImagesInMongo;
+
     @Value("${booklink.di.frequency-check}")
     protected int frequencyCheck;
 

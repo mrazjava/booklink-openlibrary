@@ -1,11 +1,11 @@
 package com.github.mrazjava.booklink.openlibrary.schema;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize;
 import lombok.Data;
+import org.bson.BsonBinarySubType;
+import org.bson.types.Binary;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -20,7 +20,7 @@ import java.util.Set;
 
 @JsonIgnoreProperties(value = {"m", "type"})
 @Data
-public abstract class BaseSchema {
+public abstract class BaseSchema implements DefaultImageSupport  {
 
     @Id
     @JsonProperty
@@ -71,6 +71,18 @@ public abstract class BaseSchema {
     @JsonProperty
     private List<String> languages;
 
+    @JsonIgnore
+    private CoverImage imageSmall;
+
+    @JsonIgnore
+    private CoverImage imageMedium;
+
+    @JsonIgnore
+    private CoverImage imageLarge;
+
+    @JsonIgnore
+    private CoverImage imageOriginal;
+
 
     @JsonSetter("authors")
     public void setAuthors(JsonNode json) {
@@ -118,5 +130,42 @@ public abstract class BaseSchema {
     protected String fetchKey(JsonNode json) {
         String text = json.has("key") ? json.get("key").asText() : json.asText();
         return text.contains("/") ? text.substring(text.lastIndexOf("/") + 1) : text;
+    }
+
+    @Override
+    public void setImage(CoverImage image, ImageSize size) {
+
+        switch(size) {
+            case S:
+                setImageSmall(image);
+                break;
+            case M:
+                setImageMedium(image);
+                break;
+            case L:
+                setImageLarge(image);
+                break;
+            case O:
+                setImageOriginal(image);
+                break;
+            default:
+        }
+    }
+
+    @Override
+    public boolean hasImage(ImageSize size) {
+
+        switch(size) {
+            case S:
+                return imageSmall != null;
+            case M:
+                return imageMedium != null;
+            case L:
+                return imageLarge != null;
+            case O:
+                return imageOriginal != null;
+            default:
+                return false;
+        }
     }
 }
