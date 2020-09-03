@@ -19,10 +19,10 @@ docker-compose up
 Examples:
 
 *Process authors dump without persisting data, but if image is available, download it to a file and 
-store it in author_imgs subdirectory of the location where the dump file is read from. Sample record 
-is printed every 50,000th row:*
+store it in `author` directory to a connected USB drive. Note that author dump file and image output directory are 
+two different locations. Sample record is printed every 100,000th row:*
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=50000 -DBOOKLINK_IMG_DIR=author_imgs -DBOOKLINK_PERSIST=false"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_IMAGE_DOWNLOAD=true -DBOOKLINK_IMG_DIR=/media/azimowski/booklink-5TB/authors -DBOOKLINK_PERSIST=false"
 ```
 *Process authors dump and persist each record in mongo. If avilable, download author images to a file 
 and store them in bronco subdirectory of the location where the dump file is read from. In addition, 
