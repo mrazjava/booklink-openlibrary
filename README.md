@@ -1,5 +1,6 @@
 # Booklink Data Integration: openlibrary.org
-Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org) into [booklink-data-openlibrary](../booklink-data-openlibrary).
+Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org) and raw data source for 
+author-book integration (search, etc) from the [booklink-backend](https://github.com/mrazjava/booklink-backend).
 
 ## Tech Stack
 * Spring Boot
