@@ -10,6 +10,14 @@ booklink:
     ol-dump-file: ${BOOKLINK_OL_DUMP_FILE:works-tail-n30.json}
     # Schema class (just a name) to use for parsing the dump file.
     schema-class-name: ${BOOKLINK_SCHEMA:WorkSchema}
+    # Allows to skip first N records of the dump file. This is useful when processing a file in several runs since this
+    # program always handles the dump file sequentially from the beginning to end. For example, running a scan through
+    # of an author dump to download images can take several days to complete (especially with throttling which should
+    # be enabled). Stopping a program in the middle of execution is entirely permissible. The program would resume
+    # downloading images where it stopped on the next run. In such case, if we know how many (or even approximately)
+    # records we already processed, we could set this property and the application will not even attempt to parse the
+    # first N records, greatly speeding up the resumed process.
+    start-from-record-no: ${BOOKLINK_START_WITH_RECORD:0}
     # Number of record to skip before a test record is logged as progress info
     frequency-check: ${BOOKLINK_FREQUENCY_CHECK:10}
     # Persist processed data to mongo ?

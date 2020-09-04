@@ -36,6 +36,9 @@ public class ImporterApp implements ApplicationRunner {
 	@Value("${booklink.di.schema-class-name}")
 	private String schemaClassName;
 
+	@Value("${booklink.di.start-from-record-no}")
+	private Integer startWithRecordNo;
+
 	/**
 	 * For large files, it may be desirable to every so often perform some processing.
 	 * For example, if total rows is 1000, setting this value to 100, would instruct
@@ -95,6 +98,7 @@ public class ImporterApp implements ApplicationRunner {
 					"booklink.di:\n" +
 					" ol-dump-file: {}\n" +
 					" schema-class-name: {}\n" +
+					" start-from-record-no: {}\n" +
 					" frequency-check: {}\n" +
 					" persist: {}\n" +
 					" persist-override: {}\n" +
@@ -104,6 +108,7 @@ public class ImporterApp implements ApplicationRunner {
 					" fetch-original-images: {}\n",
 					importFile.getAbsolutePath(),
 					schemaClass.getCanonicalName(),
+					startWithRecordNo,
 					frequencyCheck,
 					persistData,
 					persistDataOverride,

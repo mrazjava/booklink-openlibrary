@@ -1,5 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
+import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import lombok.extern.slf4j.Slf4j;
@@ -103,7 +104,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             try {
                 downloadImages(author, sequenceNo);
             } catch (IOException e) {
-                log.error("problem downloading author images: {}", e.getMessage());
+                throw new OpenLibraryIntegrationException("problem downloading author images", e);
             }
         }
 

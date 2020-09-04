@@ -3,6 +3,7 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,9 +24,17 @@ public class CommonsLineIterator implements FileImporter {
     @Value("${booklink.di.frequency-check}")
     private int frequencyCheck;
 
+    @Value("${booklink.di.start-from-record-no}")
+    private Integer startWithRecordNo;
+
 
     @Override
     public void runImport(File jsonFile, Class schema) {
+
+        if(startWithRecordNo < 0) {
+            log.warn("invalid value for [{}={}]; forcing 0!", "start-from-record-no", startWithRecordNo);
+            startWithRecordNo = 0;
+        }
 
         String line = null;
         long counter = 0;
@@ -43,15 +52,19 @@ public class CommonsLineIterator implements FileImporter {
             stopWatch.start();
             while(iterator.hasNext()) {
                 line = iterator.next();
-                counter++;
+                if(counter++ < startWithRecordNo) {
+                    if(counter % frequencyCheck == 0) {
+                        log.info("pass through check; raw JSON #{}:\n{}", counter, line);
+                    }
+                    continue;
+                }
 
                 Object pojo = importHandler.toRecord(line);
 
                 if(counter % frequencyCheck == 0) {
 
-                    if(log.isDebugEnabled()) {
-                        log.debug("raw JSON #{}:\n{}", counter, line);
-                    }
+                    log.debug("raw JSON #{}:\n{}", counter, line);
+
                     if(log.isInfoEnabled()) {
                         log.info("JSON #{}:\n{}", counter, importHandler.toText(pojo));
                     }
@@ -61,11 +74,15 @@ public class CommonsLineIterator implements FileImporter {
 
                 if(log.isTraceEnabled()) {
                     log.trace("raw JSON #{}:\n{}", counter, line);
-                    log.trace("raw JSON #{}:\n{}", counter, importHandler.toText(pojo));
+                    log.trace("parsed JSON #{}:\n{}", counter, importHandler.toText(pojo));
                 }
             }
             stopWatch.stop();
-            log.info("TOTAL RECORDS: {}, time: {}", counter, stopWatch.getTime());
+
+            log.info("TOTAL RECORDS: {}, time: {}",
+                    counter,
+                    DurationFormatUtils.formatDurationHMS(stopWatch.getTime())
+            );
         } catch (Exception e) {
             log.error("JSON #{} failed:\n{}", counter, line, e);
         }

@@ -20,9 +20,10 @@ Examples:
 
 *Process authors dump without persisting data, but if image is available, download it to a file and 
 store it in `author` directory to a connected USB drive. Note that author dump file and image output directory are 
-two different locations. Sample record is printed every 100,000th row:*
+two different locations. In addition, skip first 1 milion records (eg: they were processed on earlier run). Sample 
+record is printed every 100,000th row:*
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_IMAGE_DOWNLOAD=true -DBOOKLINK_IMG_DIR=/media/azimowski/booklink-5TB/authors -DBOOKLINK_PERSIST=false"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_IMAGE_DOWNLOAD=true -DBOOKLINK_IMG_DIR=/media/azimowski/booklink-5TB/authors -DBOOKLINK_PERSIST=false -DBOOKLINK_START_WITH_RECORD=1000000"
 ```
 *Process authors dump and persist each record in mongo. If avilable, download author images to a file 
 and store them in bronco subdirectory of the location where the dump file is read from. In addition, 
