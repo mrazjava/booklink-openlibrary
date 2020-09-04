@@ -34,7 +34,8 @@ every 1000th row:*
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=1000 -DBOOKLINK_IMG_DIR=bronco -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_IMG_MONGO=true"
 ```
 *Process works dump without persisting data or downloading any images. This is a simple scan through of a dump file - 
-useful for checking the parser.*
+useful for checking the parser when a new dump file is release by openlibrary.org (they release dumps on the monthly 
+basis).*
 ```
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/works.json -DBOOKLINK_SCHEMA=WorkSchema -DBOOKLINK_FREQUENCY_CHECK=100000"
 ```
