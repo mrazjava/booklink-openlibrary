@@ -2,6 +2,25 @@
 Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org) and raw data source for 
 author-book integration (search, etc) from the [booklink-backend](https://github.com/mrazjava/booklink-backend).
 
+# Overview
+openlibrary.org is a fantastic public archive which provides a rich aggregtion of book info from all over the world. 
+Practically speaking, it is the most complete - public and free - archive of books and authors available on the 
+Internet. As of September 2020, they release updated dumps on the monthly basis. Dumps are provided in a specific 
+JSON-ish format.
+
+Unfortunately I could not find a stable schema for processing openlibrary dumps, let alone a full fledged import 
+program not even mentioning one that would meet the requirements of the booklink application. There was no other way 
+around this than writing one from scratch, if booklink were to utilize openlibrary data base.
+
+This project builds into two executables:
+
+* `com.github.mrazjava.booklink.openlibrary.dataimport.ImporterApp` is the actual import process.
+* `TODO:` REST service for querying openlibrary mongo repository
+
+These could be two separate projects/apps with a shared schema *.jar (3rd project), but to keep things simple they 
+are both part of the same project. Should there be another integration in the future, schema can be easily split off 
+into a library and projects can be refactored (separated).
+
 ## Tech Stack
 * Spring Boot
 * [Jackson](https://github.com/FasterXML/jackson-docs)
