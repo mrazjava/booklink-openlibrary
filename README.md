@@ -18,8 +18,11 @@ This project builds into two executables:
 * `TODO:` REST service for querying openlibrary mongo repository
 
 These could be two separate projects/apps with a shared schema *.jar (3rd project), but to keep things simple they 
-are both part of the same project. Should there be another integration in the future, schema can be easily split off 
-into a library and projects can be refactored (separated).
+are both part of the same project. Should there be another integration in the future, booklink/mongo schema would need 
+to fork off from openlibrary schema (currently they're the same) and project would to be refactored into multiple 
+parts (REST service, import, mongo schema, open library schema, new/future integration schema etc etc). Again, this 
+level of complexity is not necessary at this point thus book source including openlibrary integration are part of a 
+single project.
 
 ## Tech Stack
 * Spring Boot
