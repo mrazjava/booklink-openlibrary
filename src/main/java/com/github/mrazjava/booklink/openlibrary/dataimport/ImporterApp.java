@@ -37,7 +37,7 @@ public class ImporterApp implements ApplicationRunner {
 	private String schemaClassName;
 
 	@Value("${booklink.di.start-from-record-no}")
-	private Integer startWithRecordNo;
+	private int startWithRecordNo;
 
 	/**
 	 * For large files, it may be desirable to every so often perform some processing.

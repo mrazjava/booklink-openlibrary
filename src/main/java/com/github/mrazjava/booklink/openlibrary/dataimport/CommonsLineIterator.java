@@ -79,6 +79,8 @@ public class CommonsLineIterator implements FileImporter {
             }
             stopWatch.stop();
 
+            importHandler.conclude(workingDirectory);
+
             log.info("TOTAL RECORDS: {}, time: {}",
                     counter,
                     DurationFormatUtils.formatDurationHMS(stopWatch.getTime())

@@ -3,6 +3,7 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -11,17 +12,14 @@ import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
@@ -52,6 +50,11 @@ public class ImageDownloader {
     @Value("${booklink.di.fetch-original-images}")
     private Boolean fetchOriginalImages;
 
+    private Set<String> failedImageDownloads = new HashSet<>();
+
+    private final int MINIMUM_VALID_IMAGE_BYTE_SIZE = 850;
+
+
     public Map<ImageSize, File> downloadImageToFile(String destinationDir, String imgId, String imgTemplate) throws IOException {
 
         Map<ImageSize, File> files = new HashMap<>();
@@ -64,11 +67,7 @@ public class ImageDownloader {
 
             if(imgSize == O && BooleanUtils.isFalse(fetchOriginalImages)) continue;
 
-            File imgById = new File(
-                    destinationDir +
-                            File.separator +
-                            (imgSize == O ? String.format("%s.jpg", imgId) : String.format("%s-%s.jpg", imgId, imgSize))
-            );
+            File imgById = getImageFile(destinationDir, imgSize, imgId);
 
             files.put(imgSize, imgById);
 
@@ -80,10 +79,37 @@ public class ImageDownloader {
 
             log.info("downloading.... {}", imgUrl);
 
-            FileUtils.copyToFile(new ByteArrayInputStream(downloadImage(imgUrl)), imgById);
+            byte[] imageBytes = downloadImage(imgUrl);
+            if(imageBytes != null && imageBytes.length > MINIMUM_VALID_IMAGE_BYTE_SIZE) {
+                FileUtils.copyToFile(new ByteArrayInputStream(imageBytes), imgById);
+            }
         }
 
         return files;
+    }
+
+    private File getImageFile(String destinationDir, ImageSize imgSize, String imgId) {
+        return new File(
+                destinationDir +
+                        File.separator +
+                        (imgSize == O ? String.format("%s.jpg", imgId) : String.format("%s-%s.jpg", imgId, imgSize))
+        );
+    }
+
+    public boolean filesExist(String destinationDir, String imgId, List<ImageSize> sizes) {
+
+        AtomicBoolean allExist = new AtomicBoolean(true);
+
+        Optional.of(sizes).orElse(List.of(ImageSize.values()))
+                .stream()
+                .distinct()
+                .forEach(size -> {
+                    boolean exists = getImageFile(destinationDir, size, imgId).exists();
+                    allExist.set(allExist.get() && exists);
+                    if(!exists) return;
+                });
+
+        return allExist.get();
     }
 
     public void downloadImageToBinary(
@@ -198,10 +224,19 @@ public class ImageDownloader {
             log.info("OK! {} | sleeping {}ms", imgUrl, sleep);
             Thread.sleep(sleep); // throttle to ensure no more than 100 requests per 5 min
 
-        } catch (InterruptedException e) {
+        }
+        catch(InterruptedException e) {
             log.error("invalid url[{}]: {}", imgUrl, e.getMessage());
+        }
+        catch(FileNotFoundException e) {
+            log.warn("image does not exist: {}", e.getMessage());
+            failedImageDownloads.add(imgUrl);
         }
 
         return baos.toByteArray();
+    }
+
+    public Set<String> getFailedImageDownloads() {
+        return Collections.unmodifiableSet(failedImageDownloads);
     }
 }

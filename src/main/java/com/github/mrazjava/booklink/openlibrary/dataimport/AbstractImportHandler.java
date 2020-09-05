@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
+import java.util.Set;
 
 @Slf4j
 abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
@@ -35,6 +36,10 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
 
     protected int savedCount = 0;
 
+    @Autowired
+    protected ImageDownloader imageDownloader;
+
+
     @Override
     public R toRecord(String line) {
 
@@ -53,6 +58,16 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
         } catch (JsonProcessingException e) {
             log.warn("failed record:\n{}", record);
             throw new OpenLibraryIntegrationException("problem writing record", e);
+        }
+    }
+
+    @Override
+    public void conclude(File dataSource) {
+        if(log.isInfoEnabled()) {
+            Set<String> failedDownloads = imageDownloader.getFailedImageDownloads();
+            StringBuilder urls = new StringBuilder();
+            failedDownloads.stream().forEach(url -> urls.append(url + "\n"));
+            log.info("{} failed downloads:\n{}", failedDownloads.size(), urls.toString());
         }
     }
 

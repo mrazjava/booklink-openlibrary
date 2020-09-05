@@ -13,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,9 +25,6 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
     @Autowired
     private AuthorRepository repository;
-
-    @Autowired
-    private ImageDownloader imageDownloader;
 
     private File authorImagesDestination;
 
@@ -66,7 +64,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         if(authorIdFilter.isEnabled()) {
             if (authorIdFilter.exists(record.getId())) {
-                log.debug("FILTER: author # {} matched author ID[{}]:\n{}", sequenceNo, record.getId(), toText(record));
+                log.trace("FILTER: author # {} matched author ID[{}]:\n{}", sequenceNo, record.getId(), toText(record));
                 authorMatchCount++;
             } else {
                 return;
@@ -134,8 +132,14 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         boolean downloadToFile = StringUtils.isNotBlank(imageDir);
         boolean downloadToBinary = BooleanUtils.isTrue(storeImagesInMongo);
 
-        if(downloadToFile || downloadToBinary) {
-            log.info("author #{} [{}]; checking images ...", sequenceNo, record.getId());
+        if(log.isDebugEnabled()) {
+            if ((downloadToFile || downloadToBinary) && !imageDownloader.filesExist(
+                    authorImagesDestination.getAbsolutePath(),
+                    Integer.toString(photoId),
+                    List.of(ImageSize.S, ImageSize.M, ImageSize.L)
+            )) {
+                log.debug("author #{} [{}]; checking images ...", sequenceNo, record.getId());
+            }
         }
 
         Map<ImageSize, File> imgFiles = downloadToFile ?

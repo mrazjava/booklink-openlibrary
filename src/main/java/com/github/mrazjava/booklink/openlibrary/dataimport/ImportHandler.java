@@ -16,6 +16,8 @@ public interface ImportHandler<T, R> {
      */
     void handle(R record, long sequenceNo);
 
+    void conclude(T dataSource);
+
     R toRecord(String text);
 
     String toText(R record);
