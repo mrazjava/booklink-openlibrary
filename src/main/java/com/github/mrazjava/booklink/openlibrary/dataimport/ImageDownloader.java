@@ -5,6 +5,7 @@ import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Sets;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.bson.BsonBinarySubType;
@@ -54,6 +55,12 @@ public class ImageDownloader {
 
     private final int MINIMUM_VALID_IMAGE_BYTE_SIZE = 850;
 
+    private IdFilter idFilter;
+
+
+    public void setIdFilter(IdFilter idFilter) {
+        this.idFilter = idFilter;
+    }
 
     public Map<ImageSize, File> downloadImageToFile(String destinationDir, String imgId, String imgTemplate) throws IOException {
 
@@ -69,12 +76,15 @@ public class ImageDownloader {
 
             File imgById = getImageFile(destinationDir, imgSize, imgId);
 
-            files.put(imgSize, imgById);
-
             if(imgById.exists()) {
                 log.debug("file exists, skipping: {}", imgById);
                 continue;
             }
+            if(idFilter.exists(FilenameUtils.getBaseName(imgById.getAbsolutePath()))) {
+                log.info("filter matched; ignoring! {}", imgById.getName());
+                continue;
+            }
+
             String imgUrl = String.format(imgTemplate, imgId, imgSize);
 
             log.info("downloading.... {}", imgUrl);
@@ -82,6 +92,7 @@ public class ImageDownloader {
             byte[] imageBytes = downloadImage(imgUrl);
             if(imageBytes != null && imageBytes.length > MINIMUM_VALID_IMAGE_BYTE_SIZE) {
                 FileUtils.copyToFile(new ByteArrayInputStream(imageBytes), imgById);
+                files.put(imgSize, imgById);
             }
         }
 

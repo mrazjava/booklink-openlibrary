@@ -31,6 +31,9 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Autowired
     private AuthorIdFilter authorIdFilter;
 
+    @Autowired
+    private AuthorImgExclusionFilter authorImgExclusionFilter;
+
     private int authorMatchCount = 0;
 
     @Override
@@ -46,6 +49,9 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         }
 
         authorIdFilter.load(workingDirectory);
+        authorImgExclusionFilter.load(workingDirectory);
+
+        imageDownloader.setIdFilter(authorImgExclusionFilter);
 
         log.info("destinationAuthorImg: {}", authorImagesDestination);
     }
