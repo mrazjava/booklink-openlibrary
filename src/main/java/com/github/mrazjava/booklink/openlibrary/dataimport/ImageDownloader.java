@@ -203,6 +203,16 @@ public class ImageDownloader {
                 ReadableByteChannel inChannel = Channels.newChannel(remoteImg.openStream());
                 WritableByteChannel outChannel = Channels.newChannel(baos);
         ) {
+            // only 100 requests/IP are allowed for every 5 minutes
+            // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
+            //
+            // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
+            //
+            // randomize sleep value within 1 second of a defined throttle value
+            long sleep = RandomUtils.nextLong(OPENLIB_IMG_THROTTLE_MS -500, OPENLIB_IMG_THROTTLE_MS +500);
+            log.debug("sleeping {}ms", sleep);
+            Thread.sleep(sleep); // throttle to ensure no more than 100 requests per 5 min
+
             int read;
             while((read = inChannel.read(byteBuffer)) > 0) {
                 byteBuffer.rewind();
@@ -213,17 +223,13 @@ public class ImageDownloader {
                 byteBuffer.clear();
             }
 
-            // only 100 requests/IP are allowed for every 5 minutes
-            // see RATE LIMITING: https://openlibrary.org/dev/docs/api/covers
-            //
-            // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
-            //
-            // randomize sleep value within 1 second of a defined throttle value
-            long sleep = RandomUtils.nextLong(OPENLIB_IMG_THROTTLE_MS -500, OPENLIB_IMG_THROTTLE_MS +500);
-
-            log.info("OK! {} | sleeping {}ms", imgUrl, sleep);
-            Thread.sleep(sleep); // throttle to ensure no more than 100 requests per 5 min
-
+            int size = baos.size();
+            if(size > MINIMUM_VALID_IMAGE_BYTE_SIZE) {
+                log.info("OK! ({} bytes) {}", size, imgUrl);
+            }
+            else {
+                log.warn("corrupted download! [size={}]: {}", size, imgUrl);
+            }
         }
         catch(InterruptedException e) {
             log.error("invalid url[{}]: {}", imgUrl, e.getMessage());
