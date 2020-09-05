@@ -1,16 +1,17 @@
 # Booklink Data Integration: openlibrary.org
-Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org) and raw data source for 
-author-book integration (search, etc) from the [booklink-backend](https://github.com/mrazjava/booklink-backend).
+Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org). Raw data source for 
+author-book feed (search, etc) into the [booklink-backend](https://github.com/mrazjava/booklink-backend).
 
 # Overview
-openlibrary.org is a fantastic public archive which provides a rich aggregtion of book info from all over the world. 
+openlibrary.org is a fantastic public archive which provides a rich aggregation of book info from all over the world. 
 Practically speaking, it is the most complete - public and free - archive of books and authors available on the 
 Internet. As of September 2020, they release updated dumps on the monthly basis. Dumps are provided in a specific 
 JSON-ish format.
 
-Unfortunately I could not find a stable schema for processing openlibrary dumps, let alone a full fledged import 
-program not even mentioning one that would meet the requirements of the booklink application. There was no other way 
-around this than writing one from scratch, if booklink were to utilize openlibrary data base.
+Even though openlibrary exposes a [rich interface API](https://github.com/internetarchive/openlibrary) for their dumps, 
+I could not find a stable schema for processing these dumps easily with java, let alone a full fledged import program, 
+not even mentioning one that would meet the requirements of the booklink application. There was no other way around 
+this than writing one from scratch.
 
 This project builds into two executables:
 
