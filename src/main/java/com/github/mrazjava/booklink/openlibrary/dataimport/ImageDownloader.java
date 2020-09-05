@@ -3,7 +3,6 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.compress.utils.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
