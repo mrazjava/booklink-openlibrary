@@ -64,8 +64,9 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FIL
 ```
 
 ## Filters
-All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. All 
-filters are optional and should live in the working directory (same location as dump file).
+All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. Each 
+filtered item should appear on its own line. Typically a filtered item is some form of an ID. All filters are optional 
+and should live in the working directory (same location as dump file).
 #### `author-id-filter.txt`
 If enabled, then only authors listed in that file will be handled (persisted, etc). All other authors from the dump 
 file will still be parsed, but will be ignored. The format of this file is one author ID per line.
