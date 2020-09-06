@@ -107,13 +107,6 @@ basis.
 
 Book covers are available as a bulk download.
 
-Author images must be download individually on case-by-case basis, which makes obtaining them much more difficult. This 
-import process does support author image download though. I ran it over several nights (about a week in total) with 
-stop-resume approach quite successfully. As of September 2020, downloading 1 image per author (some authors have more 
-than one image available) resulted in about 150k images for ~7.5 million authors which adjusting for size (S/M/L) gives 
-us one image every 150th author on average; or, only about 0.67% of authors (usually most popular ones) have a 
-downloadable image.
-
 #### Covers
 Book records contain references to covers which are by far the largest download. Covers are available in three sizes, 
 small, medium and large. Details explained on [this](https://openlibrary.org/dev/docs/api/covers) openlibrary page 
@@ -129,6 +122,13 @@ Author images can be downloaded by primary key or by explicit photo ID (see open
 by primary key is convenient but it's often just a copy of one of the photo IDs, may possibly be an alias to one of 
 the IDs. More reliable way is to download directly off photo ID. Not every author has a collection of photo IDs. 
 Booklink importer will download author photo off a first ID in a photo collection only.
+
+Author images must be download individually on case-by-case basis, which makes obtaining them much more difficult. This 
+import process does support author image download though. I ran it over several nights (about a week in total) with 
+stop-resume approach quite successfully. As of September 2020, downloading 1 image per author (some authors have more 
+than one image available) resulted in about 150k images for ~7.5 million authors which adjusting for size (S/M/L) gives 
+us one image every 150th author on average; or, only about 0.67% of authors (usually most popular ones) have a 
+downloadable image.
 
 ## Dump Processing
 Once uncompressed, data dumps must be prepared before parsing as they are not in JSON ready import format. They are JSON exports, but they contain additional metadata which must be stripped.
