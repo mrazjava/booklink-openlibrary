@@ -181,7 +181,7 @@ smaller chunks, 1 million lines each.
 
 ## Importing Dumps
 Once data dumps are processed, run the import (see the quick start). Import can process only one file per process, and 
-it's recommended to prcess them in order, starting with author, followed by works and editions last.
+it's recommended to process them in order, starting with author, followed by works and editions last.
 
 ## Notes
 To create short samples with specific content use `fgrep` as explained [here](https://stackoverflow.com/questions/13913014/grepping-a-huge-file-80gb-any-way-to-speed-it-up):
