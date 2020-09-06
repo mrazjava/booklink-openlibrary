@@ -100,8 +100,12 @@ sizes: (S)mall, (M)edium and (L)arge. Openlibrary also provides images in the or
 incomplete, meaning, there are many small/medium/large images which do not have the original. In addition, not all 
 images can be downloaded in bulk. For instance, author images can only be downloaded directly on case by case basis.
 
-Book covers are available for bulk download. Author images must be download individually which makes obtaining them 
-much more difficult. 
+Book covers are available as a bulk download. Author images must be download individually on case-by-case basis, which 
+makes obtaining them much more difficult. This import process does support author image download though. I ran it over 
+several nights (about a week in total) with stop-resume approach quite successfully. As of September 2020, downloading 
+1 image per author (some authors have more than one image available) resulted in about 150k images for 7.5 million 
+authors which adjusting for size (S/M/L) gives us `7.5mil / 50k = 150`. On average there is an image every 150th author 
+in the dump; or, only about 0.67% of authors (usually most popular ones) have a downloadable image.
 
 #### Covers
 Book records contain references to covers which are by far the largest download. Covers are available in three sizes, 
