@@ -26,6 +26,6 @@ public class AuthorImgExclusionFilter extends AbstractIdFilter<AuthorSchema> {
 
     @Override
     protected String getFilterName() {
-        return null;
+        return FILTER_NAME;
     }
 }
