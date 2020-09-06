@@ -20,10 +20,10 @@ This project builds into two executables:
 
 These could be two separate projects/apps with a shared schema *.jar (3rd project), but to keep things simple they 
 are both part of the same project. Should there be another integration in the future, booklink/mongo schema would need 
-to fork off from openlibrary schema (currently they're the same) and project would to be refactored into multiple 
-parts (REST service, import, mongo schema, open library schema, new/future integration schema etc etc). Again, this 
-level of complexity is not necessary at this point thus book source including openlibrary integration are part of a 
-single project.
+to fork off from openlibrary schema (currently they're the same) and project would have to be refactored into multiple 
+components (REST query service, import process, mongo schema, open library schema, new/future integration schema etc 
+etc). Again, this level of complexity is not necessary at this point thus book source including openlibrary integration 
+are part of a single project.
 
 ## Tech Stack
 * Spring Boot
@@ -63,11 +63,17 @@ basis).*
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/works.json -DBOOKLINK_SCHEMA=WorkSchema -DBOOKLINK_FREQUENCY_CHECK=100000"
 ```
 
-## Features
-#### Author Filtering
-If a file called `author-id-filter.txt` exists in the working directory (same location as dump file), then only authors 
-listed in that file will be handled (persisted, etc). The format of this file is one author ID per line. Comment is 
-allowed and must start with a `#`. Empty lines are also allowed and are ignored.
+## Filters
+All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. All 
+filters are optional and should live in the working directory (same location as dump file).
+#### `author-id-filter.txt`
+If enabled, then only authors listed in that file will be handled (persisted, etc). All other authors from the dump 
+file will still be parsed, but will be ignored. The format of this file is one author ID per line.
+#### `author-img-exclusions.txt`
+If enabled, then images present in this filter file will be ignored during the download process of author images. Some 
+images are missing from openlibrary archive and return a `404`. I've seen others regularly return a `500`. Normally, 
+the import process will abort when it encounters unexpected error such as this and we do want to fail fast to know 
+which image caused the problem.
 
 ## Datasources
 Raw [data](https://openlibrary.org/data/) [dumps](https://archive.org/details/ol_exports?sort=-publicdate) are pulled from [openlibrary](https://openlibrary.org/developers/dumps). 
