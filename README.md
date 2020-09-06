@@ -96,7 +96,9 @@ pv ol_dump_editions_latest.txt.gz | gunzip > editions.txt
 
 ## Images
 Openlibrary.org provides images for downloads. Usually, each image available through open library comes in three 
-sizes: (S)mall, (M)edium and (L)arge. Not all images can be downloaded in bulk, though.
+sizes: (S)mall, (M)edium and (L)arge. Openlibrary provides also images in the original size but I noticed this set is 
+incomplete, meaning, there are many small/medium/large images which do not have the original. In addition, not all 
+images can be downloaded in bulk. For instance, author images can only be downloaded directly on case by case basis.
 
 Book covers are available for bulk download. Author images must be download individually which makes obtaining them 
 much more difficult. 
