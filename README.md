@@ -110,7 +110,7 @@ Book covers are available as a bulk download.
 Author images must be download individually on case-by-case basis, which makes obtaining them much more difficult. This 
 import process does support author image download though. I ran it over several nights (about a week in total) with 
 stop-resume approach quite successfully. As of September 2020, downloading 1 image per author (some authors have more 
-than one image available) resulted in about 150k images for 7.5 million authors which adjusting for size (S/M/L) gives 
+than one image available) resulted in about 150k images for ~7.5 million authors which adjusting for size (S/M/L) gives 
 us one image every 150th author on average; or, only about 0.67% of authors (usually most popular ones) have a 
 downloadable image.
 
