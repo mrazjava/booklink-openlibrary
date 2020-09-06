@@ -72,9 +72,10 @@ If enabled, then only authors listed in that file will be handled (persisted, et
 file will be still parsed, but will be ignored. The format of this file is one author ID (eg: `OL1179289A`) per line.
 #### `author-img-exclusions.txt`
 If enabled, then images present in this filter file will be ignored during the download process of author images. Some 
-images are missing from openlibrary archive and return a `404`. I've seen others regularly return a `500`. Normally, 
-the import process will abort when it encounters unexpected error such as this and we do want to fail fast to know 
-which image caused the problem. The format is one file name without extension per line. Example: `3401366-L`.
+images, even though listed as an author option in the dump file, are missing from openlibrary archive and return a 
+`404`. I've seen others regularly return a `500`. Normally, the import process will abort when it encounters unexpected 
+error such as this and we do want to fail fast to know which image caused the problem. The format is one file name 
+without extension per line. Example: `3401366-L`.
 
 ## Datasources
 Raw [data](https://openlibrary.org/data/) [dumps](https://archive.org/details/ol_exports?sort=-publicdate) are pulled from [openlibrary](https://openlibrary.org/developers/dumps). 
