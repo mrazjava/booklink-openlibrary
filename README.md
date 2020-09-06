@@ -69,7 +69,7 @@ filtered item should appear on its own line. Typically a filtered item is some f
 and should live in the working directory (same location as dump file).
 #### `author-id-filter.txt`
 If enabled, then only authors listed in that file will be handled (persisted, etc). All other authors from the dump 
-file will still be parsed, but will be ignored. The format of this file is one author ID (eg: `OL1179289A`) per line.
+file will be still parsed, but will be ignored. The format of this file is one author ID (eg: `OL1179289A`) per line.
 #### `author-img-exclusions.txt`
 If enabled, then images present in this filter file will be ignored during the download process of author images. Some 
 images are missing from openlibrary archive and return a `404`. I've seen others regularly return a `500`. Normally, 
@@ -96,7 +96,7 @@ pv ol_dump_editions_latest.txt.gz | gunzip > editions.txt
 
 ## Images
 Openlibrary.org provides images for downloads. Usually, each image available through open library comes in three 
-sizes: (S)mall, (M)edium and (L)arge. Openlibrary provides also images in the original size but I noticed this set is 
+sizes: (S)mall, (M)edium and (L)arge. Openlibrary also provides images in the original size but I noticed this set is 
 incomplete, meaning, there are many small/medium/large images which do not have the original. In addition, not all 
 images can be downloaded in bulk. For instance, author images can only be downloaded directly on case by case basis.
 
