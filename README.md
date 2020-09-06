@@ -74,8 +74,8 @@ file will be still parsed, but will be ignored. The format of this file is one a
 If enabled, then images present in this filter file will be ignored during the download process of author images. Some 
 images, even though listed as an author option in the dump file, are missing from openlibrary archive and return a 
 `404`. I've seen others regularly return a `500`. Normally, the import process will abort when it encounters unexpected 
-error such as this and we do want to fail fast to know which image caused the problem especially since the process is 
-designed to easily resume (see the `BOOKLINK_START_WITH_RECORD` config option). The format is one file name 
+error such as this and we do want to fail fast to know which image caused the problem, especially since the process is 
+designed to be easily resumable (see the `BOOKLINK_START_WITH_RECORD` config option). The format is one file name 
 without extension per line. Example: `3401366-L`.
 
 ## Datasources
