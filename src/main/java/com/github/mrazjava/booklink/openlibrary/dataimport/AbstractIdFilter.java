@@ -1,7 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.repository.OpenLibraryMongoRepository;
-import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
@@ -10,16 +8,21 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
+/**
+ * Support for a filter whose content is fetched from a file on a disk. Enablement of such filter is dictated by the
+ * presence of the file and presence of filterable content. Therefore, by default, this filter is disabled since by
+ * default no file will be present.
+ */
 @Slf4j
-abstract class AbstractIdFilter<T extends BaseSchema> implements IdFilter {
+abstract class AbstractIdFilter implements IdFilter {
 
     protected Set<String> allowedIds = new HashSet<>();
 
     private String filterFilename;
+
+    private boolean enabled;
 
 
     AbstractIdFilter(String filterFilename) {
@@ -29,8 +32,9 @@ abstract class AbstractIdFilter<T extends BaseSchema> implements IdFilter {
     @Override
     public void load(File workingDirectory) {
 
-        File idFilterFile = new File(workingDirectory.getAbsolutePath() + File.separator + filterFilename);
-        if(idFilterFile.exists()) {
+        File idFilterFile = buildFilterFile(workingDirectory);
+        enabled = idFilterFile.exists();
+        if(isEnabled()) {
             log.info("[{} FILTER] detected ID file: {}", getFilterName(), idFilterFile.getAbsoluteFile());
             try {
                 LineIterator iterator = FileUtils.lineIterator(idFilterFile, "UTF-8");
@@ -46,11 +50,18 @@ abstract class AbstractIdFilter<T extends BaseSchema> implements IdFilter {
                 allowedIds.clear();
             }
         }
+        else {
+            log.info("[{} FILTER] - DISABLED", getFilterName());
+        }
+    }
+
+    private File buildFilterFile(File workingDirectory) {
+        return new File(workingDirectory.getAbsolutePath() + File.separator + filterFilename);
     }
 
     @Override
     public boolean isEnabled() {
-        return !allowedIds.isEmpty();
+        return enabled;
     }
 
     @Override
