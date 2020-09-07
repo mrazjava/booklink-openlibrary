@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
 @Slf4j
@@ -68,6 +69,10 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
             repository.save(record);
             savedCount++;
         }
+    }
+
+    private void downloadImages(WorkSchema record, long sequenceNo) throws IOException {
+        // TODO: implement me
     }
 
     @Override

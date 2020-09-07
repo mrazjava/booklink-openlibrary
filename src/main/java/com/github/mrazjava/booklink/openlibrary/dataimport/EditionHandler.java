@@ -5,13 +5,11 @@ import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
-import java.util.List;
-import java.util.Optional;
+import java.io.IOException;
 import java.util.Set;
 
 @Slf4j
@@ -50,9 +48,9 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
             savedCount = authorMatchCount = workMatchCount = 0;
         }
 
-        String matchedId = runFilter(record, authorIdFilter, sequenceNo);
+        String matchedId = runAuthorIdFilter(record, authorIdFilter, sequenceNo);
         if(StringUtils.isBlank(matchedId)) {
-            matchedId = runFilter(record, workIdFilter, sequenceNo);
+            matchedId = runAuthorIdFilter(record, workIdFilter, sequenceNo);
             if(StringUtils.isBlank(matchedId)) {
                 return;
             }
@@ -75,7 +73,11 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
     }
 
-    private String runFilter(EditionSchema record, AbstractIdFilter filter, long sequenceNo) {
+    private void downloadImages(EditionSchema record, long sequenceNo) throws IOException {
+        // TODO: implement me
+    }
+
+    private String runAuthorIdFilter(EditionSchema record, AbstractIdFilter filter, long sequenceNo) {
 
         String matchedId = null;
         Set<String> ids = AuthorIdFilter.FILTER_NAME.equals(filter.getFilterName()) ?
