@@ -133,7 +133,7 @@ public class ImageDownloader {
 
         if(!smallExistedB4) {
             ImageSize size = S;
-            byte[] image = cache.containsKey(size) ?
+            byte[] image = isImageInCache(cache, size) ?
                     FileUtils.readFileToByteArray(cache.get(size)) :
                     downloadImage(String.format(imgTemplate, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
@@ -146,7 +146,7 @@ public class ImageDownloader {
 
         if(!mediumExistedB4) {
             ImageSize size = M;
-            byte[] image = cache.containsKey(size) ?
+            byte[] image = isImageInCache(cache, size) ?
                     FileUtils.readFileToByteArray(cache.get(size)) :
                     downloadImage(String.format(imgTemplate, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
@@ -159,7 +159,7 @@ public class ImageDownloader {
 
         if(!largeExistedB4) {
             ImageSize size = ImageSize.L;
-            byte[] image = cache.containsKey(size) ?
+            byte[] image = isImageInCache(cache, size) ?
                     FileUtils.readFileToByteArray(cache.get(size)) :
                     downloadImage(String.format(imgTemplate, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
@@ -174,7 +174,7 @@ public class ImageDownloader {
 
             if (!originalExistedB4) {
                 ImageSize size = O;
-                byte[] image = cache.containsKey(size) ?
+                byte[] image = isImageInCache(cache, size) ?
                         FileUtils.readFileToByteArray(cache.get(size)) :
                         downloadImage(String.format(imgTemplate, imgId, size));
                 imgSupport.setImage(buildImage(imgId, image), size);
@@ -191,6 +191,10 @@ public class ImageDownloader {
                     originalExistedB4 ? MSG_EXISTS : (fetchOriginalImages ? (imgSupport.hasImage(O) ? MSG_DOWNLOADED : MSG_FAILURE) : MSG_BLOCKED)
             );
         }
+    }
+
+    private boolean isImageInCache(Map<ImageSize, File> cache, ImageSize size) {
+        return cache != null && cache.containsKey(size);
     }
 
     private CoverImage buildImage(String id, byte[] image) {
