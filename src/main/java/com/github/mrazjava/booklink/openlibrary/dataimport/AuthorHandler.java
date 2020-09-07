@@ -43,8 +43,10 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             authorImagesDestination = Path.of(imageDir).getParent() == null ?
                     Path.of(workingDirectory.getAbsolutePath() + File.separator + imageDir).toFile() :
                     Path.of(imageDir).toFile();
-            if(!authorImagesDestination.exists()) {
-                authorImagesDestination.mkdir();
+            if(BooleanUtils.isTrue(downloadImages) && !authorImagesDestination.exists()) {
+                throw new OpenLibraryIntegrationException(
+                        String.format("booklink.di.image-dir does not exist! %s", authorImagesDestination.getAbsolutePath())
+                );
             }
         }
 
