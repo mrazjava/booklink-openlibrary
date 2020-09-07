@@ -17,15 +17,12 @@ import java.util.stream.Collectors;
 @Slf4j
 abstract class AbstractIdFilter<T extends BaseSchema> implements IdFilter {
 
-    private Set<String> allowedIds = new HashSet<>();
-
-    private OpenLibraryMongoRepository<T> repository;
+    protected Set<String> allowedIds = new HashSet<>();
 
     private String filterFilename;
 
 
-    AbstractIdFilter(OpenLibraryMongoRepository repository, String filterFilename) {
-        this.repository = repository;
+    AbstractIdFilter(String filterFilename) {
         this.filterFilename = filterFilename;
     }
 
@@ -47,16 +44,6 @@ abstract class AbstractIdFilter<T extends BaseSchema> implements IdFilter {
             } catch (IOException e) {
                 log.error("[{} FILTER] problem loading id file [{}]: {}", getFilterName(), idFilterFile.getAbsolutePath(), e.getMessage());
                 allowedIds.clear();
-            }
-        }
-        else {
-            List<String> ids = repository.findAllIds().stream()
-                    .map(BaseSchema::getId)
-                    .collect(Collectors.toList());
-
-            if(!ids.isEmpty()) {
-                log.info("[{} FILTER] detected {} IDs in mongo", getFilterName(), ids.size());
-                allowedIds.addAll(ids);
             }
         }
     }

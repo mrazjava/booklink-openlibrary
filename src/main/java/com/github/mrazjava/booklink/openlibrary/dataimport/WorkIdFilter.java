@@ -5,7 +5,7 @@ import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import org.springframework.stereotype.Component;
 
 @Component
-public class WorkIdFilter extends AbstractIdFilter<WorkSchema> {
+public class WorkIdFilter extends AbstractMongoBackedIdFilter<WorkSchema> {
 
     public static final String FILTER_NAME = "WORK";
 

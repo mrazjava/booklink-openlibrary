@@ -36,11 +36,11 @@ public class ImageDownloader {
      */
     public static final long OPENLIB_IMG_THROTTLE_MS = 2000;
 
-    static final String MSG_EXISTS = "\u2612";
+    static final String MSG_EXISTS = "exists";
 
     static final String MSG_BLOCKED = "blocked";
 
-    static final String MSG_DOWNLOADED = "\u2611";
+    static final String MSG_DOWNLOADED = "downloaded";
 
     static final String MSG_FAILURE = "failed";
 
@@ -239,6 +239,7 @@ public class ImageDownloader {
             }
             else {
                 log.warn("corrupted download! [size={}]: {}", size, imgUrl);
+                failedImageDownloads.add(imgUrl);
             }
         }
         catch(InterruptedException e) {

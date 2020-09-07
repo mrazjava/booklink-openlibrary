@@ -1,6 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import org.springframework.stereotype.Component;
 
@@ -20,8 +19,8 @@ public class AuthorImgExclusionFilter extends AbstractIdFilter<AuthorSchema> {
     public static final String FILTER_FILENAME = "author-img-exclusions.txt";
 
 
-    AuthorImgExclusionFilter(AuthorRepository repository) {
-        super(repository, FILTER_FILENAME);
+    AuthorImgExclusionFilter() {
+        super(FILTER_FILENAME);
     }
 
     @Override

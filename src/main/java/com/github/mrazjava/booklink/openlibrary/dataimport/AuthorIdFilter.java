@@ -5,7 +5,7 @@ import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AuthorIdFilter extends AbstractIdFilter<AuthorSchema> {
+public class AuthorIdFilter extends AbstractMongoBackedIdFilter<AuthorSchema> {
 
     public static final String FILTER_NAME = "AUTHOR-ID";
 
