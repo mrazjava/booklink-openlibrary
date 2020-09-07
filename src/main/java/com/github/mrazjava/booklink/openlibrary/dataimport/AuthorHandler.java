@@ -158,9 +158,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         if(downloadToBinary) {
             imageDownloader.downloadImageToBinary(
-                    String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE,
-                    record,
-                    imgFiles == null ? Map.of() : imgFiles
+                    String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE, record, imgFiles
             );
         }
     }
