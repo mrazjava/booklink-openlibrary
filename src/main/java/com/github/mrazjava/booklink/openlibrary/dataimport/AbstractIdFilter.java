@@ -20,24 +20,22 @@ abstract class AbstractIdFilter implements IdFilter {
 
     protected Set<String> allowedIds = new HashSet<>();
 
-    private String filterFilename;
-
-    private boolean enabled;
+    private File filterFile;
 
 
     AbstractIdFilter(String filterFilename) {
-        this.filterFilename = filterFilename;
+        filterFile = new File(filterFilename);
     }
 
     @Override
     public void load(File workingDirectory) {
 
-        File idFilterFile = buildFilterFile(workingDirectory);
-        enabled = idFilterFile.exists();
+        filterFile = new File(workingDirectory.getAbsolutePath() + File.separator + filterFile.getName());
+
         if(isEnabled()) {
-            log.info("[{} FILTER] detected ID file: {}", getFilterName(), idFilterFile.getAbsoluteFile());
+            log.info("[{} FILTER] detected ID file: {}", getFilterName(), filterFile.getAbsoluteFile());
             try {
-                LineIterator iterator = FileUtils.lineIterator(idFilterFile, "UTF-8");
+                LineIterator iterator = FileUtils.lineIterator(filterFile, "UTF-8");
                 while(iterator.hasNext()) {
                     String line = iterator.next();
                     if(StringUtils.isNotBlank(line) && !line.startsWith("#")) {
@@ -46,7 +44,7 @@ abstract class AbstractIdFilter implements IdFilter {
                 }
                 log.info("[{} FILTER] loaded {} IDs:\n{}", getFilterName(), allowedIds.size(), allowedIds);
             } catch (IOException e) {
-                log.error("[{} FILTER] problem loading id file [{}]: {}", getFilterName(), idFilterFile.getAbsolutePath(), e.getMessage());
+                log.error("[{} FILTER] problem loading id file [{}]: {}", getFilterName(), filterFile.getAbsolutePath(), e.getMessage());
                 allowedIds.clear();
             }
         }
@@ -55,13 +53,9 @@ abstract class AbstractIdFilter implements IdFilter {
         }
     }
 
-    private File buildFilterFile(File workingDirectory) {
-        return new File(workingDirectory.getAbsolutePath() + File.separator + filterFilename);
-    }
-
     @Override
     public boolean isEnabled() {
-        return enabled;
+        return filterFile.exists();
     }
 
     @Override
