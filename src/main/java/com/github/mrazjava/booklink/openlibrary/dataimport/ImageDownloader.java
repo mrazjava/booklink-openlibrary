@@ -79,7 +79,7 @@ public class ImageDownloader {
                 log.debug("file exists, skipping: {}", imgById);
                 continue;
             }
-            if(idFilter.exists(FilenameUtils.getBaseName(imgById.getAbsolutePath()))) {
+            if(idFilter.exists(imgId) || idFilter.exists(FilenameUtils.getBaseName(imgById.getAbsolutePath()))) {
                 log.info("filter matched; ignoring! {}", imgById.getName());
                 continue;
             }
