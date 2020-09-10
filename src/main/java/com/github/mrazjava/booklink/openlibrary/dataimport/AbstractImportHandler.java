@@ -39,6 +39,8 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     @Autowired
     protected ImageDownloader imageDownloader;
 
+    protected File imageDirectoryLocation;
+
 
     @Override
     public R toRecord(String line) {

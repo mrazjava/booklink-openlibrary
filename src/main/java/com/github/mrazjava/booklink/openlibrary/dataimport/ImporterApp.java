@@ -2,7 +2,6 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.github.mrazjava.booklink.openlibrary.MongoConfiguration;
 import com.github.mrazjava.booklink.openlibrary.ObjectMapperConfiguration;
-import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;

@@ -14,7 +14,7 @@ public class AuthorIdFilter extends AbstractMongoBackedIdFilter<AuthorSchema> {
      * One ID per line. Comments are allowed and start with a #. Empty lines
      * are allowed and ignored.
      */
-    public static final String FILTER_FILENAME = "author-id-filter.txt";
+    public static final String FILTER_FILENAME = "src/test/resources/author-id-filter.txt";
 
 
     AuthorIdFilter(AuthorRepository repository) {

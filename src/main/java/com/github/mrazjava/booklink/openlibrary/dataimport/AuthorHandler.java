@@ -26,8 +26,6 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Autowired
     private AuthorRepository repository;
 
-    private File authorImagesDestination;
-
     @Autowired
     private AuthorIdFilter authorIdFilter;
 
@@ -40,12 +38,12 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     public void prepare(File workingDirectory) {
 
         if(StringUtils.isNotBlank(imageDir)) {
-            authorImagesDestination = Path.of(imageDir).getParent() == null ?
+            imageDirectoryLocation = Path.of(imageDir).getParent() == null ?
                     Path.of(workingDirectory.getAbsolutePath() + File.separator + imageDir).toFile() :
                     Path.of(imageDir).toFile();
-            if(BooleanUtils.isTrue(downloadImages) && !authorImagesDestination.exists()) {
+            if(BooleanUtils.isTrue(downloadImages) && !imageDirectoryLocation.exists()) {
                 throw new OpenLibraryIntegrationException(
-                        String.format("booklink.di.image-dir does not exist! %s", authorImagesDestination.getAbsolutePath())
+                        String.format("booklink.di.image-dir does not exist! %s", imageDirectoryLocation.getAbsolutePath())
                 );
             }
         }
@@ -55,7 +53,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         imageDownloader.setIdFilter(authorImgExclusionFilter);
 
-        log.info("destinationAuthorImg: {}", authorImagesDestination);
+        log.info("destinationAuthorImg: {}", imageDirectoryLocation);
     }
 
     @Override
@@ -142,7 +140,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         if(log.isDebugEnabled()) {
             if ((downloadToFile || downloadToBinary) && !imageDownloader.filesExist(
-                    authorImagesDestination.getAbsolutePath(),
+                    imageDirectoryLocation.getAbsolutePath(),
                     Integer.toString(photoId),
                     List.of(ImageSize.S, ImageSize.M, ImageSize.L)
             )) {
@@ -152,7 +150,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         Map<ImageSize, File> imgFiles = downloadToFile ?
                 imageDownloader.downloadImageToFile(
-                        authorImagesDestination.getAbsolutePath(),
+                        imageDirectoryLocation.getAbsolutePath(),
                         String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE) :
                 null;
 

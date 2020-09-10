@@ -3,10 +3,13 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.BsonBinarySubType;
 import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Value;
@@ -123,7 +126,7 @@ public class ImageDownloader {
     }
 
     public void downloadImageToBinary(
-            String imgId, String imgTemplate, DefaultImageSupport imgSupport, Map<ImageSize, File> cache) throws IOException {
+            String imgId, String imgTemplateUrl, DefaultImageSupport imgSupport, Map<ImageSize, File> cache) throws IOException {
 
         if(BooleanUtils.isFalse(downloadImages)) {
             return;
@@ -135,7 +138,7 @@ public class ImageDownloader {
             ImageSize size = S;
             byte[] image = isImageInCache(cache, size) ?
                     FileUtils.readFileToByteArray(cache.get(size)) :
-                    downloadImage(String.format(imgTemplate, imgId, size));
+                    downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
         }
         else {
@@ -148,7 +151,7 @@ public class ImageDownloader {
             ImageSize size = M;
             byte[] image = isImageInCache(cache, size) ?
                     FileUtils.readFileToByteArray(cache.get(size)) :
-                    downloadImage(String.format(imgTemplate, imgId, size));
+                    downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
         }
         else {
@@ -161,7 +164,7 @@ public class ImageDownloader {
             ImageSize size = ImageSize.L;
             byte[] image = isImageInCache(cache, size) ?
                     FileUtils.readFileToByteArray(cache.get(size)) :
-                    downloadImage(String.format(imgTemplate, imgId, size));
+                    downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
         }
         else {
@@ -176,7 +179,7 @@ public class ImageDownloader {
                 ImageSize size = O;
                 byte[] image = isImageInCache(cache, size) ?
                         FileUtils.readFileToByteArray(cache.get(size)) :
-                        downloadImage(String.format(imgTemplate, imgId, size));
+                        downloadImage(String.format(imgTemplateUrl, imgId, size));
                 imgSupport.setImage(buildImage(imgId, image), size);
             } else {
                 log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
@@ -184,7 +187,77 @@ public class ImageDownloader {
         }
 
         if(log.isInfoEnabled()) {
-            log.info("--- binary ? S{} M{} L{} O{}",
+            log.info("--- binary ? S({}) M({}) L({}) O({})",
+                    smallExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(S) ? MSG_DOWNLOADED : MSG_FAILURE),
+                    mediumExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(M) ? MSG_DOWNLOADED : MSG_FAILURE),
+                    largeExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(L) ? MSG_DOWNLOADED : MSG_FAILURE),
+                    originalExistedB4 ? MSG_EXISTS : (fetchOriginalImages ? (imgSupport.hasImage(O) ? MSG_DOWNLOADED : MSG_FAILURE) : MSG_BLOCKED)
+            );
+        }
+    }
+
+    public void downloadImageToBinary(Long imgId, DefaultImageSupport imgSupport, String imgDirectory) throws Exception {
+
+        if(BooleanUtils.isFalse(downloadImages)) {
+            return;
+        }
+
+        boolean smallExistedB4 = imgSupport.hasImage(S);
+
+        if(!smallExistedB4) {
+            ImageSize size = S;
+            byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
+            if(imageBytes != null) {
+                imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
+            }
+        }
+        else {
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, S);
+        }
+
+        boolean mediumExistedB4 = imgSupport.hasImage(M);
+
+        if(!mediumExistedB4) {
+            ImageSize size = M;
+            byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
+            if(imageBytes != null) {
+                imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
+            }
+        }
+        else {
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, M);
+        }
+
+        boolean largeExistedB4 = imgSupport.hasImage(ImageSize.L);
+
+        if(!largeExistedB4) {
+            ImageSize size = ImageSize.L;
+            byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
+            if(imageBytes != null) {
+                imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
+            }
+        }
+        else {
+            log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
+        }
+
+        boolean originalExistedB4 = imgSupport.hasImage(O);
+
+        if(BooleanUtils.isTrue(fetchOriginalImages)) {
+
+            if (!originalExistedB4) {
+                ImageSize size = O;
+                byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
+                if(imageBytes != null) {
+                    imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
+                }
+            } else {
+                log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
+            }
+        }
+
+        if(log.isInfoEnabled()) {
+            log.info("--- binary ? S({}) M({}) L({}) O({})",
                     smallExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(S) ? MSG_DOWNLOADED : MSG_FAILURE),
                     mediumExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(M) ? MSG_DOWNLOADED : MSG_FAILURE),
                     largeExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(L) ? MSG_DOWNLOADED : MSG_FAILURE),
@@ -204,6 +277,46 @@ public class ImageDownloader {
                 .sizeBytes(image.length)
                 .sizeText(FileUtils.byteCountToDisplaySize(image.length))
                 .build();
+    }
+
+    public byte[] downloadImage(Long imgId, ImageSize size, File imageDir) {
+
+        if(imgId < 100000) {
+            log.warn("wrong image id [{}]", imgId);
+            return new byte[]{};
+        }
+
+        String imgIdStr = StringUtils.leftPad(Long.toString(imgId), 7, "0");
+        byte[] imageBytes = null;
+
+        char idx1 = imgIdStr.charAt(0);
+        String idx2 = imgIdStr.substring(1,3);
+
+        String tarFileName = size.name().toLowerCase() + "_covers_000" + idx1 + "_" + idx2 + ".tar";
+        String tarFullPath = imageDir.getPath() + File.separator + tarFileName.substring(0, 13) + File.separator + tarFileName;
+
+        log.debug("tar source: {}", tarFullPath);
+
+        try(TarArchiveInputStream tais = new TarArchiveInputStream(new FileInputStream(tarFullPath))) {
+
+            while(tais.getNextEntry() != null) {
+                TarArchiveEntry entry = tais.getCurrentEntry();
+                String imgFileName = "000" + imgIdStr + "-" + size.name() + ".jpg";
+                if(imgFileName.equals(entry.getName())) {
+                    log.info("{} - {} | {}", entry.getName(), entry.getSize(), entry.getLastModifiedDate());
+                    imageBytes = tais.readNBytes((int)entry.getSize());
+                    break;
+                }
+            }
+        }
+        catch(Exception e) {
+            log.warn("problem fetching image: {}", e.getMessage());
+            failedImageDownloads.add(imgIdStr);
+        }
+
+        log.debug("image:\n{}", imageBytes);
+
+        return imageBytes;
     }
 
     private byte[] downloadImage(String imgUrl) throws IOException {

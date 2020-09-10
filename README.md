@@ -28,7 +28,7 @@ are part of a single project.
 ## Tech Stack
 * Spring Boot
 * [Jackson](https://github.com/FasterXML/jackson-docs)
-* Apache Commons: LANG3, IO, VFS
+* Apache Commons: LANG3, IO, COMPRESS
 * Lombok
 * MongoDB
 
@@ -61,6 +61,11 @@ useful for checking the parser when a new dump file is release by openlibrary.or
 basis).*
 ```
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/works.json -DBOOKLINK_SCHEMA=WorkSchema -DBOOKLINK_FREQUENCY_CHECK=100000"
+```
+*Process editions dump and persist selected records that match author filter. Also fetch images for each edition cover 
+which is available in bulk tar archives (already downloaded).*
+```
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/editions.json -DBOOKLINK_SCHEMA=EditionSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_IMAGE_DOWNLOAD=true -DBOOKLINK_IMG_MONGO=true -DBOOKLINK_IMG_DIR=/media/azimowski/booklink-500GB-e/covers/ -DBOOKLINK_PERSIST=true -DBOOKLINK_START_WITH_RECORD=0"
 ```
 
 ## Filters
