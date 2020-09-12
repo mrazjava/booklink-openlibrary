@@ -16,6 +16,9 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     @Autowired
     protected ObjectMapper objectMapper;
 
+    @Autowired
+    protected OpenLibraryUrlProvider urlProvider;
+
     @Value("${booklink.di.persist}")
     protected boolean persistData;
 

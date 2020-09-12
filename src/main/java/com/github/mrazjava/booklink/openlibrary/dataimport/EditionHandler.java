@@ -96,10 +96,16 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
 
         if(BooleanUtils.isTrue(storeImagesInMongo)) {
-            Set<ImageSize> status = imageDownloader.downloadImageToBinary(coverId, record);
+            Set<ImageSize> status = imageDownloader.downloadImageToBinary(
+                    coverId, urlProvider.getBookIdUrlTemplate(), record);
         }
     }
 
+    /**
+     * Sanitizes data known to be bad in the raw reed, so that it is not imported.
+     *
+     * @param record to clean
+     */
     private void cleanBadData(EditionSchema record) {
 
         if(CollectionUtils.isEmpty(record.getCovers())) {

@@ -42,7 +42,7 @@ public class ImageDownloader {
 
     static final String MSG_EXISTS = "exists";
 
-    static final String MSG_BLOCKED = "blocked";
+    static final String MSG_IGNORED = "ignored";
 
     static final String MSG_DOWNLOADED = "downloaded";
 
@@ -202,7 +202,7 @@ public class ImageDownloader {
             }
         }
         else {
-            statusMsgs.put(ImageSize.O, MSG_BLOCKED);
+            statusMsgs.put(ImageSize.O, MSG_IGNORED);
         }
 
         if(log.isInfoEnabled()) {
@@ -224,7 +224,8 @@ public class ImageDownloader {
      * @return image sizes which were downloaded successfully; never null but set can be empty if no download
      *  succeeded
      */
-    public Set<ImageSize> downloadImageToBinary(Long imgId, DefaultImageSupport imgSupport) throws Exception {
+    public Set<ImageSize> downloadImageToBinary(
+            Long imgId, String imgTemplateUrl, DefaultImageSupport imgSupport) throws Exception {
 
         Map<ImageSize, String> statusMsgs = new HashMap<>();
 
@@ -297,7 +298,7 @@ public class ImageDownloader {
             }
         }
         else {
-            statusMsgs.put(ImageSize.O, MSG_BLOCKED);
+            statusMsgs.put(ImageSize.O, MSG_IGNORED);
         }
 
         if(log.isInfoEnabled()) {

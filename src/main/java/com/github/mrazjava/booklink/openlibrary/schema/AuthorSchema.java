@@ -26,15 +26,6 @@ import java.util.List;
 @Document(collection = "authors")
 public class AuthorSchema extends BaseSchemaEnhanced {
 
-    // TODO: support configurable handling of blank image
-    // By default it returns a blank image if the cover cannot be found. With:
-    // ?default=false
-    // appended to the end of the URL, then it returns a 404 instead.
-
-    public static final String AUTHOR_OLID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/olid/%s-%s.jpg";
-
-    public static final String AUTHOR_PHOTOID_IMG_URL_TEMPLATE = "http://covers.openlibrary.org/a/id/%s-%s.jpg";
-
     @TextIndexed(weight = 1)
     private String name;
 

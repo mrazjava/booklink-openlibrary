@@ -17,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema.AUTHOR_PHOTOID_IMG_URL_TEMPLATE;
-
 @Slf4j
 @Component
 public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
@@ -151,12 +149,12 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         Map<ImageSize, File> imgFiles = downloadToFile ?
                 imageDownloader.downloadImageToFile(
                         imageDirectoryLocation.getAbsolutePath(),
-                        String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE) :
+                        String.valueOf(photoId), urlProvider.getAuthorIdUrlTemplate()) :
                 null;
 
         if(downloadToBinary) {
             imageDownloader.downloadImageToBinary(
-                    photoId, AUTHOR_PHOTOID_IMG_URL_TEMPLATE, record, imgFiles
+                    photoId, urlProvider.getAuthorIdUrlTemplate(), record, imgFiles
             );
         }
     }
