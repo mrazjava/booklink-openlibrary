@@ -5,15 +5,12 @@ import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -99,7 +96,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
 
         if(BooleanUtils.isTrue(storeImagesInMongo)) {
-            imageDownloader.downloadImageToBinary(coverId, record, imageDir);
+            Set<ImageSize> status = imageDownloader.downloadImageToBinary(coverId, record);
         }
     }
 

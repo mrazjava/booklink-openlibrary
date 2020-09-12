@@ -53,12 +53,20 @@ public class ImageDownloader {
     @Value("${booklink.di.fetch-original-images}")
     private Boolean fetchOriginalImages;
 
+    private File imageDirectory;
+
     private Set<String> failedImageDownloads = new HashSet<>();
 
     private final int MINIMUM_VALID_IMAGE_BYTE_SIZE = 850;
 
     private IdFilter idFilter;
 
+
+    public ImageDownloader(@Value("${booklink.di.image-dir}") String imgDir) {
+        if(StringUtils.isNotBlank(imgDir)) {
+            imageDirectory = new File(imgDir);
+        }
+    }
 
     public void setIdFilter(IdFilter idFilter) {
         this.idFilter = idFilter;
@@ -208,7 +216,7 @@ public class ImageDownloader {
      * @return image sizes which were downloaded successfully; never null but set can be empty if no download
      *  succeeded
      */
-    public Set<ImageSize> downloadImageToBinary(Long imgId, DefaultImageSupport imgSupport, String imgDirectory) throws Exception {
+    public Set<ImageSize> downloadImageToBinary(Long imgId, DefaultImageSupport imgSupport) throws Exception {
 
         Set<ImageSize> downloadStatus = new HashSet<>();
 
@@ -220,7 +228,7 @@ public class ImageDownloader {
 
         if(!smallExistedB4) {
             ImageSize size = S;
-            byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
+            byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 downloadStatus.add(size);
@@ -234,7 +242,7 @@ public class ImageDownloader {
 
         if(!mediumExistedB4) {
             ImageSize size = M;
-            byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
+            byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 downloadStatus.add(size);
@@ -248,7 +256,7 @@ public class ImageDownloader {
 
         if(!largeExistedB4) {
             ImageSize size = ImageSize.L;
-            byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
+            byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 downloadStatus.add(size);
@@ -264,7 +272,7 @@ public class ImageDownloader {
 
             if (!originalExistedB4) {
                 ImageSize size = O;
-                byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
+                byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
                 if(imageBytes != null) {
                     imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                     downloadStatus.add(size);
@@ -300,6 +308,10 @@ public class ImageDownloader {
     }
 
     public byte[] downloadImage(Long imgId, ImageSize size, File imageDir) {
+
+        if(imageDir == null) {
+            return null;
+        }
 
         if(imgId < 100000) {
             log.warn("wrong image id [{}]", imgId);
