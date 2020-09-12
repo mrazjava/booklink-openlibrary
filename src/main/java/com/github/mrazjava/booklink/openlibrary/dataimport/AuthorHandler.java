@@ -129,7 +129,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             return;
         }
 
-        Integer photoId = record.getPhotos().stream().filter(id -> id > 0).findFirst().orElse(0);
+        Long photoId = record.getPhotos().stream().filter(id -> id > 0).map(Long::valueOf).findFirst().orElse(0L);
 
         if(photoId == 0) {
             return;
@@ -141,7 +141,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         if(log.isDebugEnabled()) {
             if ((downloadToFile || downloadToBinary) && !imageDownloader.filesExist(
                     imageDirectoryLocation.getAbsolutePath(),
-                    Integer.toString(photoId),
+                    Long.toString(photoId),
                     List.of(ImageSize.S, ImageSize.M, ImageSize.L)
             )) {
                 log.debug("author #{} [{}]; checking images ...", sequenceNo, record.getId());
@@ -156,7 +156,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         if(downloadToBinary) {
             imageDownloader.downloadImageToBinary(
-                    String.valueOf(photoId), AUTHOR_PHOTOID_IMG_URL_TEMPLATE, record, imgFiles
+                    photoId, AUTHOR_PHOTOID_IMG_URL_TEMPLATE, record, imgFiles
             );
         }
     }
