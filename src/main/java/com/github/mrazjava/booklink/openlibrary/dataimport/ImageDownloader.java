@@ -75,11 +75,16 @@ public class ImageDownloader {
         this.idFilter = idFilter;
     }
 
-    public Map<ImageSize, File> downloadImageToFile(String destinationDir, String imgId, String imgTemplate) throws IOException {
+    public Map<ImageSize, File> downloadImageToFile(String destinationDir, Long imgId, String imgTemplate) throws IOException {
 
         Map<ImageSize, File> files = new HashMap<>();
 
         if(BooleanUtils.isFalse(downloadImages)) {
+            return files;
+        }
+
+        if(idFilter.exists(Long.toString(imgId))) {
+            log.info("filter matched; ignoring all sizes! {}", imgId);
             return files;
         }
 
@@ -93,7 +98,7 @@ public class ImageDownloader {
                 log.debug("file exists, skipping: {}", imgById);
                 continue;
             }
-            if(idFilter.exists(imgId) || idFilter.exists(FilenameUtils.getBaseName(imgById.getAbsolutePath()))) {
+            if(idFilter.exists(FilenameUtils.getBaseName(imgById.getAbsolutePath()))) {
                 log.info("filter matched; ignoring! {}", imgById.getName());
                 continue;
             }
@@ -112,15 +117,15 @@ public class ImageDownloader {
         return files;
     }
 
-    private File getImageFile(String destinationDir, ImageSize imgSize, String imgId) {
+    private File getImageFile(String destinationDir, ImageSize imgSize, Long imgId) {
         return new File(
                 destinationDir +
                         File.separator +
-                        (imgSize == O ? String.format("%s.jpg", imgId) : String.format("%s-%s.jpg", imgId, imgSize))
+                        (imgSize == O ? String.format("%d.jpg", imgId) : String.format("%d-%s.jpg", imgId, imgSize))
         );
     }
 
-    public boolean filesExist(String destinationDir, String imgId, List<ImageSize> sizes) {
+    public boolean filesExist(String destinationDir, Long imgId, List<ImageSize> sizes) {
 
         AtomicBoolean allExist = new AtomicBoolean(true);
 

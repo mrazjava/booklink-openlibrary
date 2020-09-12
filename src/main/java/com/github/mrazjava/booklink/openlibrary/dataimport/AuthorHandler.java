@@ -139,7 +139,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         if(log.isDebugEnabled()) {
             if ((downloadToFile || downloadToBinary) && !imageDownloader.filesExist(
                     imageDirectoryLocation.getAbsolutePath(),
-                    Long.toString(photoId),
+                    photoId,
                     List.of(ImageSize.S, ImageSize.M, ImageSize.L)
             )) {
                 log.debug("author #{} [{}]; checking images ...", sequenceNo, record.getId());
@@ -149,7 +149,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         Map<ImageSize, File> imgFiles = downloadToFile ?
                 imageDownloader.downloadImageToFile(
                         imageDirectoryLocation.getAbsolutePath(),
-                        String.valueOf(photoId), urlProvider.getAuthorIdUrlTemplate()) :
+                        photoId, urlProvider.getAuthorIdUrlTemplate()) :
                 null;
 
         if(downloadToBinary) {
