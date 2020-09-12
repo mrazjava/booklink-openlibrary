@@ -23,6 +23,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
@@ -44,6 +45,8 @@ public class ImageDownloader {
     static final String MSG_BLOCKED = "blocked";
 
     static final String MSG_DOWNLOADED = "downloaded";
+
+    static final String MSG_FETCHED = "fetched";
 
     static final String MSG_FAILURE = "failed";
 
@@ -218,80 +221,93 @@ public class ImageDownloader {
      */
     public Set<ImageSize> downloadImageToBinary(Long imgId, DefaultImageSupport imgSupport) throws Exception {
 
-        Set<ImageSize> downloadStatus = new HashSet<>();
+        Map<ImageSize, String> statusMsgs = new HashMap<>();
 
         if(BooleanUtils.isFalse(downloadImages)) {
-            return downloadStatus;
+            return Set.of();
         }
 
-        boolean smallExistedB4 = imgSupport.hasImage(S);
-
-        if(!smallExistedB4) {
+        if(!imgSupport.hasImage(S)) {
             ImageSize size = S;
             byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
-                downloadStatus.add(size);
+                statusMsgs.put(size, MSG_FETCHED);
+            }
+            else {
+                statusMsgs.put(size, MSG_FAILURE);
             }
         }
         else {
             log.debug("skipping binary image[{}]-{}; already exists", imgId, S);
+            statusMsgs.put(ImageSize.S, MSG_EXISTS);
         }
 
-        boolean mediumExistedB4 = imgSupport.hasImage(M);
-
-        if(!mediumExistedB4) {
+        if(!imgSupport.hasImage(M)) {
             ImageSize size = M;
             byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
-                downloadStatus.add(size);
+                statusMsgs.put(size, MSG_FETCHED);
+            }
+            else {
+                statusMsgs.put(size, MSG_FAILURE);
             }
         }
         else {
             log.debug("skipping binary image[{}]-{}; already exists", imgId, M);
+            statusMsgs.put(ImageSize.M, MSG_EXISTS);
         }
 
-        boolean largeExistedB4 = imgSupport.hasImage(ImageSize.L);
-
-        if(!largeExistedB4) {
+        if(!imgSupport.hasImage(ImageSize.L)) {
             ImageSize size = ImageSize.L;
             byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
-                downloadStatus.add(size);
+                statusMsgs.put(size, MSG_FETCHED);
+            }
+            else {
+                statusMsgs.put(size, MSG_FAILURE);
             }
         }
         else {
             log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
+            statusMsgs.put(ImageSize.L, MSG_EXISTS);
         }
 
-        boolean originalExistedB4 = imgSupport.hasImage(O);
-
         if(BooleanUtils.isTrue(fetchOriginalImages)) {
-
-            if (!originalExistedB4) {
+            if (!imgSupport.hasImage(O)) {
                 ImageSize size = O;
                 byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
                 if(imageBytes != null) {
                     imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
-                    downloadStatus.add(size);
+                    statusMsgs.put(size, MSG_FETCHED);
+                }
+                else {
+                    statusMsgs.put(size, MSG_FAILURE);
                 }
             } else {
                 log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
+                statusMsgs.put(ImageSize.O, MSG_FETCHED);
             }
+        }
+        else {
+            statusMsgs.put(ImageSize.O, MSG_BLOCKED);
         }
 
         if(log.isInfoEnabled()) {
             log.info("--- binary ? S({}) M({}) L({}) O({})",
-                    smallExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(S) ? MSG_DOWNLOADED : MSG_FAILURE),
-                    mediumExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(M) ? MSG_DOWNLOADED : MSG_FAILURE),
-                    largeExistedB4 ? MSG_EXISTS : (imgSupport.hasImage(L) ? MSG_DOWNLOADED : MSG_FAILURE),
-                    originalExistedB4 ? MSG_EXISTS : (fetchOriginalImages ? (imgSupport.hasImage(O) ? MSG_DOWNLOADED : MSG_FAILURE) : MSG_BLOCKED)
+                    statusMsgs.get(ImageSize.S),
+                    statusMsgs.get(ImageSize.M),
+                    statusMsgs.get(ImageSize.L),
+                    statusMsgs.get(ImageSize.O)
             );
         }
 
-        return downloadStatus;
+        return statusMsgs.keySet().stream().filter(k -> {
+            String msg = statusMsgs.get(k);
+            return MSG_DOWNLOADED.equals(msg) || MSG_FETCHED.equals(msg);
+        }).collect(Collectors.toSet());
     }
 
     private boolean isImageInCache(Map<ImageSize, File> cache, ImageSize size) {
