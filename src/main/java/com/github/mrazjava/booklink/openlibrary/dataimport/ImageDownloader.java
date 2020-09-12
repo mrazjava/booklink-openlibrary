@@ -235,7 +235,7 @@ public class ImageDownloader {
 
         if(!imgSupport.hasImage(S)) {
             ImageSize size = S;
-            byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
+            byte[] imageBytes = fetchImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 statusMsgs.put(size, MSG_FETCHED);
@@ -251,7 +251,7 @@ public class ImageDownloader {
 
         if(!imgSupport.hasImage(M)) {
             ImageSize size = M;
-            byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
+            byte[] imageBytes = fetchImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 statusMsgs.put(size, MSG_FETCHED);
@@ -267,7 +267,7 @@ public class ImageDownloader {
 
         if(!imgSupport.hasImage(ImageSize.L)) {
             ImageSize size = ImageSize.L;
-            byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
+            byte[] imageBytes = fetchImage(imgId, size, imageDirectory);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 statusMsgs.put(size, MSG_FETCHED);
@@ -284,7 +284,7 @@ public class ImageDownloader {
         if(BooleanUtils.isTrue(fetchOriginalImages)) {
             if (!imgSupport.hasImage(O)) {
                 ImageSize size = O;
-                byte[] imageBytes = downloadImage(imgId, size, imageDirectory);
+                byte[] imageBytes = fetchImage(imgId, size, imageDirectory);
                 if(imageBytes != null) {
                     imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                     statusMsgs.put(size, MSG_FETCHED);
@@ -329,7 +329,7 @@ public class ImageDownloader {
                 .build();
     }
 
-    public byte[] downloadImage(Long imgId, ImageSize size, File imageDir) {
+    public byte[] fetchImage(Long imgId, ImageSize size, File imageDir) {
 
         if(imageDir == null) {
             return null;
