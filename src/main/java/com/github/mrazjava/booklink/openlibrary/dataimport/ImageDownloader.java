@@ -125,11 +125,13 @@ public class ImageDownloader {
         return allExist.get();
     }
 
-    public void downloadImageToBinary(
+    public Set<ImageSize> downloadImageToBinary(
             String imgId, String imgTemplateUrl, DefaultImageSupport imgSupport, Map<ImageSize, File> cache) throws IOException {
 
+        Set<ImageSize> downloadStatus = new HashSet<>();
+
         if(BooleanUtils.isFalse(downloadImages)) {
-            return;
+            return downloadStatus;
         }
 
         boolean smallExistedB4 = imgSupport.hasImage(S);
@@ -140,6 +142,7 @@ public class ImageDownloader {
                     FileUtils.readFileToByteArray(cache.get(size)) :
                     downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
+            downloadStatus.add(size);
         }
         else {
             log.debug("skipping binary image[{}]-{}; already exists", imgId, S);
@@ -153,6 +156,7 @@ public class ImageDownloader {
                     FileUtils.readFileToByteArray(cache.get(size)) :
                     downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
+            downloadStatus.add(size);
         }
         else {
             log.debug("skipping binary image[{}]-{}; already exists", imgId, M);
@@ -166,6 +170,7 @@ public class ImageDownloader {
                     FileUtils.readFileToByteArray(cache.get(size)) :
                     downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(imgId, image), size);
+            downloadStatus.add(size);
         }
         else {
             log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
@@ -181,6 +186,7 @@ public class ImageDownloader {
                         FileUtils.readFileToByteArray(cache.get(size)) :
                         downloadImage(String.format(imgTemplateUrl, imgId, size));
                 imgSupport.setImage(buildImage(imgId, image), size);
+                downloadStatus.add(size);
             } else {
                 log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
             }
@@ -194,12 +200,20 @@ public class ImageDownloader {
                     originalExistedB4 ? MSG_EXISTS : (fetchOriginalImages ? (imgSupport.hasImage(O) ? MSG_DOWNLOADED : MSG_FAILURE) : MSG_BLOCKED)
             );
         }
+
+        return downloadStatus;
     }
 
-    public void downloadImageToBinary(Long imgId, DefaultImageSupport imgSupport, String imgDirectory) throws Exception {
+    /**
+     * @return image sizes which were downloaded successfully; never null but set can be empty if no download
+     *  succeeded
+     */
+    public Set<ImageSize> downloadImageToBinary(Long imgId, DefaultImageSupport imgSupport, String imgDirectory) throws Exception {
+
+        Set<ImageSize> downloadStatus = new HashSet<>();
 
         if(BooleanUtils.isFalse(downloadImages)) {
-            return;
+            return downloadStatus;
         }
 
         boolean smallExistedB4 = imgSupport.hasImage(S);
@@ -209,6 +223,7 @@ public class ImageDownloader {
             byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
+                downloadStatus.add(size);
             }
         }
         else {
@@ -222,6 +237,7 @@ public class ImageDownloader {
             byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
+                downloadStatus.add(size);
             }
         }
         else {
@@ -235,6 +251,7 @@ public class ImageDownloader {
             byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
+                downloadStatus.add(size);
             }
         }
         else {
@@ -250,6 +267,7 @@ public class ImageDownloader {
                 byte[] imageBytes = downloadImage(imgId, size, new File(imgDirectory));
                 if(imageBytes != null) {
                     imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
+                    downloadStatus.add(size);
                 }
             } else {
                 log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
@@ -264,6 +282,8 @@ public class ImageDownloader {
                     originalExistedB4 ? MSG_EXISTS : (fetchOriginalImages ? (imgSupport.hasImage(O) ? MSG_DOWNLOADED : MSG_FAILURE) : MSG_BLOCKED)
             );
         }
+
+        return downloadStatus;
     }
 
     private boolean isImageInCache(Map<ImageSize, File> cache, ImageSize size) {
