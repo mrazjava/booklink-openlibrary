@@ -146,15 +146,15 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             }
         }
 
-        Map<ImageSize, File> imgFiles = downloadToFile ?
-                imageDownloader.downloadImageToFile(
+        Map<ImageSize, byte[]> images = downloadToFile ?
+                imageDownloader.downloadImageFiles(
                         imageDirectoryLocation.getAbsolutePath(),
                         photoId, urlProvider.getAuthorIdUrlTemplate()) :
                 null;
 
         if(downloadToBinary) {
             imageDownloader.downloadImageToBinary(
-                    photoId, urlProvider.getAuthorIdUrlTemplate(), record, imgFiles
+                    photoId, urlProvider.getAuthorIdUrlTemplate(), record, images
             );
         }
     }

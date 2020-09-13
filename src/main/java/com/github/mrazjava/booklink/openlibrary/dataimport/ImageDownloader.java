@@ -76,17 +76,19 @@ public class ImageDownloader {
     }
 
     /**
-     * Downloads all available sizes of an image from openlibrary.org to files on a disk. Original
-     * image is only downloaded if {@code booklink.di.fetch-original-images} is enabled.
+     * Downloads all available sizes of an image from openlibrary.org to files on a disk. In addition
+     * to saving downloaded images into files, returns key-value lookup for convenience of the downloaded
+     * images. Original sized image is only downloaded if {@code booklink.di.fetch-original-images} is
+     * enabled.
      *
      * @param destinationDir where files should be saved
      * @param imgId to identify image for download
      * @param urlTemplate of openlibary.org source to use for a download
-     * @return key = size of image successfully downloaded, value = file successfully downloaded
+     * @return key = size of image successfully downloaded, value = binary content of an image
      */
-    public Map<ImageSize, File> downloadImageToFile(String destinationDir, Long imgId, String urlTemplate) throws IOException {
+    public Map<ImageSize, byte[]> downloadImageFiles(String destinationDir, Long imgId, String urlTemplate) throws IOException {
 
-        Map<ImageSize, File> files = new HashMap<>();
+        Map<ImageSize, byte[]> files = new HashMap<>();
 
         if(BooleanUtils.isFalse(downloadImages)) {
             return files;
@@ -101,29 +103,42 @@ public class ImageDownloader {
 
             if(imgSize == O && BooleanUtils.isFalse(fetchOriginalImages)) continue;
 
-            File imgById = getImageFile(destinationDir, imgSize, imgId);
-
-            if(imgById.exists()) {
-                log.debug("file exists, skipping: {}", imgById);
-                continue;
-            }
-            if(idFilter.exists(FilenameUtils.getBaseName(imgById.getAbsolutePath()))) {
-                log.info("filter matched; ignoring! {}", imgById.getName());
-                continue;
-            }
-
-            String imgUrl = String.format(urlTemplate, imgId, imgSize);
-
-            log.info("downloading.... {}", imgUrl);
-
-            byte[] imageBytes = downloadImage(imgUrl);
-            if(imageBytes != null && imageBytes.length > MINIMUM_VALID_IMAGE_BYTE_SIZE) {
-                FileUtils.copyToFile(new ByteArrayInputStream(imageBytes), imgById);
-                files.put(imgSize, imgById);
+            byte[] imageBytes = downloadImageToFile(destinationDir, imgId, imgSize, urlTemplate);
+            if(imageBytes != null) {
+                files.put(imgSize, imageBytes);
             }
         }
 
         return files;
+    }
+
+    public byte[] downloadImageToFile(String destinationDir, Long imgId, ImageSize size, String urlTemplate) throws IOException {
+
+        if(BooleanUtils.isFalse(downloadImages)) {
+            return null;
+        }
+
+        File imageFile = getImageFile(destinationDir, size, imgId);
+
+        if(imageFile.exists()) {
+            log.debug("file exists [{}]; skipping", imageFile);
+            return null;
+        }
+        if(idFilter.exists(FilenameUtils.getBaseName(imageFile.getAbsolutePath()))) {
+            log.info("filter matched; ignoring! {}", imageFile.getName());
+            return null;
+        }
+
+        String imgUrl = String.format(urlTemplate, imgId, size);
+
+        log.info("downloading.... {}", imgUrl);
+
+        byte[] imageBytes = downloadImage(imgUrl);
+        if(imageBytes != null && imageBytes.length > MINIMUM_VALID_IMAGE_BYTE_SIZE) {
+            FileUtils.copyToFile(new ByteArrayInputStream(imageBytes), imageFile);
+        }
+
+        return imageBytes;
     }
 
     private File getImageFile(String destinationDir, ImageSize imgSize, Long imgId) {
@@ -151,7 +166,7 @@ public class ImageDownloader {
     }
 
     public Set<ImageSize> downloadImageToBinary(
-            Long imgId, String imgTemplateUrl, DefaultImageSupport imgSupport, Map<ImageSize, File> cache) throws IOException {
+            Long imgId, String imgTemplateUrl, DefaultImageSupport imgSupport, Map<ImageSize, byte[]> cache) throws IOException {
 
         Map<ImageSize, String> statusMsgs = new HashMap<>();
 
@@ -163,7 +178,7 @@ public class ImageDownloader {
             ImageSize size = S;
             boolean fetch = isImageInCache(cache, size);
             byte[] image = fetch ?
-                    FileUtils.readFileToByteArray(cache.get(size)) :
+                    cache.get(size) :
                     downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(Long.toString(imgId), image), size);
             statusMsgs.put(size, fetch ? MSG_FETCHED : MSG_DOWNLOADED);
@@ -177,7 +192,7 @@ public class ImageDownloader {
             ImageSize size = M;
             boolean fetch = isImageInCache(cache, size);
             byte[] image = fetch ?
-                    FileUtils.readFileToByteArray(cache.get(size)) :
+                    cache.get(size) :
                     downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(Long.toString(imgId), image), size);
             statusMsgs.put(size, fetch ? MSG_FETCHED : MSG_DOWNLOADED);
@@ -191,7 +206,7 @@ public class ImageDownloader {
             ImageSize size = ImageSize.L;
             boolean fetch = isImageInCache(cache, size);
             byte[] image = fetch ?
-                    FileUtils.readFileToByteArray(cache.get(size)) :
+                    cache.get(size) :
                     downloadImage(String.format(imgTemplateUrl, imgId, size));
             imgSupport.setImage(buildImage(Long.toString(imgId), image), size);
             statusMsgs.put(size, fetch ? MSG_FETCHED : MSG_DOWNLOADED);
@@ -206,7 +221,7 @@ public class ImageDownloader {
                 ImageSize size = O;
                 boolean fetch = isImageInCache(cache, size);
                 byte[] image = fetch ?
-                        FileUtils.readFileToByteArray(cache.get(size)) :
+                        cache.get(size) :
                         downloadImage(String.format(imgTemplateUrl, imgId, size));
                 imgSupport.setImage(buildImage(Long.toString(imgId), image), size);
                 statusMsgs.put(size, fetch ? MSG_FETCHED : MSG_DOWNLOADED);
@@ -331,7 +346,7 @@ public class ImageDownloader {
         }).collect(Collectors.toSet());
     }
 
-    private boolean isImageInCache(Map<ImageSize, File> cache, ImageSize size) {
+    private boolean isImageInCache(Map<ImageSize, byte[]> cache, ImageSize size) {
         return cache != null && cache.containsKey(size);
     }
 
