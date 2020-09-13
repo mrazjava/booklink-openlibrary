@@ -1,6 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
+import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -10,8 +10,6 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.BsonBinarySubType;
-import org.bson.types.Binary;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,6 +23,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.buildImage;
 import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
 @Slf4j
@@ -39,6 +38,8 @@ public class ImageDownloader {
      * Number of milliseconds to wait after downloading an image.
      */
     public static final long OPENLIB_IMG_THROTTLE_MS = 2000;
+
+    private long throttleMs = OPENLIB_IMG_THROTTLE_MS;
 
     static final String MSG_EXISTS = "exists";
 
@@ -69,6 +70,14 @@ public class ImageDownloader {
         if(StringUtils.isNotBlank(imgDir)) {
             imageDirectory = new File(imgDir);
         }
+    }
+
+    public long getThrottleMs() {
+        return throttleMs;
+    }
+
+    public void setThrottleMs(long throttleMs) {
+        this.throttleMs = throttleMs;
     }
 
     public void setIdFilter(IdFilter idFilter) {
@@ -120,10 +129,15 @@ public class ImageDownloader {
 
         File imageFile = getImageFile(destinationDir, size, imgId);
 
+        if(!imageFile.getParentFile().exists()) {
+            throw new OpenLibraryIntegrationException(String.format("destination directory does not exist: %s", imageFile.getParentFile()));
+        }
+
         if(imageFile.exists()) {
             log.debug("file exists [{}]; skipping", imageFile);
-            return null;
+            return FileUtils.readFileToByteArray(imageFile);
         }
+
         if(idFilter.exists(FilenameUtils.getBaseName(imageFile.getAbsolutePath()))) {
             log.info("filter matched; ignoring! {}", imageFile.getName());
             return null;
@@ -250,11 +264,16 @@ public class ImageDownloader {
     }
 
     /**
-     * @return image sizes which were downloaded successfully; never null but set can be empty if no download
-     *  succeeded
+     * Assuming cover archives exist locally (have been downloaded manually), search the *.tar
+     * archives and fetch image if available. No internet connection is used for this operation.
+     *
+     * @param imgId an ID (not OLID) of an image to fetch
+     * @param imgSupport to populate with fetched images
+     * @param nonBulkImages alternate location where covers may reside as individual images; if available
+     *          fetch is attempted from this location as well
+     * @return image sizes which failed to fetch
      */
-    public Set<ImageSize> downloadImageToBinary(
-            Long imgId, String imgTemplateUrl, DefaultImageSupport imgSupport) throws Exception {
+    public Set<ImageSize> fetchImageToBinary(Long imgId, DefaultImageSupport imgSupport, File nonBulkImages) {
 
         Map<ImageSize, String> statusMsgs = new HashMap<>();
 
@@ -264,13 +283,12 @@ public class ImageDownloader {
 
         if(!imgSupport.hasImage(S)) {
             ImageSize size = S;
-            byte[] imageBytes = fetchImage(imgId, size, imageDirectory);
+            byte[] imageBytes = fetchImage(imgId, size, imageDirectory, nonBulkImages);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 statusMsgs.put(size, MSG_FETCHED);
             }
             else {
-
                 statusMsgs.put(size, MSG_FAILURE);
             }
         }
@@ -281,7 +299,7 @@ public class ImageDownloader {
 
         if(!imgSupport.hasImage(M)) {
             ImageSize size = M;
-            byte[] imageBytes = fetchImage(imgId, size, imageDirectory);
+            byte[] imageBytes = fetchImage(imgId, size, imageDirectory, nonBulkImages);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 statusMsgs.put(size, MSG_FETCHED);
@@ -297,7 +315,7 @@ public class ImageDownloader {
 
         if(!imgSupport.hasImage(ImageSize.L)) {
             ImageSize size = ImageSize.L;
-            byte[] imageBytes = fetchImage(imgId, size, imageDirectory);
+            byte[] imageBytes = fetchImage(imgId, size, imageDirectory, nonBulkImages);
             if(imageBytes != null) {
                 imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                 statusMsgs.put(size, MSG_FETCHED);
@@ -314,7 +332,7 @@ public class ImageDownloader {
         if(BooleanUtils.isTrue(fetchOriginalImages)) {
             if (!imgSupport.hasImage(O)) {
                 ImageSize size = O;
-                byte[] imageBytes = fetchImage(imgId, size, imageDirectory);
+                byte[] imageBytes = fetchImage(imgId, size, imageDirectory, nonBulkImages);
                 if(imageBytes != null) {
                     imgSupport.setImage(buildImage(Long.toString(imgId), imageBytes), size);
                     statusMsgs.put(size, MSG_FETCHED);
@@ -340,34 +358,44 @@ public class ImageDownloader {
             );
         }
 
-        return statusMsgs.keySet().stream().filter(k -> {
-            String msg = statusMsgs.get(k);
-            return MSG_DOWNLOADED.equals(msg) || MSG_FETCHED.equals(msg);
-        }).collect(Collectors.toSet());
+        return statusMsgs.keySet().stream()
+                .filter(k -> MSG_FAILURE.equals(statusMsgs.get(k)))
+                .collect(Collectors.toSet());
     }
 
     private boolean isImageInCache(Map<ImageSize, byte[]> cache, ImageSize size) {
         return cache != null && cache.containsKey(size);
     }
 
-    private CoverImage buildImage(String id, byte[] image) {
-        return CoverImage.builder()
-                .id(id)
-                .image(new Binary(BsonBinarySubType.BINARY, image))
-                .sizeBytes(image.length)
-                .sizeText(FileUtils.byteCountToDisplaySize(image.length))
-                .build();
-    }
+    /**
+     * Attempts to fetch already downloaded image. No internet connection is required or used
+     * for this operation. First checks if image is available as an individual file by checking
+     * directory where non-bulk images are stored. If file does not exist, then bulk directory
+     * is checked and a relevant TAR archive inspected. If file is found in either location its
+     * content is returned.
+     *
+     * @return content of an image if found, {@code null} otherwise
+     */
+    public byte[] fetchImage(Long imgId, ImageSize size, File bulkImagesDir, File nonBulkImagesDir) {
 
-    public byte[] fetchImage(Long imgId, ImageSize size, File imageDir) {
+        if(nonBulkImagesDir != null && nonBulkImagesDir.exists()) {
+            File individualImage = getImageFile(nonBulkImagesDir.getAbsolutePath(), size, imgId);
+            if(individualImage.exists()) {
+                try {
+                    return FileUtils.readFileToByteArray(individualImage);
+                } catch (IOException e) {
+                    log.warn("cannot read non-bulk image: {}", e.getMessage());
+                }
+            }
+        }
 
-        if(imageDir == null) {
+        if(bulkImagesDir == null) {
             return null;
         }
 
         if(imgId < 100000) {
             log.warn("wrong image id [{}]", imgId);
-            return new byte[]{};
+            return null;
         }
 
         String imgIdStr = StringUtils.leftPad(Long.toString(imgId), 7, "0");
@@ -377,15 +405,15 @@ public class ImageDownloader {
         String idx2 = imgIdStr.substring(1,3);
 
         String tarFileName = size.name().toLowerCase() + "_covers_000" + idx1 + "_" + idx2 + ".tar";
-        String tarFullPath = imageDir.getPath() + File.separator + tarFileName.substring(0, 13) + File.separator + tarFileName;
+        String tarFullPath = bulkImagesDir.getPath() + File.separator + tarFileName.substring(0, 13) + File.separator + tarFileName;
 
         log.debug("tar source: {}", tarFullPath);
 
+        final String imgFileName = "000" + imgIdStr + "-" + size.name() + ".jpg";
         try(TarArchiveInputStream tais = new TarArchiveInputStream(new FileInputStream(tarFullPath))) {
 
             while(tais.getNextEntry() != null) {
                 TarArchiveEntry entry = tais.getCurrentEntry();
-                String imgFileName = "000" + imgIdStr + "-" + size.name() + ".jpg";
                 if(imgFileName.equals(entry.getName())) {
                     log.info("{} - {} | {}", entry.getName(), entry.getSize(), entry.getLastModifiedDate());
                     imageBytes = tais.readNBytes((int)entry.getSize());
@@ -393,9 +421,11 @@ public class ImageDownloader {
                 }
             }
         }
-        catch(Exception e) {
-            log.warn("problem fetching image: {}", e.getMessage());
-            failedImageDownloads.add(imgIdStr);
+        catch(FileNotFoundException e) {
+            log.warn("{}: {}", imgFileName, e.getMessage());
+        }
+        catch(IOException e) {
+            throw new OpenLibraryIntegrationException("unexpected error fetching file", e);
         }
 
         log.debug("image:\n{}", imageBytes);

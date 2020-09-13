@@ -34,6 +34,9 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     @Value("${booklink.di.image-mongo}")
     protected Boolean storeImagesInMongo;
 
+    @Value("${booklink.di.fetch-original-images}")
+    protected Boolean fetchOriginalImages;
+
     @Value("${booklink.di.frequency-check}")
     protected int frequencyCheck;
 
@@ -44,6 +47,23 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
 
     protected File imageDirectoryLocation;
 
+    @Autowired
+    protected AuthorIdFilter authorIdFilter;
+
+    @Autowired
+    private AuthorImgExclusionFilter authorImgExclusionFilter;
+
+    protected int authorMatchCount = 0;
+
+
+    @Override
+    public void prepare(File workingDirectory) {
+
+        authorIdFilter.load(workingDirectory);
+        authorImgExclusionFilter.load(workingDirectory);
+
+        imageDownloader.setIdFilter(authorImgExclusionFilter);
+    }
 
     @Override
     public R toRecord(String line) {

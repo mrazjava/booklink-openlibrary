@@ -24,16 +24,10 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Autowired
     private AuthorRepository repository;
 
-    @Autowired
-    private AuthorIdFilter authorIdFilter;
-
-    @Autowired
-    private AuthorImgExclusionFilter authorImgExclusionFilter;
-
-    private int authorMatchCount = 0;
-
     @Override
     public void prepare(File workingDirectory) {
+
+        super.prepare(workingDirectory);
 
         if(StringUtils.isNotBlank(imageDir)) {
             imageDirectoryLocation = Path.of(imageDir).getParent() == null ?
@@ -45,11 +39,6 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
                 );
             }
         }
-
-        authorIdFilter.load(workingDirectory);
-        authorImgExclusionFilter.load(workingDirectory);
-
-        imageDownloader.setIdFilter(authorImgExclusionFilter);
 
         log.info("destinationAuthorImg: {}", imageDirectoryLocation);
     }

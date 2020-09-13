@@ -1,7 +1,9 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
+import com.github.mrazjava.booklink.openlibrary.BooklinkUtils;
 import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
+import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -24,12 +27,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     private EditionRepository repository;
 
     @Autowired
-    private AuthorIdFilter authorIdFilter;
-
-    @Autowired
     private WorkIdFilter workIdFilter;
-
-    private int authorMatchCount = 0;
 
     private int workMatchCount = 0;
 
@@ -37,8 +35,9 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     @Override
     public void prepare(File workingDirectory) {
 
-        authorIdFilter.load(workingDirectory);
+        super.prepare(workingDirectory);
         workIdFilter.load(workingDirectory);
+        imageDownloader.setThrottleMs(1000);
     }
 
     @Override
@@ -69,11 +68,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
 
         if(BooleanUtils.isTrue(downloadImages)) {
-            try {
-                downloadImages(record, sequenceNo);
-            } catch (Exception e) {
-                throw new OpenLibraryIntegrationException("problem downloading edition images", e);
-            }
+            downloadImages(record, sequenceNo);
         }
 
         if(persistData) {
@@ -87,7 +82,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
     }
 
-    private void downloadImages(EditionSchema record, long sequenceNo) throws Exception {
+    private void downloadImages(EditionSchema record, long sequenceNo) {
 
         Long coverId = Optional.ofNullable(record.getCovers()).orElse(List.of()).stream().findFirst().orElse(0L);
 
@@ -96,9 +91,43 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
 
         if(BooleanUtils.isTrue(storeImagesInMongo)) {
-            Set<ImageSize> status = imageDownloader.downloadImageToBinary(
-                    coverId, urlProvider.getBookIdUrlTemplate(), record);
+            // pull images from cover TARs downloaded manually in bulk
+            Set<ImageSize> failedSizes = imageDownloader.fetchImageToBinary(
+                    coverId, record, new File(getCoverDownloadPath())
+            );
+            // not all covers exist in a bulk archive; those that failed, try to download directly
+            failedSizes.stream().forEach(size -> downloadMissingCoverAndSet(coverId, size, record));
         }
+    }
+
+    private void downloadMissingCoverAndSet(Long coverId, ImageSize size, DefaultImageSupport imageSupport) {
+
+        if(size == ImageSize.O && BooleanUtils.isFalse(fetchOriginalImages)) {
+            return;
+        }
+
+        try {
+            byte[] imageBytes = imageDownloader.downloadImageToFile(
+                    getCoverDownloadPath(),
+                    coverId,
+                    size,
+                    urlProvider.getBookIdUrlTemplate()
+            );
+
+            if(imageBytes != null) {
+                imageSupport.setImage(
+                        BooklinkUtils.buildImage(Long.toString(coverId), imageBytes),
+                        size
+                );
+            }
+
+        } catch (IOException e) {
+            log.warn("cover [{}] download error: {}", e.getMessage());
+        }
+    }
+
+    private String getCoverDownloadPath() {
+        return imageDir + File.separator + "editions";
     }
 
     /**
