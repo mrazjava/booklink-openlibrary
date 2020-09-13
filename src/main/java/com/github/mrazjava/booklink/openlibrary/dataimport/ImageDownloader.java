@@ -75,7 +75,16 @@ public class ImageDownloader {
         this.idFilter = idFilter;
     }
 
-    public Map<ImageSize, File> downloadImageToFile(String destinationDir, Long imgId, String imgTemplate) throws IOException {
+    /**
+     * Downloads all available sizes of an image from openlibrary.org to files on a disk. Original
+     * image is only downloaded if {@code booklink.di.fetch-original-images} is enabled.
+     *
+     * @param destinationDir where files should be saved
+     * @param imgId to identify image for download
+     * @param urlTemplate of openlibary.org source to use for a download
+     * @return key = size of image successfully downloaded, value = file successfully downloaded
+     */
+    public Map<ImageSize, File> downloadImageToFile(String destinationDir, Long imgId, String urlTemplate) throws IOException {
 
         Map<ImageSize, File> files = new HashMap<>();
 
@@ -103,7 +112,7 @@ public class ImageDownloader {
                 continue;
             }
 
-            String imgUrl = String.format(imgTemplate, imgId, imgSize);
+            String imgUrl = String.format(urlTemplate, imgId, imgSize);
 
             log.info("downloading.... {}", imgUrl);
 
@@ -246,6 +255,7 @@ public class ImageDownloader {
                 statusMsgs.put(size, MSG_FETCHED);
             }
             else {
+
                 statusMsgs.put(size, MSG_FAILURE);
             }
         }
