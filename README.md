@@ -47,7 +47,7 @@ Examples:
 If the image is not available, try to download it from the Internet. Any author records that may have existed in mongo 
 will be overriden.*
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_IMG_DIR=/media/azimowski/booklink-5TB/authors -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_IMAGE_DOWNLOAD=true -DBOOKLINK_IMG_MONGO=true"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_IMG_DIR=/media/azimowski/booklink-5TB/authors -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_IMAGE_PULL=true -DBOOKLINK_IMG_MONGO=true"
 ```
 
 *Process authors dump without persisting data, but if image is available, download it to a file and 
