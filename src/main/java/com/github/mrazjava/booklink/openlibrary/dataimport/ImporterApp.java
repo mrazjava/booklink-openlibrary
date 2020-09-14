@@ -53,8 +53,8 @@ public class ImporterApp implements ApplicationRunner {
 	@Value("${booklink.di.persist-override}")
 	private Boolean persistDataOverride;
 
-	@Value("${booklink.di.image-download}")
-	private Boolean imageDownload;
+	@Value("${booklink.di.image-pull}")
+	private Boolean imagePull;
 
 	@Value("${booklink.di.image-dir}")
 	private String imageDir;
@@ -101,7 +101,7 @@ public class ImporterApp implements ApplicationRunner {
 					" frequency-check: {}\n" +
 					" persist: {}\n" +
 					" persist-override: {}\n" +
-					" image-download: {}\n" +
+					" image-pull: {}\n" +
 					" image-dir: {}\n" +
 					" image-mongo: {}\n" +
 					" fetch-original-images: {}\n",
@@ -111,7 +111,7 @@ public class ImporterApp implements ApplicationRunner {
 					frequencyCheck,
 					persistData,
 					persistDataOverride,
-					imageDownload,
+					imagePull,
 					StringUtils.isBlank(imageDir) ? "feature DISABLED" : imageDir,
 					storeImagesInMongo,
 					fetchOriginalImages

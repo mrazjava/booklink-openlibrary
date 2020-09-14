@@ -33,7 +33,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             imageDirectoryLocation = Path.of(imageDir).getParent() == null ?
                     Path.of(workingDirectory.getAbsolutePath() + File.separator + imageDir).toFile() :
                     Path.of(imageDir).toFile();
-            if(BooleanUtils.isTrue(downloadImages) && !imageDirectoryLocation.exists()) {
+            if(BooleanUtils.isTrue(imagePull) && !imageDirectoryLocation.exists()) {
                 throw new OpenLibraryIntegrationException(
                         String.format("booklink.di.image-dir does not exist! %s", imageDirectoryLocation.getAbsolutePath())
                 );
@@ -91,7 +91,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             author = record;
         }
 
-        if(BooleanUtils.isTrue(downloadImages)) {
+        if(BooleanUtils.isTrue(imagePull)) {
             try {
                 downloadImages(author, sequenceNo);
             } catch (IOException e) {

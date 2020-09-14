@@ -27,7 +27,7 @@ booklink:
     persist-override: ${BOOKLINK_PERSIST_OVERRIDE:true}
     # If enabled, image download will be attempted for each record if it provides photo ids and if there is no file
     # source (cache; see BOOKLINK_IMG_DIR)
-    image-download: ${BOOKLINK_IMAGE_DOWNLOAD:false}
+    image-pull: ${BOOKLINK_IMAGE_PULL:false}
     # Directory name of full path to where images should be downloaded to. If just a directory name is provided, it
     # is expected to live in the same location as the dump file. This directory can be empty or it can contain images.
     # If it contains the images following the naming convention established by Openlibrary.org, then these images are

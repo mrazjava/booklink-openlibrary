@@ -51,8 +51,8 @@ public class ImageDownloader {
 
     static final String MSG_FAILURE = "failed";
 
-    @Value("${booklink.di.image-download}")
-    private Boolean downloadImages;
+    @Value("${booklink.di.image-pull}")
+    private Boolean imagePull;
 
     @Value("${booklink.di.fetch-original-images}")
     private Boolean fetchOriginalImages;
@@ -99,7 +99,7 @@ public class ImageDownloader {
 
         Map<ImageSize, byte[]> files = new HashMap<>();
 
-        if(BooleanUtils.isFalse(downloadImages)) {
+        if(BooleanUtils.isFalse(imagePull)) {
             return files;
         }
 
@@ -123,7 +123,7 @@ public class ImageDownloader {
 
     public byte[] downloadImageToFile(String destinationDir, Long imgId, ImageSize size, String urlTemplate) throws IOException {
 
-        if(BooleanUtils.isFalse(downloadImages)) {
+        if(BooleanUtils.isFalse(imagePull)) {
             return null;
         }
 
@@ -184,7 +184,7 @@ public class ImageDownloader {
 
         Map<ImageSize, String> statusMsgs = new HashMap<>();
 
-        if(BooleanUtils.isFalse(downloadImages)) {
+        if(BooleanUtils.isFalse(imagePull)) {
             return Set.of();
         }
 
@@ -277,7 +277,7 @@ public class ImageDownloader {
 
         Map<ImageSize, String> statusMsgs = new HashMap<>();
 
-        if(BooleanUtils.isFalse(downloadImages)) {
+        if(BooleanUtils.isFalse(imagePull)) {
             return Set.of();
         }
 

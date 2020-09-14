@@ -25,8 +25,8 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     @Value("${booklink.di.persist-override}")
     protected boolean persistDataOverride;
 
-    @Value("${booklink.di.image-download}")
-    protected Boolean downloadImages;
+    @Value("${booklink.di.image-pull}")
+    protected Boolean imagePull;
 
     @Value("${booklink.di.image-dir}")
     protected String imageDir;

@@ -1,7 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.github.mrazjava.booklink.openlibrary.BooklinkUtils;
-import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
@@ -67,7 +66,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
             authorMatchCount++;
         }
 
-        if(BooleanUtils.isTrue(downloadImages)) {
+        if(BooleanUtils.isTrue(imagePull)) {
             downloadImages(record, sequenceNo);
         }
 
