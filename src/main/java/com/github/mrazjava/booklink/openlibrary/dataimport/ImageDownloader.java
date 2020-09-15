@@ -31,14 +31,17 @@ import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 public class ImageDownloader {
 
     /**
+     * default throttling time; maybe overriden by calling component
+     */
+    public static final long OPENLIB_IMG_THROTTLE_MS = 2000;
+
+    /**
      * When downloading images individually from Openlibrary.org, slow down the
      * frequency of image requests to avoid blokade from openlibrary which limits
      * the number of requests allowed per a specific time period.
      *
      * Number of milliseconds to wait after downloading an image.
      */
-    public static final long OPENLIB_IMG_THROTTLE_MS = 2000;
-
     private long throttleMs = OPENLIB_IMG_THROTTLE_MS;
 
     static final String MSG_EXISTS = "exists";
@@ -86,8 +89,8 @@ public class ImageDownloader {
 
     /**
      * Downloads all available sizes of an image from openlibrary.org to files on a disk. In addition
-     * to saving downloaded images into files, returns key-value lookup for convenience of the downloaded
-     * images. Original sized image is only downloaded if {@code booklink.di.fetch-original-images} is
+     * to saving downloaded images into files, returns key-value lookup of the downloaded images
+     * for subsequent usage. Original sized image is only downloaded if {@code booklink.di.fetch-original-images} is
      * enabled.
      *
      * @param destinationDir where files should be saved
@@ -450,7 +453,7 @@ public class ImageDownloader {
             // 5 min * 60 secs = 300s / 100 requests = 3 sec per request
             //
             // randomize sleep value within 1 second of a defined throttle value
-            long sleep = RandomUtils.nextLong(OPENLIB_IMG_THROTTLE_MS -500, OPENLIB_IMG_THROTTLE_MS +500);
+            long sleep = RandomUtils.nextLong(throttleMs-500, throttleMs+500);
             log.debug("sleeping {}ms", sleep);
             Thread.sleep(sleep); // throttle to ensure no more than 100 requests per 5 min
 
