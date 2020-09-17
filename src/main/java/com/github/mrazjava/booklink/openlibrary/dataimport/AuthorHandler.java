@@ -16,6 +16,9 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
+
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
 @Slf4j
 @Component
@@ -49,7 +52,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         if(record == null) return;
 
         if((sequenceNo % frequencyCheck) == 0 && authorIdFilter.isEnabled()) {
-            log.info("FILTER MATCHES -- {}: {}, SAVED: {}",
+            log.info("MATCHED-FILTERS...{}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount,
                     savedCount);
             savedCount = authorMatchCount = 0;
@@ -115,12 +118,29 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         if(CollectionUtils.isEmpty(record.getPhotos())) {
             return;
         }
+        AtomicLong lastId = new AtomicLong(0L);
+        record.getPhotos().stream()
+                .filter(id -> id > 0)
+                .map(Long::valueOf)
+                .filter(id -> {
+                    log.info("author[{}] img[{}]", record.getId(), id);
+                    if(lastId.get() > 0) {
+                        log.info(".... trying alternate photoId[{}] (author={}, sequenceNo={})",
+                                id, record.getId(), sequenceNo);
+                    }
+                    boolean success = downloadImages(record, id, sequenceNo);
+                    if(!success) {
+                        lastId.set(id);
+                    }
+                    return success;
+                })
+                .findFirst();
+    }
 
-        Long photoId = record.getPhotos().stream().filter(id -> id > 0).map(Long::valueOf).findFirst().orElse(0L);
-
-        if(photoId == 0) {
-            return;
-        }
+    /**
+     * @return {@code true} if operation succeeded; {@code false} otherwise
+     */
+    private boolean downloadImages(AuthorSchema record, long photoId, long sequenceNo) {
 
         boolean downloadToFile = StringUtils.isNotBlank(imageDir);
         boolean downloadToBinary = BooleanUtils.isTrue(storeImagesInMongo);
@@ -129,22 +149,33 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             if ((downloadToFile || downloadToBinary) && !imageDownloader.filesExist(
                     imageDirectoryLocation.getAbsolutePath(),
                     photoId,
-                    List.of(ImageSize.S, ImageSize.M, ImageSize.L)
+                    List.of(S, M, L)
             )) {
                 log.debug("author #{} [{}]; checking images ...", sequenceNo, record.getId());
             }
         }
 
-        Map<ImageSize, byte[]> images = downloadToFile ?
-                imageDownloader.downloadImageFiles(
-                        imageDirectoryLocation.getAbsolutePath(),
-                        photoId, urlProvider.getAuthorIdUrlTemplate()) :
-                null;
+        Map<ImageSize, byte[]> images = Map.of();
 
-        if(downloadToBinary) {
-            imageDownloader.downloadImageToBinary(
-                    photoId, urlProvider.getAuthorIdUrlTemplate(), record, images
-            );
+        try {
+            if (downloadToFile) {
+                images = imageDownloader.downloadImageFiles(
+                        imageDirectoryLocation.getAbsolutePath(),
+                        photoId, urlProvider.getAuthorIdUrlTemplate());
+            }
+            if (downloadToBinary) {
+                imageDownloader.downloadImageToBinary(
+                        photoId, urlProvider.getAuthorIdUrlTemplate(), record, images
+                );
+            }
         }
+        catch(IOException e) {
+            log.error("download error! authorId[{}], photoId[{}], sequenceNo[{}]: {}",
+                    record.getId(), photoId, sequenceNo, e.getMessage());
+        }
+
+        return (images.containsKey(S) || record.getImageSmall() != null) &&
+                (images.containsKey(M) || record.getImageMedium() != null) &&
+                (images.containsKey(L) || record.getImageLarge() != null);
     }
 }

@@ -50,7 +50,7 @@ public class ImageDownloader {
 
     static final String MSG_DOWNLOADED = "downloaded";
 
-    static final String MSG_FETCHED = "fetched";
+    static final String MSG_FETCHED = "cache-hit";
 
     static final String MSG_FAILURE = "failed";
 
@@ -252,7 +252,8 @@ public class ImageDownloader {
         }
 
         if(log.isInfoEnabled()) {
-            log.info("--- binary ? S({}) M({}) L({}) O({})",
+            log.info("--- mongo img[{}] ? S({}) M({}) L({}) O({})",
+                    imgId,
                     statusMsgs.get(ImageSize.S),
                     statusMsgs.get(ImageSize.M),
                     statusMsgs.get(ImageSize.L),
