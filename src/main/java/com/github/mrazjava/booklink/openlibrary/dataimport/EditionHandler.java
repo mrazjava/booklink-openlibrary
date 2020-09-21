@@ -13,9 +13,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -83,26 +84,61 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
 
     private void downloadImages(EditionSchema record, long sequenceNo) {
 
-        Long coverId = Optional.ofNullable(record.getCovers()).orElse(List.of()).stream().findFirst().orElse(0L);
-
-        if(coverId == 0) {
+        if(CollectionUtils.isEmpty(record.getCovers())) {
             return;
         }
-
-        if(BooleanUtils.isTrue(storeImagesInMongo)) {
-            // pull images from cover TARs downloaded manually in bulk
-            Set<ImageSize> failedSizes = imageDownloader.fetchImageToBinary(
-                    coverId, record, new File(getCoverDownloadPath())
-            );
-            // not all covers exist in a bulk archive; those that failed, try to download directly
-            failedSizes.stream().forEach(size -> downloadMissingCoverAndSet(coverId, size, record));
-        }
+        AtomicLong lastId = new AtomicLong(0L);
+        record.getCovers().stream()
+                .filter(id -> id > 0)
+                .filter(id -> {
+                    log.debug("edition[{}] img[{}]", record.getId(), id);
+                    if(lastId.get() > 0) {
+                        log.info(".... trying alternate coverId[{}] (edition={}, sequenceNo={})",
+                                id, record.getId(), sequenceNo);
+                    }
+                    boolean success = loadCovers(record, id);
+                    if(!success) {
+                        lastId.set(id);
+                    }
+                    return success;
+                })
+                .findFirst();
     }
 
-    private void downloadMissingCoverAndSet(Long coverId, ImageSize size, DefaultImageSupport imageSupport) {
+    /**
+     * Attempts to fetch book cover images of all sizes for a specific edition and a cover. Depending
+     * on configuration, may attempt a download from internet (openlibrary) if cover is missing in a
+     * bulk TAR archive. Also depending on configuration, may set fetched cover images as part of a
+     * mongo record.
+     *
+     * @return {@code true} if cover images were loaded successfully using whichever means
+     */
+    private boolean loadCovers(EditionSchema record, Long coverId) {
+
+        // pull images from cover TARs downloaded manually in bulk
+        Set<ImageSize> fetchStatus = imageDownloader.fetchImageToBinary(
+                coverId, record, new File(getCoverDownloadPath())
+        );
+
+        Set<ImageSize> downloadStatus = new HashSet<>();
+
+        // not all covers exist in a bulk archive; those that failed, try to download directly
+        fetchStatus.stream().forEach(size -> {
+            if(!downloadMissingCoverAndSet(coverId, size, record)) {
+                downloadStatus.add(size);
+            }
+        });
+
+        return fetchStatus.isEmpty() || downloadStatus.isEmpty();
+    }
+
+    /**
+     * @return {@code true} if image was suiccessfuly downloaded
+     */
+    private boolean downloadMissingCoverAndSet(Long coverId, ImageSize size, DefaultImageSupport imageSupport) {
 
         if(size == ImageSize.O && BooleanUtils.isFalse(fetchOriginalImages)) {
-            return;
+            return true;
         }
 
         try {
@@ -113,15 +149,22 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
                     urlProvider.getBookIdUrlTemplate()
             );
 
-            if(imageBytes != null) {
-                imageSupport.setImage(
-                        BooklinkUtils.buildImage(Long.toString(coverId), imageBytes),
-                        size
-                );
+            boolean status = (imageBytes != null) && imageBytes.length > ImageDownloader.MINIMUM_VALID_IMAGE_BYTE_SIZE;
+
+            if(status) {
+                if(BooleanUtils.isTrue(storeImagesInMongo)) {
+                    imageSupport.setImage(
+                            BooklinkUtils.buildImage(Long.toString(coverId), imageBytes),
+                            size
+                    );
+                }
             }
+
+            return status;
 
         } catch (IOException e) {
             log.warn("cover [{}] download error: {}", e.getMessage());
+            return false;
         }
     }
 

@@ -123,7 +123,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
                 .filter(id -> id > 0)
                 .map(Long::valueOf)
                 .filter(id -> {
-                    log.info("author[{}] img[{}]", record.getId(), id);
+                    log.debug("author[{}] img[{}]", record.getId(), id);
                     if(lastId.get() > 0) {
                         log.info(".... trying alternate photoId[{}] (author={}, sequenceNo={})",
                                 id, record.getId(), sequenceNo);

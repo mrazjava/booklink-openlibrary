@@ -64,7 +64,7 @@ public class ImageDownloader {
 
     private Set<String> failedImageDownloads = new HashSet<>();
 
-    private final int MINIMUM_VALID_IMAGE_BYTE_SIZE = 850;
+    final static int MINIMUM_VALID_IMAGE_BYTE_SIZE = 850;
 
     private IdFilter idFilter;
 
@@ -124,6 +124,11 @@ public class ImageDownloader {
         return files;
     }
 
+    /**
+     * Download image from openlibrary.org and saves it to a file in the destination directory.
+     *
+     * @return content of a downloaded file
+     */
     public byte[] downloadImageToFile(String destinationDir, Long imgId, ImageSize size, String urlTemplate) throws IOException {
 
         if(BooleanUtils.isFalse(imagePull)) {
