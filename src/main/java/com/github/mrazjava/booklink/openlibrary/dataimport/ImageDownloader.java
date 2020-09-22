@@ -187,6 +187,9 @@ public class ImageDownloader {
         return allExist.get();
     }
 
+    /**
+     * @return image sizes which fetched successfully
+     */
     public Set<ImageSize> downloadImageToBinary(
             Long imgId, String imgTemplateUrl, DefaultImageSupport imgSupport, Map<ImageSize, byte[]> cache) throws IOException {
 
@@ -206,7 +209,7 @@ public class ImageDownloader {
             statusMsgs.put(size, fetch ? MSG_FETCHED : MSG_DOWNLOADED);
         }
         else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, S);
+            log.debug("skipping mongo image[{}]-{}; already exists", imgId, S);
             statusMsgs.put(ImageSize.S, MSG_EXISTS);
         }
 
@@ -220,7 +223,7 @@ public class ImageDownloader {
             statusMsgs.put(size, fetch ? MSG_FETCHED : MSG_DOWNLOADED);
         }
         else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, M);
+            log.debug("skipping mongo image[{}]-{}; already exists", imgId, M);
             statusMsgs.put(ImageSize.M, MSG_EXISTS);
         }
 
@@ -234,7 +237,7 @@ public class ImageDownloader {
             statusMsgs.put(size, fetch ? MSG_FETCHED : MSG_DOWNLOADED);
         }
         else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
+            log.debug("skipping mongo image[{}]-{}; already exists", imgId, ImageSize.L);
             statusMsgs.put(ImageSize.L, MSG_EXISTS);
         }
 
@@ -248,7 +251,7 @@ public class ImageDownloader {
                 imgSupport.setImage(buildImage(Long.toString(imgId), image), size);
                 statusMsgs.put(size, fetch ? MSG_FETCHED : MSG_DOWNLOADED);
             } else {
-                log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
+                log.debug("skipping mongo image[{}]-{}; already exists", imgId, O);
                 statusMsgs.put(ImageSize.O, MSG_EXISTS);
             }
         }
@@ -280,7 +283,7 @@ public class ImageDownloader {
      * @param imgSupport to populate with fetched images
      * @param nonBulkImages alternate location where covers may reside as individual images; if available
      *          fetch is attempted from this location as well
-     * @return image sizes which failed to fetch
+     * @return image sizes which fetched successfully
      */
     public Set<ImageSize> fetchImageToBinary(Long imgId, DefaultImageSupport imgSupport, File nonBulkImages) {
 
@@ -302,7 +305,7 @@ public class ImageDownloader {
             }
         }
         else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, S);
+            log.debug("skipping mongo image[{}]-{}; already exists", imgId, S);
             statusMsgs.put(ImageSize.S, MSG_EXISTS);
         }
 
@@ -318,7 +321,7 @@ public class ImageDownloader {
             }
         }
         else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, M);
+            log.debug("skipping mongo image[{}]-{}; already exists", imgId, M);
             statusMsgs.put(ImageSize.M, MSG_EXISTS);
         }
 
@@ -334,7 +337,7 @@ public class ImageDownloader {
             }
         }
         else {
-            log.debug("skipping binary image[{}]-{}; already exists", imgId, ImageSize.L);
+            log.debug("skipping mongo image[{}]-{}; already exists", imgId, ImageSize.L);
             statusMsgs.put(ImageSize.L, MSG_EXISTS);
         }
 
@@ -350,8 +353,8 @@ public class ImageDownloader {
                     statusMsgs.put(size, MSG_FAILURE);
                 }
             } else {
-                log.debug("skipping binary image[{}]-{}; already exists", imgId, O);
-                statusMsgs.put(ImageSize.O, MSG_FETCHED);
+                log.debug("skipping mongo image[{}]-{}; already exists", imgId, O);
+                statusMsgs.put(ImageSize.O, MSG_EXISTS);
             }
         }
         else {
@@ -359,7 +362,8 @@ public class ImageDownloader {
         }
 
         if(log.isInfoEnabled()) {
-            log.info("--- binary ? S({}) M({}) L({}) O({})",
+            log.info("--- mongo img[{}] ? S({}) M({}) L({}) O({})",
+                    imgId,
                     statusMsgs.get(ImageSize.S),
                     statusMsgs.get(ImageSize.M),
                     statusMsgs.get(ImageSize.L),
@@ -367,9 +371,10 @@ public class ImageDownloader {
             );
         }
 
-        return statusMsgs.keySet().stream()
-                .filter(k -> MSG_FAILURE.equals(statusMsgs.get(k)))
-                .collect(Collectors.toSet());
+        return statusMsgs.keySet().stream().filter(k -> {
+            String msg = statusMsgs.get(k);
+            return MSG_FETCHED.equals(msg) || MSG_EXISTS.equals(msg);
+        }).collect(Collectors.toSet());
     }
 
     private boolean isImageInCache(Map<ImageSize, byte[]> cache, ImageSize size) {
@@ -391,6 +396,7 @@ public class ImageDownloader {
             File individualImage = getImageFile(nonBulkImagesDir.getAbsolutePath(), size, imgId);
             if(individualImage.exists()) {
                 try {
+                    log.info("file: {}", individualImage.getAbsolutePath());
                     return FileUtils.readFileToByteArray(individualImage);
                 } catch (IOException e) {
                     log.warn("cannot read non-bulk image: {}", e.getMessage());
@@ -424,7 +430,7 @@ public class ImageDownloader {
             while(tais.getNextEntry() != null) {
                 TarArchiveEntry entry = tais.getCurrentEntry();
                 if(imgFileName.equals(entry.getName())) {
-                    log.info("{} - {} | {}", entry.getName(), entry.getSize(), entry.getLastModifiedDate());
+                    log.info("{} @ {} - {} | {}", tarFileName, entry.getName(), entry.getSize(), entry.getLastModifiedDate());
                     imageBytes = tais.readNBytes((int)entry.getSize());
                     break;
                 }

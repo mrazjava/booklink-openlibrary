@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkIdFilter extends AbstractMongoBackedIdFilter<WorkSchema> {
 
-    public static final String FILTER_NAME = "WORK";
+    public static final String FILTER_NAME = "WORK-ID";
 
     /**
      * Optional file; if exists, only works in that list will be persisted.

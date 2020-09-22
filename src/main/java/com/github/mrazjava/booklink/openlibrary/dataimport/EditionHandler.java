@@ -1,10 +1,12 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.github.mrazjava.booklink.openlibrary.BooklinkUtils;
+import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +15,14 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
+
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
 @Slf4j
 @Component
@@ -46,7 +51,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         cleanBadData(record);
 
         if(sequenceNo % frequencyCheck == 0) {
-            log.info("FILTER MATCHES -- {}: {}, {}: {}, SAVED: {}",
+            log.info("FILTER MATCHES -- BY-{}: {}, BY-{}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount,
                     workIdFilter.getFilterName(), workMatchCount,
                     savedCount);
@@ -87,11 +92,12 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         if(CollectionUtils.isEmpty(record.getCovers())) {
             return;
         }
+
         AtomicLong lastId = new AtomicLong(0L);
         record.getCovers().stream()
                 .filter(id -> id > 0)
                 .filter(id -> {
-                    log.debug("edition[{}] img[{}]", record.getId(), id);
+                    log.info("edition[{}] img[{}]", record.getId(), id);
                     if(lastId.get() > 0) {
                         log.info(".... trying alternate coverId[{}] (edition={}, sequenceNo={})",
                                 id, record.getId(), sequenceNo);
@@ -122,18 +128,20 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
 
         Set<ImageSize> downloadStatus = new HashSet<>();
 
-        // not all covers exist in a bulk archive; those that failed, try to download directly
-        fetchStatus.stream().forEach(size -> {
-            if(!downloadMissingCoverAndSet(coverId, size, record)) {
+        // not all covers exist in a bulk archive; those that did not succeed, try to download directly
+        Arrays.stream(ImageSize.values())
+                .filter(size -> !fetchStatus.contains(size) && !ImageSize.O.equals(size))
+                .forEach(size -> {
+            if(downloadMissingCoverAndSet(coverId, size, record)) {
                 downloadStatus.add(size);
             }
         });
 
-        return fetchStatus.isEmpty() || downloadStatus.isEmpty();
+        return SetUtils.union(fetchStatus, downloadStatus).containsAll(Set.of(S, M, L));
     }
 
     /**
-     * @return {@code true} if image was suiccessfuly downloaded
+     * @return {@code true} if image was successfully downloaded
      */
     private boolean downloadMissingCoverAndSet(Long coverId, ImageSize size, DefaultImageSupport imageSupport) {
 

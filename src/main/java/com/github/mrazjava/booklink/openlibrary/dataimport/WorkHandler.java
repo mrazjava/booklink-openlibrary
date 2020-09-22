@@ -33,7 +33,7 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
     public void handle(WorkSchema record, long sequenceNo) {
 
         if(sequenceNo % frequencyCheck == 0) {
-            log.info("FILTER MATCHES -- {}: {}, SAVED: {}",
+            log.info("FILTER MATCHES -- BY-{}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount, savedCount);
             authorMatchCount = 0;
         }

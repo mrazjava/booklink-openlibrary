@@ -52,7 +52,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         if(record == null) return;
 
         if((sequenceNo % frequencyCheck) == 0 && authorIdFilter.isEnabled()) {
-            log.info("MATCHED-FILTERS...{}: {}, SAVED: {}",
+            log.info("FILTER MATCHES -- BY-{}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount,
                     savedCount);
             savedCount = authorMatchCount = 0;
