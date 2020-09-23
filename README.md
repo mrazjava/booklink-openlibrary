@@ -42,14 +42,14 @@ docker-compose up
 
 Examples:
 
-*Scan included **author** sample from `src/main/resources/openlibrary/samples/authors-tail-n1000.json` only. No image 
+*Scan included **author** sample from `src/main/resources/openlibrary/samples/authors-tail-n1000.json`. No image 
 processing is done. Nothing is persisted.*
 ```
 mvn clean spring-boot:run
 ```
 
-*Simple **author** scan-through. No image processing is done. Nothing is persisted. Good start to test the parser and 
-quality of the data dump.*
+*Scan a full **author** dump in a custom location. No image processing is done. Nothing is persisted. Each record is 
+parsed into a POJO and back into String. Each record is logged with the frequency of `BOOKLINK_FREQUENCY_CHECK`*
 ```
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json"
 ```
