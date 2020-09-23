@@ -19,7 +19,7 @@ booklink:
     # first N records, greatly speeding up the resumed process.
     start-from-record-no: ${BOOKLINK_START_WITH_RECORD:0}
     # Number of record to skip before a test record is logged as progress info
-    frequency-check: ${BOOKLINK_FREQUENCY_CHECK:10}
+    frequency-check: ${BOOKLINK_FREQUENCY_CHECK:100000}
     # Persist processed data to mongo ?
     persist: ${BOOKLINK_PERSIST:false}
     # Override existing records when persisting ? If disabled (false), import is much slower because for each imported
