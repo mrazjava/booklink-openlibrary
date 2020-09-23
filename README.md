@@ -42,8 +42,8 @@ docker-compose up
 
 Examples:
 
-*Simle scan-through. No image processing is done. Nothing is persisted. Good start to test the parser and quality of 
-the data dump.*
+*Simle **author** scan-through. No image processing is done. Nothing is persisted. Good start to test the parser and 
+quality of the data dump.*
 ```
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_PERSIST=false"
 ```
