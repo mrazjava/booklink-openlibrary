@@ -88,7 +88,7 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
 
     @Override
     public void conclude(File dataSource) {
-        if(log.isInfoEnabled()) {
+        if(log.isInfoEnabled() && imageDownloader.isEnabled()) {
             Set<String> failedDownloads = imageDownloader.getFailedImageDownloads();
             StringBuilder urls = new StringBuilder();
             failedDownloads.stream().forEach(url -> urls.append(url + "\n"));

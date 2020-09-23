@@ -499,6 +499,10 @@ public class ImageDownloader {
         return baos.toByteArray();
     }
 
+    boolean isEnabled() {
+        return imageDirectory != null && imageDirectory.exists();
+    }
+
     public Set<String> getFailedImageDownloads() {
         return Collections.unmodifiableSet(failedImageDownloads);
     }

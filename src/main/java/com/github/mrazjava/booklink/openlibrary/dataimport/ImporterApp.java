@@ -3,7 +3,6 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.github.mrazjava.booklink.openlibrary.MongoConfiguration;
 import com.github.mrazjava.booklink.openlibrary.ObjectMapperConfiguration;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +10,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 
@@ -30,10 +30,10 @@ public class ImporterApp implements ApplicationRunner {
 	private FileImporter importer;
 
 	@Value("${booklink.di.ol-dump-file}")
-	private String dumpFile;
+	private String dumpFilePath;
 
-	@Value("${booklink.di.schema-class-name}")
-	private String schemaClassName;
+	@Value("${booklink.di.handler-class}")
+	private String handlerClass;
 
 	@Value("${booklink.di.start-from-record-no}")
 	private int startWithRecordNo;
@@ -74,23 +74,17 @@ public class ImporterApp implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 
-		File importFile = null;
-
-		if(FilenameUtils.indexOfLastSeparator(dumpFile) != -1) {
-			importFile = new File(dumpFile);
-		}
-
-		if(importFile == null) {
-			String sampleFilePath = String.format("%sopenlibrary%ssamples%s%s", StringUtils.repeat(File.separator, 3), dumpFile);
-			importFile = new File(getClass().getResource(sampleFilePath).getFile());
-		}
+		boolean sample = !StringUtils.startsWith(dumpFilePath, "/");
+		File importFile = sample ?
+				(new ClassPathResource(dumpFilePath)).getFile() :
+				new File(dumpFilePath);
 
 		if(log.isInfoEnabled()) {
 
 			log.info("starting...\n\n" +
 					"booklink.di:\n" +
 					" ol-dump-file: {}\n" +
-					" schema-class-name: {}\n" +
+					" handler-class: {}\n" +
 					" start-from-record-no: {}\n" +
 					" frequency-check: {}\n" +
 					" persist: {}\n" +
@@ -100,7 +94,7 @@ public class ImporterApp implements ApplicationRunner {
 					" image-mongo: {}\n" +
 					" fetch-original-images: {}\n",
 					importFile.getAbsolutePath(),
-					schemaClass.getCanonicalName(),
+					handlerClass,
 					startWithRecordNo,
 					frequencyCheck,
 					persistData,
