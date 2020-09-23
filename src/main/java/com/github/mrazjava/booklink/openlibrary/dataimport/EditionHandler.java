@@ -50,7 +50,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
 
         cleanBadData(record);
 
-        if(sequenceNo % frequencyCheck == 0) {
+        if((authorIdFilter.isEnabled() || workIdFilter.isEnabled()) && sequenceNo % frequencyCheck == 0) {
             log.info("FILTER MATCHES -- BY-{}: {}, BY-{}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount,
                     workIdFilter.getFilterName(), workMatchCount,

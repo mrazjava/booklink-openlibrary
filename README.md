@@ -42,10 +42,16 @@ docker-compose up
 
 Examples:
 
-*Load into mongo only **authors** defined in `src/main/resources/author-id-filter.txt`. Use author images in the provided 
-`BOOKLINK_IMG_DIR` and make them part of a mongo record (as a binary field, in all three sizes: small, medium, large). 
-If the image is not available, try to download it from the Internet. Any author records that may have existed in mongo 
-will be overriden.*
+*Simle scan-through. No image processing is done. Nothing is persisted. Good start to test the parser and quality of 
+the data dump.*
+```
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_PERSIST=false"
+```
+
+*Load into mongo only **authors** defined in `src/main/resources/author-id-filter.txt` (assuming file had been copied to 
+the same location where the dump file is). Use author images in the provided `BOOKLINK_IMG_DIR` and make them part of a 
+mongo record (as a binary field, in all three sizes: small, medium, large). If the image is not available, try to 
+download it from the Internet. Any author records that may have existed in mongo will be overriden.*
 ```
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_SCHEMA=AuthorSchema -DBOOKLINK_FREQUENCY_CHECK=100000 -DBOOKLINK_IMG_DIR=/media/azimowski/booklink-5TB/authors -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_IMAGE_PULL=true -DBOOKLINK_IMG_MONGO=true"
 ```

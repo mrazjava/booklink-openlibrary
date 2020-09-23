@@ -51,7 +51,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         if(record == null) return;
 
-        if((sequenceNo % frequencyCheck) == 0 && authorIdFilter.isEnabled()) {
+        if(authorIdFilter.isEnabled() && (sequenceNo % frequencyCheck) == 0) {
             log.info("FILTER MATCHES -- BY-{}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount,
                     savedCount);

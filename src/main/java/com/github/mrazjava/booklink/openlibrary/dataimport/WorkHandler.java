@@ -32,7 +32,7 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
     @Override
     public void handle(WorkSchema record, long sequenceNo) {
 
-        if(sequenceNo % frequencyCheck == 0) {
+        if(authorIdFilter.isEnabled() && sequenceNo % frequencyCheck == 0) {
             log.info("FILTER MATCHES -- BY-{}: {}, SAVED: {}",
                     authorIdFilter.getFilterName(), authorMatchCount, savedCount);
             authorMatchCount = 0;
