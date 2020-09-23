@@ -45,7 +45,7 @@ Examples:
 FYI: unless `BOOKLINK_START_WITH_RECORD` is defined (default `0`), every record is unmarshalled into a POJO and then 
 marshalled back into a `String` as means to test the parser. 
 
-*Scan included **author** sample from `src/main/resources/openlibrary/samples/authors-tail-n1000.json`. No image 
+*Scan the **author** sample from `src/main/resources/openlibrary/samples/authors-tail-n1000.json`. No image 
 processing is done. Nothing is persisted.*
 ```
 mvn clean spring-boot:run
