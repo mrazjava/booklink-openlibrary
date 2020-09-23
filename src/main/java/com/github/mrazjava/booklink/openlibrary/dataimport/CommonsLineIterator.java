@@ -19,7 +19,7 @@ import java.io.File;
 public class CommonsLineIterator implements FileImporter {
 
     @Autowired
-    private ImportHandlingResolution handlingResolver;
+    private ImportHandler importHandler;
 
     @Value("${booklink.di.frequency-check}")
     private int frequencyCheck;
@@ -29,7 +29,7 @@ public class CommonsLineIterator implements FileImporter {
 
 
     @Override
-    public void runImport(File jsonFile, Class schema) {
+    public void runImport(File jsonFile) {
 
         if(startWithRecordNo < 0) {
             log.warn("invalid value for [{}={}]; forcing 0!", "start-from-record-no", startWithRecordNo);
@@ -45,7 +45,6 @@ public class CommonsLineIterator implements FileImporter {
             log.info("workingDir: {}", workingDir);
 
             File workingDirectory = new File(workingDir);
-            ImportHandler importHandler = handlingResolver.resolve(schema);
             importHandler.prepare(workingDirectory);
 
             StopWatch stopWatch = new StopWatch();

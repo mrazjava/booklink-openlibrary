@@ -7,9 +7,9 @@ booklink:
   di: # (d)ata-(i)import
     # Full path to an openlibrary dump file to process. The dump file must be pre-processed
     # according to the readme. Each line is expected as a valid JSON record.
-    ol-dump-file: ${BOOKLINK_OL_DUMP_FILE:works-tail-n30.json}
+    ol-dump-file: ${BOOKLINK_OL_DUMP_FILE:openlibrary/samples/authors-tail-n1000.json}
     # Schema class (just a name) to use for parsing the dump file.
-    schema-class-name: ${BOOKLINK_SCHEMA:WorkSchema}
+    schema-class-name: ${BOOKLINK_SCHEMA:}
     # Allows to skip first N records of the dump file. This is useful when processing a file in several runs since this
     # program always handles the dump file sequentially from the beginning to end. For example, running a scan through
     # of an author dump to download images can take several days to complete (especially with throttling which should

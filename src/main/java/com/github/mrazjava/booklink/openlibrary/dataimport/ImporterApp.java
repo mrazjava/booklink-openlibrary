@@ -74,12 +74,6 @@ public class ImporterApp implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 
-		Class schemaClass = Class.forName(
-				schemaClassName.contains(".") ?
-				schemaClassName :
-				String.format("com.github.mrazjava.booklink.openlibrary.schema.%s", schemaClassName)
-		);
-
 		File importFile = null;
 
 		if(FilenameUtils.indexOfLastSeparator(dumpFile) != -1) {
@@ -118,6 +112,6 @@ public class ImporterApp implements ApplicationRunner {
 			);
 		}
 
-		importer.runImport(importFile, schemaClass);
+		importer.runImport(importFile);
 	}
 }
