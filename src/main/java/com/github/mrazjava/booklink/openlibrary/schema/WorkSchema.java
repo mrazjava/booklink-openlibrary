@@ -61,6 +61,11 @@ public class WorkSchema extends BaseSchema {
 
     private String ospid;
 
+    /**
+     * Organisational Culture And Individual Development
+     */
+    private String ocaid;
+
     private TypeValue notes;
 
     private List<Excerpt> excerpts;
