@@ -52,14 +52,14 @@ public class CommonsLineIterator implements FileImporter {
 
             Object pojo = null;
 
-            // always log 1st record
+            // process 1st record explicitly
             if(iterator.hasNext()) {
                 line = iterator.next();
                 pojo = importHandler.toRecord(line);
-                if(frequencyCheck != 1) {
+                if(log.isInfoEnabled() && frequencyCheck != 1) { // always log 1st record
                     if (counter++ < startWithRecordNo) {
                         log.info("pass through check; raw JSON #{}:\n{}", counter, line);
-                    } else if (log.isInfoEnabled()) {
+                    } else {
                         log.info("JSON #{}:\n{}", counter, importHandler.toText(pojo));
                     }
                 }
@@ -94,11 +94,10 @@ public class CommonsLineIterator implements FileImporter {
                 }
             }
 
-            // always log last record
-            if(frequencyCheck != 1) {
-                if (counter < startWithRecordNo) {
+            if(log.isInfoEnabled() && frequencyCheck != 1) { // always log last record
+                if(counter < startWithRecordNo) {
                     log.info("pass through check; raw JSON #{} (last record):\n{}", counter, line);
-                } else if (log.isInfoEnabled()) {
+                } else {
                     log.info("JSON #{} (last record):\n{}", counter, importHandler.toText(pojo));
                 }
             }
