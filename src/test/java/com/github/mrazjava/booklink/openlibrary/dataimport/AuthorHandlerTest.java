@@ -3,8 +3,10 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
+import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -12,12 +14,18 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
+
 
 @TestPropertySource(properties = {
         "booklink.di.start-from-record-no: 0",
@@ -44,7 +52,7 @@ public class AuthorHandlerTest {
     private OpenLibraryUrlProvider urlProvider;
 
     @MockBean
-    private ImageDownloader imgDownloader;
+    private ImageDownloader imageDownloader;
 
     @MockBean
     private AuthorIdFilter authorIdFilter;
@@ -58,8 +66,10 @@ public class AuthorHandlerTest {
 
     @BeforeEach
     public void prepare() throws IOException {
-        handler.persistData = false;
+        handler.persistData = handler.imagePull = handler.withMongoImages = false;
         handler.persistDataOverride = true;
+        handler.imageDir = null;
+        handler.imageDirectoryLocation = null;
         handler.authorMatchCount = handler.savedCount = 0;
         handler.prepare((new ClassPathResource("openlibrary/samples/authors-tail-n1000.json")).getFile());
     }
@@ -130,5 +140,60 @@ public class AuthorHandlerTest {
 
         assertEquals(0, handler.savedCount);
         verify(authorRepository, times(0)).save(eq(record));
+    }
+
+    @Test
+    public void shouldNotPullImagesWithEmptyPhotosCollection() {
+
+        AuthorSchema record = mock(AuthorSchema.class);
+        String id = "foo-bar";
+
+        handler.imagePull = true;
+
+        when(record.getId()).thenReturn(id);
+        verify(imageDownloader, times(1)).setIdFilter(any());
+
+        handler.handle(record, 1);
+
+        verify(record, times(1)).getPhotos();
+        verifyNoMoreInteractions(imageDownloader);
+    }
+
+    @Test
+    public void shouldPullImages() throws IOException {
+
+        AuthorSchema record = mock(AuthorSchema.class);
+        String id = "foo-bar";
+        Long imgId = 6746285L;
+        Map<ImageSize, byte[]> pulledImageMocks = mock(Map.class);
+        CoverImage mockImage = mock(CoverImage.class);
+
+        handler.imagePull = handler.withMongoImages = true;
+        handler.imageDir = "/tmp/test"; // for the test purposes value irrelevant so long not blank
+        handler.imageDirectoryLocation = new File(handler.imageDir);
+
+        when(record.getId()).thenReturn(id);
+        when(record.getPhotos()).thenReturn(List.of(imgId.intValue()));
+        when(record.getImageSmall()).thenReturn(mockImage);
+        when(record.getImageMedium()).thenReturn(mockImage);
+        when(record.getImageLarge()).thenReturn(mockImage);
+        when(pulledImageMocks.containsKey(S)).thenReturn(false);
+        when(pulledImageMocks.containsKey(M)).thenReturn(false);
+        when(pulledImageMocks.containsKey(L)).thenReturn(false);
+        when(imageDownloader.downloadImageFiles(eq(handler.imageDir), eq(imgId), any())).thenReturn(pulledImageMocks);
+
+        handler.handle(record, 1);
+
+        verify(record, times(2)).getPhotos();
+        verify(imageDownloader, times(1)).downloadImageFiles(
+                eq(handler.imageDir), eq(imgId), any()
+        );
+        verify(imageDownloader, times(1)).downloadImageToBinary(
+                eq(imgId), any(), eq(record), eq(pulledImageMocks)
+        );
+        verify(pulledImageMocks, times(3)).containsKey(any());
+        verify(record, times(1)).getImageSmall();
+        verify(record, times(1)).getImageMedium();
+        verify(record, times(1)).getImageLarge();
     }
 }
