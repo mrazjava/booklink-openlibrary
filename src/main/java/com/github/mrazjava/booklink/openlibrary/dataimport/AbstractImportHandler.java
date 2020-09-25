@@ -31,8 +31,8 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     @Value("${booklink.di.image-dir}")
     protected String imageDir;
 
-    @Value("${booklink.di.image-mongo}")
-    protected Boolean storeImagesInMongo;
+    @Value("${booklink.di.with-mongo-images}")
+    protected Boolean withMongoImages;
 
     @Value("${booklink.di.fetch-original-images}")
     protected Boolean fetchOriginalImages;

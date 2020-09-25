@@ -20,13 +20,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @TestPropertySource(properties = {
-        "booklink.di.ol-dump-file: openlibrary/samples/authors-tail-n1000.json",
         "booklink.di.start-from-record-no: 0",
         "booklink.di.frequency-check: 20",
-        "booklink.di.persist:false",
+        "booklink.di.persist: false",
         "booklink.di.persist-override: true",
         "booklink.di.image-pull: false",
-        "booklink.di.image-mongo: false",
+        "booklink.di.with-mongo-images: false",
         "booklink.di.fetch-original-images: false"
 })
 @SpringJUnitConfig

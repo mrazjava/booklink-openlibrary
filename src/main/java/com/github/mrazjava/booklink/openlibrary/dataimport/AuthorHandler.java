@@ -75,7 +75,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         if(persistData) {
             AuthorSchema saved = null;
 
-            if (!persistDataOverride || BooleanUtils.isTrue(storeImagesInMongo)) {
+            if (!persistDataOverride || BooleanUtils.isTrue(withMongoImages)) {
                 saved = repository.findById(record.getId()).orElse(null);
                 if (!persistDataOverride && saved != null) {
                     return;
@@ -146,7 +146,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     private boolean downloadImages(AuthorSchema record, long photoId, long sequenceNo) {
 
         boolean downloadToFile = StringUtils.isNotBlank(imageDir);
-        boolean downloadToBinary = BooleanUtils.isTrue(storeImagesInMongo);
+        boolean downloadToBinary = BooleanUtils.isTrue(withMongoImages);
 
         if(log.isDebugEnabled()) {
             if ((downloadToFile || downloadToBinary) && !imageDownloader.filesExist(

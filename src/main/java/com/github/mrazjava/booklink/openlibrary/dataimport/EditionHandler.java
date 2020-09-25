@@ -1,7 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.github.mrazjava.booklink.openlibrary.BooklinkUtils;
-import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
@@ -160,7 +159,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
             boolean status = (imageBytes != null) && imageBytes.length > ImageDownloader.MINIMUM_VALID_IMAGE_BYTE_SIZE;
 
             if(status) {
-                if(BooleanUtils.isTrue(storeImagesInMongo)) {
+                if(BooleanUtils.isTrue(withMongoImages)) {
                     imageSupport.setImage(
                             BooklinkUtils.buildImage(Long.toString(coverId), imageBytes),
                             size

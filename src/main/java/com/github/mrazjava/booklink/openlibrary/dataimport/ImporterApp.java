@@ -59,8 +59,8 @@ public class ImporterApp implements ApplicationRunner {
 	@Value("${booklink.di.image-dir}")
 	private String imageDir;
 
-	@Value("${booklink.di.image-mongo}")
-	private Boolean storeImagesInMongo;
+	@Value("${booklink.di.with-mongo-images}")
+	private Boolean withMongoImages;
 
 	@Value("${booklink.di.fetch-original-images}")
 	private Boolean fetchOriginalImages;
@@ -91,7 +91,7 @@ public class ImporterApp implements ApplicationRunner {
 					" persist-override: {}\n" +
 					" image-pull: {}\n" +
 					" image-dir: {}\n" +
-					" image-mongo: {}\n" +
+					" with-mongo-images: {}\n" +
 					" fetch-original-images: {}\n",
 					importFile.getAbsolutePath(),
 					handlerClass,
@@ -101,7 +101,7 @@ public class ImporterApp implements ApplicationRunner {
 					persistDataOverride,
 					imagePull,
 					StringUtils.isBlank(imageDir) ? "feature DISABLED" : imageDir,
-					storeImagesInMongo,
+					withMongoImages,
 					fetchOriginalImages
 			);
 		}
