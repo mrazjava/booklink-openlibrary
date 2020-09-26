@@ -16,7 +16,7 @@ import java.io.File;
  */
 @Slf4j
 @Component
-public class CommonsLineIterator implements FileImporter {
+public class CommonsLineIterator implements DataImport<File> {
 
     @Autowired
     private ImportHandler importHandler;

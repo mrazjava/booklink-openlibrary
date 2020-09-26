@@ -27,7 +27,7 @@ import java.io.File;
 public class ImporterApp implements ApplicationRunner {
 
 	@Autowired
-	private FileImporter importer;
+	private DataImport importer;
 
 	@Value("${booklink.di.ol-dump-file}")
 	private String dumpFilePath;
