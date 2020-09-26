@@ -25,15 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
-@TestPropertySource(properties = {
-        "booklink.di.start-from-record-no: 0",
-        "booklink.di.frequency-check: 20",
-        "booklink.di.persist: false",
-        "booklink.di.persist-override: true",
-        "booklink.di.image-pull: false",
-        "booklink.di.with-mongo-images: false",
-        "booklink.di.fetch-original-images: false"
-})
+@BooklinkTestPropertySource
 @SpringJUnitConfig
 @Import({
         AuthorHandler.class
