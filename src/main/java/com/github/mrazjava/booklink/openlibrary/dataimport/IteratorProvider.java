@@ -1,7 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import org.apache.commons.io.LineIterator;
-
 import java.io.Closeable;
 import java.util.Iterator;
 
