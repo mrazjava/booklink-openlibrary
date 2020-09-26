@@ -2,7 +2,6 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,16 +9,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
+import java.util.Iterator;
 
 /**
  * <a href="https://itnext.io/using-java-to-read-really-really-large-files-a6f8a3f44649">Benchmarks</a>
  */
 @Slf4j
 @Component
-public class CommonsLineIterator implements DataImport<File> {
+public class CommonsDataImport implements DataImport<File> {
 
     @Autowired
     private ImportHandler importHandler;
+
+    @Autowired
+    private IteratorProvider<String, File> iteratorProvider;
 
     @Value("${booklink.di.frequency-check}")
     private int frequencyCheck;
@@ -39,12 +42,11 @@ public class CommonsLineIterator implements DataImport<File> {
         String line = null;
         long counter = 0;
         try {
-            LineIterator iterator = FileUtils.lineIterator(jsonFile, "UTF-8");
-            final String workingDir = jsonFile.getParent();
+            Iterator<String> iterator = iteratorProvider.provide(jsonFile);
+            File workingDirectory = jsonFile.getParentFile();
 
-            log.info("workingDir: {}", workingDir);
+            log.info("working directory: {}", workingDirectory);
 
-            File workingDirectory = new File(workingDir);
             importHandler.prepare(workingDirectory);
 
             StopWatch stopWatch = new StopWatch();
