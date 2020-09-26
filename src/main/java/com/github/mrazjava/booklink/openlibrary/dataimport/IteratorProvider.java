@@ -1,7 +1,8 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
+import org.apache.commons.io.LineIterator;
 
+import java.io.Closeable;
 import java.util.Iterator;
 
 /**
@@ -10,5 +11,7 @@ import java.util.Iterator;
  */
 public interface IteratorProvider<I, S> {
 
-    Iterator<I> provide(S source);
+    Closeable open(S source);
+
+    Iterator<I> provide(Closeable closeable);
 }

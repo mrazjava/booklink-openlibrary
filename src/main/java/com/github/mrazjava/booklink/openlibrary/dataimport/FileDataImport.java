@@ -1,13 +1,13 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.Closeable;
 import java.io.File;
 import java.util.Iterator;
 
@@ -16,7 +16,7 @@ import java.util.Iterator;
  */
 @Slf4j
 @Component
-public class CommonsDataImport implements DataImport<File> {
+public class FileDataImport implements DataImport<File> {
 
     @Autowired
     private ImportHandler importHandler;
@@ -41,8 +41,10 @@ public class CommonsDataImport implements DataImport<File> {
 
         String line = null;
         long counter = 0;
-        try {
-            Iterator<String> iterator = iteratorProvider.provide(jsonFile);
+
+        try(Closeable closeable = iteratorProvider.open(jsonFile)) {
+
+            Iterator<String> iterator = iteratorProvider.provide(closeable);
             File workingDirectory = jsonFile.getParentFile();
 
             log.info("working directory: {}", workingDirectory);
@@ -112,6 +114,7 @@ public class CommonsDataImport implements DataImport<File> {
                     counter,
                     DurationFormatUtils.formatDurationHMS(stopWatch.getTime())
             );
+
         } catch (Exception e) {
             log.error("JSON #{} failed:\n{}", counter, line, e);
         }

@@ -11,12 +11,12 @@ import java.io.File;
 @BooklinkTestPropertySource
 @SpringJUnitConfig
 @Import({
-        CommonsDataImport.class
+        FileDataImport.class
 })
-public class CommonsDataImportTest {
+public class FileDataImportTest {
 
     @Autowired
-    private CommonsDataImport dataImport;
+    private FileDataImport dataImport;
 
     @MockBean
     private IteratorProvider<String, File> iteratorProvider;
