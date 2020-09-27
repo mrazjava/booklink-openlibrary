@@ -1,5 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,10 @@ public class FileDataImportTest {
     @MockBean
     private ImportHandler handler;
 
+    @BeforeEach
+    void prepare() {
+        importer.setFrequencyCheck(20);
+    }
 
     @Test
     public void shouldIterateSource() {
