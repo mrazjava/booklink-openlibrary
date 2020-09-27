@@ -1,6 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
-@Slf4j
 @BooklinkTestPropertySource
 @SpringJUnitConfig
 @Import({
