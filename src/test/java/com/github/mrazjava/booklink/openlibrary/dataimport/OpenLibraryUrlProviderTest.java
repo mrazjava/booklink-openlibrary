@@ -1,7 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 })
 public class OpenLibraryUrlProviderTest {
 
-    @InjectMocks
+    @Autowired
     private OpenLibraryUrlProvider provider;
 
 
