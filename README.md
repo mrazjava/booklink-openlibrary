@@ -91,6 +91,16 @@ which is available in bulk tar archives (already downloaded).*
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/home/azimowski/Downloads/booklink/editions.json -DBOOKLINK_IMAGE_PULL=true -DBOOKLINK_WITH_MONGO_IMGS=true -DBOOKLINK_IMG_DIR=/media/azimowski/booklink-500GB-e/covers/ -DBOOKLINK_PERSIST=true"
 ```
 
+#### Sandbox Dataset
+The following commands create sample dataset (using authors defined in `src/main/resources/author-id-filter.txt`) used 
+by the sandbox. Assuming that openlibrary dumps have been prepped, and that the dumps and cover images exist in 
+`/tmp/openlibrary/`:
+```
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/tmp/openlibrary/authors.json -DBOOKLINK_IMG_DIR=/tmp/openlibrary/authors -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_IMAGE_PULL=true -DBOOKLINK_WITH_MONGO_IMGS=true"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/tmp/openlibrary/works.json -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/tmp/openlibrary/editions.json -DBOOKLINK_IMG_DIR=/tmp/openlibrary/covers/ -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_IMAGE_PULL=true -DBOOKLINK_WITH_MONGO_IMGS=true"
+```
+
 ## Filters
 All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. Each 
 filtered item should appear on its own line. Typically a filtered item is some form of an ID. All filters are optional 
@@ -220,6 +230,13 @@ Dropping prefix types from dump files to produce JSON only:
 ```
 sed 's/^[^{]*//' ol_dump_authors_latest.txt > authors.txt
 ```
+
+#### Mongo Dumps
+The database created with `author-id-filter.txt` is used by the sandbox environment. A mongo dump of it is about 
+`325mb` and can be extracted with the following:
+```
+docker exec CONTAINER_ID sh -c 'mongodump --username USERNAME --password PASSWORD --db DATABASE --authenticationDatabase admin --archive' > booklink-openlibrry-mongo.dump
+``` 
 
 #### Mongo Queries
 Count authors which have a small image:
