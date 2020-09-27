@@ -60,8 +60,9 @@ public class FileDataImport implements DataImport<File> {
             if(iterator.hasNext()) {
                 line = iterator.next();
                 pojo = importHandler.toRecord(line);
-                if(log.isInfoEnabled() && frequencyCheck != 1) { // always log 1st record
-                    if (counter++ < startWithRecordNo) {
+                log.debug("raw JSON #{}:\n{}", ++counter, line);
+                if(log.isInfoEnabled()) { // always log 1st record
+                    if (counter < startWithRecordNo) {
                         log.info("pass through check; raw JSON #{}:\n{}", counter, line);
                     } else {
                         log.info("JSON #{}:\n{}", counter, importHandler.toText(pojo));
@@ -118,5 +119,13 @@ public class FileDataImport implements DataImport<File> {
         } catch (Exception e) {
             log.error("JSON #{} failed:\n{}", counter, line, e);
         }
+    }
+
+    void setFrequencyCheck(int frequencyCheck) {
+        this.frequencyCheck = frequencyCheck;
+    }
+
+    void setStartWithRecordNo(Integer startWithRecordNo) {
+        this.startWithRecordNo = startWithRecordNo;
     }
 }
