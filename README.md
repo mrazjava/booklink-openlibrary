@@ -232,8 +232,8 @@ sed 's/^[^{]*//' ol_dump_authors_latest.txt > authors.txt
 ```
 
 #### Mongo Archives
-The database created with `author-id-filter.txt` is used by the sandbox environment. A gzipped mongo archive of a 
-filtered sandbox sample is about `290mb`.
+The database created with `author-id-filter.txt` (with embedded binary images of authors and editions) is used by the 
+sandbox environment. A gzipped mongo archive of a filtered sandbox sample is about `290mb`.
 
 Exporting an archive is done from a running docker container:
 ```
