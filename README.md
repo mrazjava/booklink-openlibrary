@@ -237,11 +237,11 @@ sandbox environment. A gzipped mongo archive of a filtered sandbox sample is abo
 
 Exporting an archive is done from a running docker container:
 ```
-docker exec CONTAINER_ID sh -c 'mongodump --username USERNAME --password PASSWORD --db DATABASE --authenticationDatabase admin --gzip --archive' > /tmp/mongodump/openlibrry-mongo.archive
+docker exec CONTAINER_ID sh -c 'mongodump --username USERNAME --password PASSWORD --db DATABASE --authenticationDatabase admin --gzip --archive' > /tmp/mongodump/openlibrary-mongo.archive
 ```
 Importing an archive is typically done into another docker container (see sandbox), but the basic command would be:
 ```
-mongorestore --username root --password pass123 --authenticationDatabase admin --nsInclude=openlibrary.* --verbose --gzip --archive=/tmp/mongodump/openlibrry-mongo.archive
+mongorestore --username root --password pass123 --authenticationDatabase admin --nsInclude=openlibrary.* --verbose --gzip --archive=/tmp/mongodump/openlibrary-mongo.archive
 ```
 
 #### Mongo Queries
