@@ -101,6 +101,14 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FIL
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_OL_DUMP_FILE=/tmp/openlibrary/editions.json -DBOOKLINK_IMG_DIR=/tmp/openlibrary/covers/ -DBOOKLINK_PERSIST=true -DBOOKLINK_PERSIST_OVERRIDE=true -DBOOKLINK_IMAGE_PULL=true -DBOOKLINK_WITH_MONGO_IMGS=true"
 ```
 
+#### Docker Image
+The sample dataset (using authors defined in `src/main/resources/author-id-filter.txt`) is freely available as a docker 
+image on [dockerhub](https://hub.docker.com/repository/docker/mrazjava/booklink-mongo). This same image is used by the 
+sandbox. Run it with:
+```
+docker run -p 27117:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
+```
+
 ## Filters
 All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. Each 
 filtered item should appear on its own line. Typically a filtered item is some form of an ID. All filters are optional 
