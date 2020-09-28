@@ -235,12 +235,10 @@ sed 's/^[^{]*//' ol_dump_authors_latest.txt > authors.txt
 The database created with `author-id-filter.txt` is used by the sandbox environment. A gzipped mongo archive of it is 
 about `290mb`.
 
-## Archive Export
-Dumping an archive is done from a running docker container:
+Exporting an archive is done from a running docker container:
 ```
 docker exec CONTAINER_ID sh -c 'mongodump --username USERNAME --password PASSWORD --db DATABASE --authenticationDatabase admin --gzip --archive' > booklink-openlibrry-mongo.archive
 ```
-## Archive Import
 Importing an archive is typically done into another docker container (see sandbox), but the basic command would be:
 ```
 mongorestore --username root --password pass123 --authenticationDatabase admin --nsInclude=openlibrary.* --verbose --gzip --archive=/tmp/mongodump/booklink-openlibrry-mongo.archive
