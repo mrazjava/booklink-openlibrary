@@ -65,8 +65,9 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FIL
 
 #### Docker Image
 The sample dataset (using authors defined in `src/main/resources/author-id-filter.txt`) is freely available as a docker 
-image on [dockerhub](https://hub.docker.com/repository/docker/mrazjava/booklink-mongo). This same image is used by the 
-sandbox. Run it with:
+image on [dockerhub](https://hub.docker.com/repository/docker/mrazjava/booklink-mongo). This database contains embedded 
+images of authors and editions (if available) as per openlibrary specification. This same image is used by the sandbox. 
+Run it with:
 ```
 docker run -p 27017:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
 ```
