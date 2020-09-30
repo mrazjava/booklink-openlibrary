@@ -36,17 +36,22 @@ are part of a single project.
 ## Quick Start
 See `application.yml` for available configuration options. Each spring boot config is driven by environment variable.
 
-Dependencies (mongo) are provided via docker:
+#### Dependencies
+Persistence store is provided via docker:
 ```
 docker-compose up
 ```
-Data Import:
+
+#### Data Import
 ```
 mvn clean spring-boot:run
 ```
 By default, import runs off a sample file. Apply `-Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_*..."` configuration 
 overrides to customize behavior. See [examples](https://github.com/mrazjava/booklink-openlibrary/blob/master/EXAMPLES.md) 
 for details.
+
+#### REST API
+TODO
 
 #### Sandbox Dataset
 The following commands create sample dataset (using authors defined in `src/main/resources/author-id-filter.txt`) used 
