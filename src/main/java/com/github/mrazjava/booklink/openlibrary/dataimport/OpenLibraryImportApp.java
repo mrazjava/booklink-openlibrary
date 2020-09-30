@@ -24,7 +24,7 @@ import java.io.File;
 		MongoConfiguration.class,
 		ObjectMapperConfiguration.class
 })
-public class ImporterApp implements ApplicationRunner {
+public class OpenLibraryImportApp implements ApplicationRunner {
 
 	@Autowired
 	private DataImport importer;
@@ -68,7 +68,7 @@ public class ImporterApp implements ApplicationRunner {
 
 	public static void main(String[] args) {
 
-		SpringApplication.run(ImporterApp.class, args);
+		SpringApplication.run(OpenLibraryImportApp.class, args);
 	}
 
 	@Override

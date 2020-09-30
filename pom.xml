@@ -17,7 +17,7 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<start-class>com.github.mrazjava.booklink.openlibrary.dataimport.ImporterApp</start-class>
+		<start-class>com.github.mrazjava.booklink.openlibrary.dataimport.OpenLibraryImportApp</start-class>
 	</properties>
 
 	<dependencies>

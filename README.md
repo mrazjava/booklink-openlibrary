@@ -15,7 +15,7 @@ this than writing one from scratch.
 
 This project builds into two executables:
 
-* `com.github.mrazjava.booklink.openlibrary.dataimport.ImporterApp` is the actual import process.
+* `com.github.mrazjava.booklink.openlibrary.dataimport.OpenLibraryImportApp` is the actual import process.
 * `TODO:` REST service for querying openlibrary mongo repository
 
 These could be two separate projects/apps with a shared schema *.jar (3rd project), but to keep things simple they 
@@ -106,7 +106,7 @@ The sample dataset (using authors defined in `src/main/resources/author-id-filte
 image on [dockerhub](https://hub.docker.com/repository/docker/mrazjava/booklink-mongo). This same image is used by the 
 sandbox. Run it with:
 ```
-docker run -p 27117:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
+docker run -p 27017:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
 ```
 
 ## Filters
