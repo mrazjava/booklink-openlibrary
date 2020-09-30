@@ -26,11 +26,12 @@ etc). Again, this level of complexity is not necessary at this point thus book s
 are part of a single project.
 
 ## Tech Stack
-* Spring Boot
+* [Java 11](https://openjdk.java.net/projects/jdk/11/)
+* [Spring Boot](https://spring.io/projects/spring-boot)
 * [Jackson](https://github.com/FasterXML/jackson-docs)
-* Apache Commons: LANG3, IO, COMPRESS
-* Lombok
-* MongoDB
+* [Apache Commons](https://commons.apache.org/): LANG3, COLLECTIONS4, IO, COMPRESS
+* [Lombok](https://projectlombok.org/)
+* [MongoDB](https://www.mongodb.com/)
 
 ## Quick Start
 See `application.yml` for available configuration options. Each spring boot config is driven by environment variable.
