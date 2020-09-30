@@ -87,7 +87,7 @@ error such as this and we do want to fail fast to know which image caused the pr
 designed to be easily resumable (see the `BOOKLINK_DI_START_WITH_RECORD` config option). The format is one file name 
 without extension per line. Example: `3401366-L`.
 
-## Datasources
+## Raw Data Sources
 Raw [data](https://openlibrary.org/data/) [dumps](https://archive.org/details/ol_exports?sort=-publicdate) are pulled from [openlibrary](https://openlibrary.org/developers/dumps). 
 These are large downloads (authors ~320mb, works ~1.7gb, editions 6.1gb) and big files once uncompressed (authors ~2.5gb, works ~10.6gb, editions ~29gb); 
 sizes as of May 2020. Row counts (Aug 2020 dumps): authors ~7.4M, works ~19.2M, editions ~27.1M.
