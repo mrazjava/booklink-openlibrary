@@ -7,12 +7,12 @@ booklink:
   di: # (d)ata-(i)import
     # Full path to an openlibrary dump file to process. The dump file must be pre-processed
     # according to the readme. Each line is expected as a valid JSON record.
-    ol-dump-file: ${BOOKLINK_OL_DUMP_FILE:openlibrary/samples/authors-tail-n1000.json}
+    ol-dump-file: ${BOOKLINK_DI_DUMP_FILE:openlibrary/samples/authors-tail-n1000.json}
     # Fully qualified name of a handler (instance of com.github.mrazjava.booklink.openlibrary.dataimport.ImportHandler}
     # class to handle the import. Automatically derived from dump file name if possible. If a dump file name contains
     # word 'author', 'work', or 'edition' (case insensitive) then appropriate handler will be derived. Only required
     # if a dump file name does not conform to described naming convention.
-    handler-class: ${BOOKLINK_HANDLER_CLASS:}
+    handler-class: ${BOOKLINK_DI_HANDLER_CLASS:}
     # Allows to skip first N records of the dump file. This is useful when processing a file in several runs since this
     # program always handles the dump file sequentially from the beginning to end. For example, running a scan through
     # of an author dump to download images can take several days to complete (especially with throttling which should
@@ -20,32 +20,32 @@ booklink:
     # downloading images where it stopped on the next run. In such case, if we know how many (or even approximately)
     # records we already processed, we could set this property and the application will not even attempt to parse the
     # first N records, greatly speeding up the resumed process.
-    start-from-record-no: ${BOOKLINK_START_WITH_RECORD:0}
+    start-from-record-no: ${BOOKLINK_DI_START_WITH_RECORD:0}
     # Number of record to skip before a test record is logged as progress info. If booklink.di.start-from-record-no > 0,
     # then records processed (always sequentially) lower than that threshold will be logged as stored in the file
     # (plain text), records processed higher than the threshold are logged fully parsed (unmarshalled, then marshalled,
     # then logged).
-    frequency-check: ${BOOKLINK_FREQUENCY_CHECK:100000}
+    frequency-check: ${BOOKLINK_DI_FREQUENCY_CHECK:100000}
     # Persist processed data to mongo ?
-    persist: ${BOOKLINK_PERSIST:false}
+    persist: ${BOOKLINK_DI_PERSIST:false}
     # Override existing records when persisting (by default, yes) ? If disabled (false), import is much slower because
     # for each imported record a mongo query by id is issued to check if a record exists.
-    persist-override: ${BOOKLINK_PERSIST_OVERRIDE:true}
+    persist-override: ${BOOKLINK_DI_PERSIST_OVERRIDE:true}
     # If enabled, image download will be attempted for each record if it provides photo ids and if there is no file
-    # source (cache; see BOOKLINK_IMG_DIR)
-    image-pull: ${BOOKLINK_IMAGE_PULL:false}
+    # source (cache; see BOOKLINK_DI_IMG_DIR)
+    image-pull: ${BOOKLINK_DI_IMAGE_PULL:false}
     # Directory name of full path to where images should be downloaded to. If just a directory name is provided, it
     # is expected to live in the same location as the dump file. This directory can be empty or it can contain images.
     # If it contains the images following the naming convention established by Openlibrary.org, then these images are
     # used as a source (cache) when mongo image import is enabled. For works and editions, cover images downloaded via
     # bulk (*.tar) archives would be provided in this directory. *.tar archives do not need to be extracted. Importer
     # will read from them directly.
-    image-dir: ${BOOKLINK_IMG_DIR:}
+    image-dir: ${BOOKLINK_DI_IMG_DIR:}
     # Requires that booklink.di.persist=true and booklink.di.persist-override=true, otherwise ignored. If enabled,
     # implies enablement of image download. First, attempt will be made to fetch an image from a file if it exists
     # locally. For author images, exact image will be checked for and used if available. For work and edition, *.tar
     # archive will be checked. Image will be stored as a Base64 encoded binary field in mongo collection.
-    with-mongo-images: ${BOOKLINK_WITH_MONGO_IMGS:false}
+    with-mongo-images: ${BOOKLINK_DI_WITH_MONGO_IMGS:false}
     # If enabled, original images will be fetched. These images are large in size (often approaching 1MB).
     # Often large size is sufficient enough while much smaller in size.
-    fetch-original-images: ${BOOKLINK_FETCH_ORIG_IMGS:false}
+    fetch-original-images: ${BOOKLINK_DI_FETCH_ORIG_IMGS:false}
