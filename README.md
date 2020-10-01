@@ -15,7 +15,7 @@ this than writing one from scratch.
 
 This project builds into two executables:
 
-* `com.github.mrazjava.booklink.openlibrary.dataimport.OpenLibraryImportApp` is the actual import process.
+* `com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp` is the actual import process.
 * `TODO:` REST service for querying openlibrary mongo repository
 
 These could be two separate projects/apps with a shared schema *.jar (3rd project), but to keep things simple they 

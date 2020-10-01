@@ -1,7 +1,6 @@
-package com.github.mrazjava.booklink.openlibrary.dataimport;
+package com.github.mrazjava.booklink.openlibrary;
 
-import com.github.mrazjava.booklink.openlibrary.MongoConfiguration;
-import com.github.mrazjava.booklink.openlibrary.ObjectMapperConfiguration;
+import com.github.mrazjava.booklink.openlibrary.dataimport.DataImport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -138,7 +137,7 @@ public class ImageDownloader {
         File imageFile = getImageFile(destinationDir, size, imgId);
 
         if(!imageFile.getParentFile().exists()) {
-            throw new OpenLibraryIntegrationException(String.format("destination directory does not exist: %s", imageFile.getParentFile()));
+            throw new OpenLibraryImportException(String.format("destination directory does not exist: %s", imageFile.getParentFile()));
         }
 
         if(imageFile.exists()) {
@@ -440,7 +439,7 @@ public class ImageDownloader {
             log.warn("{}: {}", imgFileName, e.getMessage());
         }
         catch(IOException e) {
-            throw new OpenLibraryIntegrationException("unexpected error fetching file", e);
+            throw new OpenLibraryImportException("unexpected error fetching file", e);
         }
 
         log.debug("image:\n{}", imageBytes);

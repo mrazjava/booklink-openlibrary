@@ -1,6 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +36,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
                     Path.of(workingDirectory.getAbsolutePath() + File.separator + imageDir).toFile() :
                     Path.of(imageDir).toFile();
             if(BooleanUtils.isTrue(imagePull) && !imageDirectoryLocation.exists()) {
-                throw new OpenLibraryIntegrationException(
+                throw new OpenLibraryImportException(
                         String.format("booklink.di.image-dir does not exist! %s", imageDirectoryLocation.getAbsolutePath())
                 );
             }
@@ -101,7 +100,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             try {
                 downloadImages(author, sequenceNo);
             } catch (IOException e) {
-                throw new OpenLibraryIntegrationException("problem downloading author images", e);
+                throw new OpenLibraryImportException("problem downloading author images", e);
             }
         }
 

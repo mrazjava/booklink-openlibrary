@@ -1,6 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
@@ -21,7 +20,7 @@ public class CommonsLineIteratorProvider implements IteratorProvider<String, Fil
             return FileUtils.lineIterator(source, "UTF-8");
         }
         catch(IOException e) {
-            throw new OpenLibraryIntegrationException("file read error", e);
+            throw new OpenLibraryImportException("file read error", e);
         }
     }
 

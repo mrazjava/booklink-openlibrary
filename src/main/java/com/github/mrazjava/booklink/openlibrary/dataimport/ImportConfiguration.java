@@ -1,9 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.OpenLibraryIntegrationException;
-import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
-import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
-import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +35,7 @@ public class ImportConfiguration {
             (new ClassPathResource(dumpFilePath)).getFile();
 
         if(!dumpFile.exists()) {
-            throw new OpenLibraryIntegrationException(String.format("invalid import source: %s", dumpFilePath));
+            throw new OpenLibraryImportException(String.format("invalid import source: %s", dumpFilePath));
         }
 
         if(StringUtils.containsIgnoreCase(dumpFilePath, "author")) {
@@ -66,6 +62,6 @@ public class ImportConfiguration {
                 ImportHandler.class.getCanonicalName(),
                 dumpFilePath, configuredHandlerClass);
 
-        throw new OpenLibraryIntegrationException("invalid configuration");
+        throw new OpenLibraryImportException("invalid configuration");
     }
 }
