@@ -15,8 +15,8 @@ this than writing one from scratch.
 
 This project builds into two executables:
 
-* `com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp` is the actual import process.
-* `TODO:` REST service for querying openlibrary mongo repository
+* `com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp`: import openlibrary dumps into mongo
+* `com.github.mrazjava.booklink.openlibrary.OpenLibraryRestApp`: expose imported mongo data as REST API
 
 These could be two separate projects/apps with a shared schema *.jar (3rd project), but to keep things simple they 
 are both part of the same project. Should there be another integration in the future, booklink/mongo schema would need 
@@ -51,7 +51,9 @@ overrides to customize behavior. See [examples](https://github.com/mrazjava/book
 for details.
 
 #### REST API
-TODO
+```
+mvn clean spring-boot:run -Prest
+```
 
 #### Sandbox Dataset
 The following commands create sample dataset (using authors defined in `src/main/resources/author-id-filter.txt`) used 

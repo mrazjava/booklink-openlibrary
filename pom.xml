@@ -17,7 +17,6 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<start-class>com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp</start-class>
 	</properties>
 
 	<dependencies>
@@ -82,11 +81,32 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>import</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<start.class>com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp</start.class>
+			</properties>
+		</profile>
+		<profile>
+			<id>rest</id>
+			<properties>
+				<start.class>com.github.mrazjava.booklink.openlibrary.OpenLibraryRestApp</start.class>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<mainClass>${start.class}</mainClass>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

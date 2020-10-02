@@ -5,25 +5,29 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Profile;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 
 /**
- * Read json, row by row, from openlibrary dump file. Assumes file had been prepped to contain
- * exactly one JSON record per line. The {@code dumpFile} argument can be just the name of a
- * (sample) file, or a full path to a real import file.
+ * Imports data dump from openlibrary.org into a mongo database. Supports imports for authors,
+ * works and editions but each must be ran separately.
  */
+@Profile(OpenLibraryImportApp.PROFILE)
 @Slf4j
 @SpringBootApplication(scanBasePackageClasses = {
 		MongoConfiguration.class,
 		ObjectMapperConfiguration.class
 })
-public class OpenLibraryImportApp implements ApplicationRunner {
+public class OpenLibraryImportApp {
+
+	public static final String PROFILE = "IMPORT";
 
 	@Autowired
 	private DataImport importer;
@@ -64,14 +68,20 @@ public class OpenLibraryImportApp implements ApplicationRunner {
 	@Value("${booklink.di.fetch-original-images}")
 	private Boolean fetchOriginalImages;
 
+	@Autowired
+	private ApplicationContext context;
+
 
 	public static void main(String[] args) {
 
-		SpringApplication.run(OpenLibraryImportApp.class, args);
+		new SpringApplicationBuilder()
+				.sources(OpenLibraryImportApp.class)
+				.profiles(OpenLibraryImportApp.PROFILE)
+				.run(args);
 	}
 
-	@Override
-	public void run(ApplicationArguments args) throws Exception {
+	@EventListener(ApplicationReadyEvent.class)
+	void initialize() throws Exception {
 
 		boolean sample = !StringUtils.startsWith(dumpFilePath, "/");
 		File importFile = sample ?
@@ -80,7 +90,7 @@ public class OpenLibraryImportApp implements ApplicationRunner {
 
 		if(log.isInfoEnabled()) {
 
-			log.info("starting...\n\n" +
+			log.info("Booklink-OpenLibrary Import\n\n" +
 					"booklink.di:\n" +
 					" ol-dump-file: {}\n" +
 					" handler-class: {}\n" +
