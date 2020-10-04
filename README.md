@@ -65,7 +65,11 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FIL
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/tmp/openlibrary/editions.json -DBOOKLINK_DI_IMG_DIR=/tmp/openlibrary/covers/ -DBOOKLINK_DI_PERSIST=true -DBOOKLINK_DI_PERSIST_OVERRIDE=true -DBOOKLINK_DI_IMAGE_PULL=true -DBOOKLINK_DI_WITH_MONGO_IMGS=true"
 ```
 
-#### Docker Image
+## Docker Images
+MongoDB dependency is assembled for convenience via docker-compose. Import and REST API are packaged into docker 
+images of which only REST API is ran via sandbox. Import can be ran via docker image, but often it's more practical 
+to just run it via maven.
+#### MongoDB image
 The sample dataset (using authors defined in `src/main/resources/author-id-filter.txt`) is freely available as a docker 
 image on [dockerhub](https://hub.docker.com/repository/docker/mrazjava/booklink-mongo). This database contains embedded 
 images of authors and editions (if available) as per openlibrary specification. This same image is used by the sandbox. 
@@ -73,6 +77,18 @@ Run it with:
 ```
 docker run -p 27017:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
 ```
+#### Import image
+A new image should be rebuilt on monthly basis as openlibrary data dumps are released and schema is updated:
+```
+docker build -f import.Dockerfile -t mrazjava/booklink-openlibrary-import:YYYYMM .
+```
+Assuming mongo was started with docker-compose we run the image by attaching to the same default network. We bind a 
+sample file to the container path for test import. Note that we connect to internal container (`27017`) port, not 
+exposed host port (`27117`) - see `import.env` for details:
+```
+docker run --network=booklinkopenlibrary_default -v ~/idea/projects/booklink-openlibrary/src/main/resources/openlibrary/samples:/opt/app/samples --env-file=import.env mrazjava/booklink-openlibrary-import:202008
+```
+#### REST API image
 
 ## Filters
 All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. Each 

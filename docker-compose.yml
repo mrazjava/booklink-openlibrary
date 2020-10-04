@@ -1,14 +1,8 @@
 version: '3.1'
 
-networks:
-  booklink:
-    driver: bridge
-
 services:
   mongodb:
     image: library/mongo:4.4.0-bionic # https://hub.docker.com/_/mongo
-    networks:
-      - booklink
     ports:
       - "27117:27017"
     restart: always
