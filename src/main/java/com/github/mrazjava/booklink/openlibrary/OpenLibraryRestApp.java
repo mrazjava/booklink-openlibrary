@@ -4,17 +4,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Profile(OpenLibraryRestApp.PROFILE)
 @Slf4j
-@EnableSwagger2
-@SpringBootApplication(scanBasePackageClasses = {
-        MongoConfiguration.class,
-        ObjectMapperConfiguration.class
-})
+@ComponentScan(
+        excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern="com.github.mrazjava.booklink.openlibrary.dataimport.*")
+)
+@SpringBootApplication
 public class OpenLibraryRestApp {
 
     public static final String PROFILE = "REST";

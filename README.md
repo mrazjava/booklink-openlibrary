@@ -29,6 +29,7 @@ are part of a single project.
 ## Tech Stack
 * [Java 11](https://openjdk.java.net/projects/jdk/11/)
 * [Spring Boot](https://spring.io/projects/spring-boot)
+* [Springfox](https://github.com/springfox/springfox/releases/tag/3.0.0)
 * [Jackson](https://github.com/FasterXML/jackson-docs)
 * [Apache Commons](https://commons.apache.org/): LANG3, COLLECTIONS4, IO, COMPRESS
 * [Lombok](https://projectlombok.org/)
@@ -55,6 +56,7 @@ for details.
 ```
 mvn clean spring-boot:run -Prest
 ```
+Swagger interface is available at `localhost:8080/swagger-ui/`.
 
 #### Sandbox Dataset
 The following commands create sample dataset (using authors defined in `src/test/resources/author-id-filter.txt`) used 

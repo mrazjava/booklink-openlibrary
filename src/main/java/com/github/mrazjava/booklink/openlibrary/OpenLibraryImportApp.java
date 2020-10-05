@@ -5,12 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Profile;
-import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -21,11 +23,11 @@ import java.io.File;
  */
 @Profile(OpenLibraryImportApp.PROFILE)
 @Slf4j
-@SpringBootApplication(scanBasePackageClasses = {
-		MongoConfiguration.class,
-		ObjectMapperConfiguration.class
-})
-public class OpenLibraryImportApp {
+@ComponentScan(
+		excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern="com.github.mrazjava.booklink.openlibrary.rest.*")
+)
+@SpringBootApplication
+public class OpenLibraryImportApp implements CommandLineRunner {
 
 	public static final String PROFILE = "IMPORT";
 
@@ -74,14 +76,18 @@ public class OpenLibraryImportApp {
 
 	public static void main(String[] args) {
 
-		new SpringApplicationBuilder()
+		ConfigurableApplicationContext context = new SpringApplicationBuilder()
 				.sources(OpenLibraryImportApp.class)
 				.profiles(OpenLibraryImportApp.PROFILE)
 				.run(args);
+
+		log.info("import finished, asking Spring to exit the process...");
+
+		context.close();
 	}
 
-	@EventListener(ApplicationReadyEvent.class)
-	void initialize() throws Exception {
+	@Override
+	public void run(String... args) throws Exception {
 
 		boolean sample = !StringUtils.startsWith(dumpFilePath, "/");
 		File importFile = sample ?
@@ -91,17 +97,17 @@ public class OpenLibraryImportApp {
 		if(log.isInfoEnabled()) {
 
 			log.info("Booklink-OpenLibrary Import\n\n" +
-					"booklink.di:\n" +
-					" ol-dump-file: {}\n" +
-					" handler-class: {}\n" +
-					" start-from-record-no: {}\n" +
-					" frequency-check: {}\n" +
-					" persist: {}\n" +
-					" persist-override: {}\n" +
-					" image-pull: {}\n" +
-					" image-dir: {}\n" +
-					" with-mongo-images: {}\n" +
-					" fetch-original-images: {}\n",
+							"booklink.di:\n" +
+							" ol-dump-file: {}\n" +
+							" handler-class: {}\n" +
+							" start-from-record-no: {}\n" +
+							" frequency-check: {}\n" +
+							" persist: {}\n" +
+							" persist-override: {}\n" +
+							" image-pull: {}\n" +
+							" image-dir: {}\n" +
+							" with-mongo-images: {}\n" +
+							" fetch-original-images: {}\n",
 					importFile.getAbsolutePath(),
 					handlerClass,
 					startWithRecordNo,

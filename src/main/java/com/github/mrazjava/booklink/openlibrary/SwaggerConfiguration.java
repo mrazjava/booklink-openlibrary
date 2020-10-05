@@ -6,6 +6,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -15,6 +20,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.Optional;
 
+@Profile(OpenLibraryRestApp.PROFILE)
 @Configuration
 public class SwaggerConfiguration {
 
@@ -30,7 +36,7 @@ public class SwaggerConfiguration {
     @Bean
     public Docket internalAPI() {
         final String version = (build.isPresent()) ? build.get().getVersion() : "";
-        Docket d = new Docket(DocumentationType.SWAGGER_2)
+        Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .groupName("booklink-" + version)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage(OpenLibraryRestApp.class.getPackageName()))
@@ -40,9 +46,9 @@ public class SwaggerConfiguration {
                 .apiInfo(generateInternalApiInfo(version, "booklink-openlibrary", "openlibrary.org query api"));
 
         if (StringUtils.isNotBlank(swaggerhost)) {
-            d.host(swaggerhost);
+            docket.host(swaggerhost);
         }
-        return d;
+        return docket;
     }
 
     private ApiInfo generateInternalApiInfo(String version, String title, String desc) {
