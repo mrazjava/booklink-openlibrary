@@ -125,7 +125,7 @@ pv ol_dump_works_latest.txt.gz | gunzip > works.txt
 pv ol_dump_editions_latest.txt.gz | gunzip > editions.txt
 ```
 
-## Images
+## Graphics
 Openlibrary.org provides images for downloads. Usually, each image available through open library comes in three 
 sizes: (S)mall, (M)edium and (L)arge. Openlibrary also provides images in the original size but I noticed this set is 
 incomplete, meaning, there are many small/medium/large images which do not have the original. Besides, original images 
