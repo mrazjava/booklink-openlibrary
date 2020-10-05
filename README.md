@@ -57,7 +57,7 @@ mvn clean spring-boot:run -Prest
 ```
 
 #### Sandbox Dataset
-The following commands create sample dataset (using authors defined in `src/main/resources/author-id-filter.txt`) used 
+The following commands create sample dataset (using authors defined in `src/test/resources/author-id-filter.txt`) used 
 by the sandbox. Assuming that openlibrary dumps have been prepped, and that the dumps and cover images exist in 
 `/tmp/openlibrary/`:
 ```
