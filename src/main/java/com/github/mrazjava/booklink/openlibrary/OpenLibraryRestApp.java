@@ -6,9 +6,11 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Profile(OpenLibraryRestApp.PROFILE)
 @Slf4j
+@EnableSwagger2
 @SpringBootApplication(scanBasePackageClasses = {
         MongoConfiguration.class,
         ObjectMapperConfiguration.class
