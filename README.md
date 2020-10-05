@@ -71,7 +71,7 @@ MongoDB dependency is assembled for convenience via docker-compose. Import and R
 images of which only REST API is ran via sandbox. Import can be ran via docker image, but often it's more practical 
 to just run it via maven.
 #### MongoDB image
-The sample dataset (using authors defined in `src/main/resources/author-id-filter.txt`) is freely available as a docker 
+The sample dataset (using authors defined in `src/test/resources/author-id-filter.txt`) is freely available as a docker 
 image on [dockerhub](https://hub.docker.com/repository/docker/mrazjava/booklink-mongo). This database contains embedded 
 images of authors and editions (if available) as per openlibrary specification. This same image is used by the sandbox. 
 Run it with:
