@@ -78,9 +78,10 @@ Run it with:
 docker run -p 27017:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
 ```
 #### Import image
-A new image should be rebuilt on monthly basis as openlibrary data dumps are released and schema is updated:
+A new image should be rebuilt on monthly basis as openlibrary data dumps are released and schema is updated. The 
+version tag follows a format `YYYYMM`, here for the sake of example we use a version from Aug 2020:
 ```
-docker build -f import.Dockerfile -t mrazjava/booklink-openlibrary-import:YYYYMM .
+docker build -f import.Dockerfile -t mrazjava/booklink-openlibrary-import:202008 .
 ```
 Assuming mongo was started with docker-compose we run the image by attaching to the same default network. We bind a 
 sample file to the container path for test import. Note that we connect to internal container port (`27017`), not 
