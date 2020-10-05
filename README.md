@@ -83,7 +83,7 @@ A new image should be rebuilt on monthly basis as openlibrary data dumps are rel
 docker build -f import.Dockerfile -t mrazjava/booklink-openlibrary-import:YYYYMM .
 ```
 Assuming mongo was started with docker-compose we run the image by attaching to the same default network. We bind a 
-sample file to the container path for test import. Note that we connect to internal container (`27017`) port, not 
+sample file to the container path for test import. Note that we connect to internal container port (`27017`), not 
 exposed host port (`27117`) - see `import.env` for details:
 ```
 docker run --network=booklinkopenlibrary_default -v ~/idea/projects/booklink-openlibrary/src/main/resources/openlibrary/samples:/opt/app/samples --env-file=import.env mrazjava/booklink-openlibrary-import:202008
