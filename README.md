@@ -126,10 +126,10 @@ pv ol_dump_editions_latest.txt.gz | gunzip > editions.txt
 ```
 
 ## Graphics
-Openlibrary.org provides images for downloads. Usually, each image available through open library comes in three 
-sizes: (S)mall, (M)edium and (L)arge. Openlibrary also provides images in the original size but I noticed this set is 
-incomplete, meaning, there are many small/medium/large images which do not have the original. Besides, original images 
-are too large for a typical practical usage in a web application - so it's not a big loss.
+Openlibrary.org provides pictures of authors and books for downloads. Usually, each image available through open 
+library comes in three sizes: (S)mall, (M)edium and (L)arge. Openlibrary also provides images in the original size but 
+I noticed this set is incomplete, meaning, there are many small/medium/large images which do not have the original. 
+Besides, original images are too large for a typical practical usage in a web application - so it's not a big loss.
 
 Not all images can be downloaded in bulk. For instance, author images can only be downloaded directly on case by case 
 basis.
