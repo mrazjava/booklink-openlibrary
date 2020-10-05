@@ -1,6 +1,7 @@
 # Booklink Data Integration: openlibrary.org
-Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org). Raw data source for 
-author-book feed (search, etc) into the [booklink-backend](https://github.com/mrazjava/booklink-backend).
+Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org). REST API for interaction 
+with imported data source to facilitate author-book feed (search, etc) into the 
+[booklink-backend](https://github.com/mrazjava/booklink-backend).
 
 # Overview
 openlibrary.org is a fantastic public archive which provides a rich aggregation of book info from all over the world. 
