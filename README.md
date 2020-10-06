@@ -59,6 +59,8 @@ By default, import runs off a sample file. Apply `-Dspring-boot.run.jvmArguments
 overrides to customize behavior. See [examples](https://github.com/mrazjava/booklink-openlibrary/blob/master/EXAMPLES.md) 
 for details.
 
+Once import is finished, application shuts down the main process and exists.
+
 #### REST API
 ```
 mvn clean spring-boot:run -Prest
