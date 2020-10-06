@@ -34,6 +34,14 @@ are part of a single project.
 * [Lombok](https://projectlombok.org/)
 * [MongoDB](https://www.mongodb.com/)
 
+## Versioning
+Version number of this software program follows the format of `YYYYMM` matching a monthly release period of data dumps 
+from openlibrary.org. Since schema of data dumps is regularly extended, software needs to be updated to be compatiblie. 
+We can check tags to track up to which point in time is our software compatible with a data dump from openlibrary.org.
+
+Even if there were no changes required after a new dump release from openlibary.org, this software will be tagged to 
+indicate compatibility.
+
 ## Quick Start
 See `application.yml` for available configuration options. Each spring boot config is driven by environment variable.
 
@@ -196,7 +204,7 @@ Line count is useful for final verification once data is imported into the datab
 #### Remove line metadata
 In order to properly parse each line into a JSON object, we must remove a prefix provided by OpenLibrary:
 ```
-sed 's/^[^{]*//'  ol_dump_works_latest.txt > works.txt
+sed 's/^[^{]*//' ol_dump_works_latest.txt > works.txt
 ```
 
 #### Parsing, Debugging, Troubleshooting
