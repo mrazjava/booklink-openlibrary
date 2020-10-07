@@ -32,6 +32,12 @@ record is printed every 100,000th row:
 ```
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/home/azimowski/Downloads/booklink/authors.json -DBOOKLINK_DI_IMAGE_PULL=true -DBOOKLINK_DI_IMG_DIR=/media/azimowski/booklink-5TB/authors -DBOOKLINK_DI_PERSIST=false -DBOOKLINK_DI_START_WITH_RECORD=1000000"
 ```
+Similar example, one I actually use to download author files every month when new dump is published (no mongo 
+persistence):
+```
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json"
+``` 
+
 #### Author
 Process full openlibrary data dump and persist each record in mongo. If avilable, download author images to a file 
 and store them in `authors` subdirectory of the location where the dump file is read from. In addition, 

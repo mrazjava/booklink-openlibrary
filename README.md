@@ -91,7 +91,7 @@ docker run -p 27017:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
 ```
 #### Import image
 A new image should be rebuilt on monthly basis as openlibrary data dumps are released and schema is updated. The 
-version tag follows a format `YYYYMM`, here for the sake of example we use a version from Aug 2020:
+version tag follows a format `YYYYMM`, here for sake of the example we use a version from Aug 2020:
 ```
 docker build -f import.Dockerfile -t mrazjava/booklink-openlibrary-import:202008 .
 ```

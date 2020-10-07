@@ -12,7 +12,7 @@
     <logger name="org.hibernate.type.descriptor.sql" level="DEBUG" />
 
     <logger name="com.github.mrazjava.booklink" level="INFO"/>
-    <logger name="com.github.mrazjava.booklink.openlibrary.dataimport.AuthorHandler" level="DEBUG"/>
+    <logger name="com.github.mrazjava.booklink.openlibrary.dataimport.AuthorHandler" level="INFO"/>
     <logger name="com.github.mrazjava.booklink.openlibrary.dataimport.ImageDownloader" level="INFO"/>
 
 </configuration>
