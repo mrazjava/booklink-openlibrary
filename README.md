@@ -33,10 +33,10 @@ structure; that is, 1) provide import into some persistent store with its own ap
 
 ## Architecture
 The goal of booklink data integration is to provide author/book data to the backend over the unified API. This is 
-accomplished by implementing `booklink-depot-schema` over REST which the backend can call. The internals of data import, 
+accomplished by implementing [booklink-depot-api](https://github.com/mrazjava/booklink-depot-api) over REST which the backend can call. The internals of data import, 
 and the underlying persistent store are unique details of each implementation. Each data integration is just a single 
 maven project which builds into two executables: `import` which runs and exits immediately after process is finished, 
-and 2) `depot` which is a standard spring boot REST app which exposes integrated data behind the `booklink-depot-schema`.
+and 2) `depot` which is a standard spring boot REST app which exposes integrated data behind the `booklink-depot-api`.
 
 It is up to the backend to decide which integration to use for what purpose and when. Since the backend talks to depot 
 endpoints which provide a unified interface, it doesn't know the underlying implementation of the depot itself nor what 
