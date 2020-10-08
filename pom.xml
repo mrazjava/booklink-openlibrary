@@ -101,9 +101,9 @@
 			</properties>
 		</profile>
 		<profile>
-			<id>rest</id>
+			<id>depot</id>
 			<properties>
-				<start.class>com.github.mrazjava.booklink.openlibrary.OpenLibraryRestApp</start.class>
+				<start.class>com.github.mrazjava.booklink.openlibrary.OpenLibraryDepotApp</start.class>
 			</properties>
 		</profile>
 	</profiles>

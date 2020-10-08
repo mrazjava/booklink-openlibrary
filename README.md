@@ -1,6 +1,6 @@
 # Booklink Data Integration: openlibrary.org
-Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org). REST API for interaction 
-with imported data source to facilitate author-book feed (search, etc) into the 
+Import process for migrating raw data dumps from [openlibrary.org](https://openlibrary.org). Depot implementation 
+(REST API) for interaction with imported data source to facilitate author-book feed (search, etc) into the 
 [booklink-backend](https://github.com/mrazjava/booklink-backend).
 
 # Overview
@@ -17,14 +17,11 @@ this than writing one from scratch.
 This project builds into two executables:
 
 * `com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp`: import openlibrary dumps into mongo
-* `com.github.mrazjava.booklink.openlibrary.OpenLibraryRestApp`: expose imported mongo data as REST API
+* `com.github.mrazjava.booklink.openlibrary.OpenLibraryDepotApp`: expose imported mongo data as REST API
 
 These could be two separate projects/apps with a shared schema *.jar (3rd project), but to keep things simple they 
-are both part of the same project. Should there be another integration in the future, booklink/mongo schema would need 
-to fork off from openlibrary schema (currently they're the same) and project would have to be refactored into multiple 
-components (REST query service, import process, mongo schema, open library schema, new/future integration schema etc 
-etc). Again, this level of complexity is not necessary at this point thus book source including openlibrary integration 
-are part of a single project.
+are both part of the same project. Should there be another integration in the future, it only has to follow the same 
+structure; that is, 1) provide import into some persistent store with its own api, and, 2) provide depot implementation. 
 
 ## Tech Stack
 * [Java 11](https://openjdk.java.net/projects/jdk/11/)
@@ -33,6 +30,17 @@ are part of a single project.
 * [Apache Commons](https://commons.apache.org/): LANG3, COLLECTIONS4, IO, COMPRESS
 * [Lombok](https://projectlombok.org/)
 * [MongoDB](https://www.mongodb.com/)
+
+## Architecture
+The goal of booklink data integration is to provide author/book data to the backend over the unified API. This is 
+accomplished by implementing `booklink-depot-schema` over REST API which backend can call. The internals of data import 
+and the underlying persistent store are unique details of each implementation. Each data integration is just a single 
+maven project which builds into two executables: `import` which runs and exits immediately after process is finished, 
+and 2) `depot` which is a standard spring boot REST API application which exposes integrated data with `booklink-depot-schema`.
+
+It is up to the backend to decide which integration to use for what purpose and when. Since backend talks to depot 
+endpoints which provide a unified interface it doesn't know the underlying implementation of the depot itself nor what 
+the imported data structure looks like.
 
 ## Versioning
 Version number of this software program follows the format of `YYYYMM` matching a monthly release period of data dumps 
@@ -63,9 +71,9 @@ Once import is finished, application shuts down the main process and exists.
 
 #### REST API
 ```
-mvn clean spring-boot:run -Prest
+mvn clean spring-boot:run -Pdepot
 ```
-Swagger interface is available at `localhost:8080/swagger-ui/`.
+Depot runs over REST and provides Swagger interface which will be available at `localhost:8080/swagger-ui/`.
 
 #### Sandbox Dataset
 The following commands create sample dataset (using authors defined in `src/test/resources/author-id-filter.txt`) used 
@@ -101,7 +109,7 @@ exposed host port (`27117`) - see `import.env` for details:
 ```
 docker run --network=booklinkopenlibrary_default -v ~/idea/projects/booklink-openlibrary/src/main/resources/openlibrary/samples:/opt/app/samples --env-file=import.env mrazjava/booklink-openlibrary-import:202008
 ```
-#### REST API image
+#### Depot image
 
 ## Filters
 All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. Each 

@@ -7,10 +7,6 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.service.ApiInfo;
@@ -20,7 +16,7 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 import java.util.Optional;
 
-@Profile(OpenLibraryRestApp.PROFILE)
+@Profile(OpenLibraryDepotApp.PROFILE)
 @Configuration
 public class SwaggerConfiguration {
 
@@ -39,11 +35,11 @@ public class SwaggerConfiguration {
         Docket docket = new Docket(DocumentationType.SWAGGER_2)
                 .groupName("booklink-" + version)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(OpenLibraryRestApp.class.getPackageName()))
+                .apis(RequestHandlerSelectors.basePackage(OpenLibraryDepotApp.class.getPackageName()))
                 .build()
                 .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
                 .directModelSubstitute(java.time.OffsetDateTime.class, java.util.Date.class)
-                .apiInfo(generateInternalApiInfo(version, "booklink-openlibrary", "openlibrary.org query api"));
+                .apiInfo(generateInternalApiInfo(version, "Booklink Openlibrary Depot", "REST API for author/book integration with openlibrary.org"));
 
         if (StringUtils.isNotBlank(swaggerhost)) {
             docket.host(swaggerhost);
