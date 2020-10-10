@@ -1,8 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,27 +21,28 @@ public class SwaggerConfiguration {
     @Autowired
     private Optional<BuildProperties> build;
 
-    @Value("${info.app.description:}")
-    private String appdesc;
+//    @Value("${info.app.description:}")
+//    private String appdesc;
 
-    @Value("${swaggerhost:}")
-    private String swaggerhost;
+//    @Value("${swaggerhost:}")
+//    private String swaggerhost;
 
     @Bean
     public Docket internalAPI() {
         final String version = (build.isPresent()) ? build.get().getVersion() : "";
-        Docket docket = new Docket(DocumentationType.SWAGGER_2)
-                .groupName("booklink-" + version)
+        Docket docket = new Docket(DocumentationType.OAS_30)
+                //.groupName("booklink-" + version)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage(OpenLibraryDepotApp.class.getPackageName()))
+                .apis(RequestHandlerSelectors.basePackage("com.github.mrazjava.booklink.openlibrary.depot"))
+                //.paths(regex("/rest/v1/depot/author/*"))
                 .build()
                 .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
                 .directModelSubstitute(java.time.OffsetDateTime.class, java.util.Date.class)
                 .apiInfo(generateInternalApiInfo(version, "Booklink Openlibrary Depot", "REST API for author/book integration with openlibrary.org"));
 
-        if (StringUtils.isNotBlank(swaggerhost)) {
-            docket.host(swaggerhost);
-        }
+//        if (StringUtils.isNotBlank(swaggerhost)) {
+//            docket.host(swaggerhost);
+//        }
         return docket;
     }
 
@@ -54,9 +53,9 @@ public class SwaggerConfiguration {
             version = buildInfo.getVersion();
         }
 
-        if (StringUtils.isNotBlank(appdesc)) {
-            description = "<b>" + appdesc + "</b>" + " <br><br>" + desc;
-        }
+//        if (StringUtils.isNotBlank(appdesc)) {
+//            description = "<b>" + appdesc + "</b>" + " <br><br>" + desc;
+//        }
 
         return new ApiInfoBuilder()
                 .title(title)
