@@ -1,7 +1,8 @@
 package com.github.mrazjava.booklink.openlibrary;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.info.BuildProperties;
+import com.github.mrazjava.booklink.openlibrary.depot.DepotAuthor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -12,57 +13,36 @@ import springfox.documentation.service.Contact;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
-import java.util.Optional;
+import static springfox.documentation.builders.PathSelectors.regex;
 
+@Slf4j
 @Profile(OpenLibraryDepotApp.PROFILE)
 @Configuration
 public class SwaggerConfiguration {
 
-    @Autowired
-    private Optional<BuildProperties> build;
-
-//    @Value("${info.app.description:}")
-//    private String appdesc;
-
-//    @Value("${swaggerhost:}")
-//    private String swaggerhost;
-
     @Bean
-    public Docket internalAPI() {
-        final String version = (build.isPresent()) ? build.get().getVersion() : "";
+    public Docket internalAPI(@Value("${project.version:unknown}") String appVersion) {
         Docket docket = new Docket(DocumentationType.OAS_30)
-                //.groupName("booklink-" + version)
+                .groupName("booklink-v" + appVersion)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.github.mrazjava.booklink.openlibrary.depot"))
-                //.paths(regex("/rest/v1/depot/author/*"))
+                .apis(RequestHandlerSelectors.basePackage(DepotAuthor.class.getPackageName()))
+                .paths(regex(".*/depot/.*"))
                 .build()
                 .directModelSubstitute(java.time.LocalDate.class, java.sql.Date.class)
                 .directModelSubstitute(java.time.OffsetDateTime.class, java.util.Date.class)
-                .apiInfo(generateInternalApiInfo(version, "Booklink Openlibrary Depot", "REST API for author/book integration with openlibrary.org"));
+                .apiInfo(generateInternalApiInfo(appVersion, "Booklink Openlibrary Depot", "REST API for author/book integration with openlibrary.org"));
 
-//        if (StringUtils.isNotBlank(swaggerhost)) {
-//            docket.host(swaggerhost);
-//        }
         return docket;
     }
 
     private ApiInfo generateInternalApiInfo(String version, String title, String desc) {
-        String description = desc;
-        if (build.isPresent()) {
-            BuildProperties buildInfo = build.get();
-            version = buildInfo.getVersion();
-        }
-
-//        if (StringUtils.isNotBlank(appdesc)) {
-//            description = "<b>" + appdesc + "</b>" + " <br><br>" + desc;
-//        }
 
         return new ApiInfoBuilder()
                 .title(title)
-                .description(description)
-                .license("")
-                .licenseUrl("")
-                .termsOfServiceUrl("")
+                .description(desc)
+                .license("Apache 2.0")
+                .licenseUrl("https://www.apache.org/licenses/LICENSE-2.0")
+                .termsOfServiceUrl("https://pre.booklinktrove.com/about/privacy-policy")
                 .version(version)
                 .contact(new Contact("mrazjava", "https://github.com/mrazjava", ""))
                 .build();
