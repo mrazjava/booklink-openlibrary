@@ -23,6 +23,7 @@ public class SwaggerConfiguration {
     @Bean
     public Docket internalAPI(@Value("${project.version:unknown}") String appVersion) {
         Docket docket = new Docket(DocumentationType.OAS_30)
+                .forCodeGeneration(true)
                 .groupName("booklink-v" + appVersion)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage(DepotAuthor.class.getPackageName()))
