@@ -33,7 +33,7 @@ public class AuthorRestController {
             }
     )
     public ResponseEntity<DepotAuthor> findById(@ApiParam(value = "unique author ID", required = true) @PathVariable("id") String authorId) {
-        log.debug("id: {}", authorId);
+        log.info("id: {}", authorId);
         return ResponseEntity.ok(DepotAuthor.builder().id(authorId).comment("tralalala").build());
     }
 }
