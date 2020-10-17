@@ -4,12 +4,18 @@ Various scenarios with full parameterized commands.
 Unless `BOOKLINK_DI_START_WITH_RECORD` is defined (default `0`), every record is unmarshalled into a POJO and then 
 marshalled back into a `String` as means to test the parser. 
 
-#### Author
+#### Author (sample)
 Scan the `src/main/resources/openlibrary/samples/authors-tail-n1000.json` sample. No image processing is done. 
 Nothing is persisted.
 ```
 mvn clean spring-boot:run
 ```
+#### Author (sample+persist)
+Same as above except sample is persisted to mongo:
+```
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_PERSIST=true"
+```
+
 #### Author
 Scan a full openlibrary data dump in a custom location. No image processing is done. Nothing is persisted. Each record is 
 logged with the frequency of `BOOKLINK_DI_FREQUENCY_CHECK`
