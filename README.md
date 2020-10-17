@@ -33,15 +33,24 @@ structure; that is, 1) provide import into some persistent store with its own ap
 
 ## Architecture
 The goal of booklink data integration is to provide author/book data to the backend over the unified API. This is 
-accomplished by implementing [booklink-depot-api](https://github.com/mrazjava/booklink-depot-api) over REST which the backend can call. The internals of data import, 
-and the underlying persistent store are unique details of each implementation. Each data integration is just a single 
-maven project which builds into two executables: `import` which runs and exits immediately after process is finished, 
-and 2) `depot` which is a standard spring boot REST app which exposes integrated data behind the `booklink-depot-api`.
+accomplished by:
+
+1) `booklink-openlibrary`: providing data import of raw dumps, which is part of the same project as implementation of depot server REST API
+> This project builds into two executables (import and depot server) and shared components such as data repositories 
+> are easily accessible from each executable. The internals of data import, and the underlying persistent store are 
+> unique details of each depot implementation.
+2) `booklink-openlibrary`: implementing a uniform depot server REST API
+> As long as there is a single depot implementation (OpenLibrary), server definitions are hand crafted and generated 
+> by springfox. If in the future another data integration is introduced, server APIs will have to be either 
+> auto generated (openapi, swagger codegen, etc), or, extracted to another library project with delegate definitions 
+> exposed for implementation.
+3) `booklink-backend`: depot client is auto generated from server [depot definitions](https://github.com/mrazjava/booklink-backend/blob/develop/src/main/resources/depot-api.json).
+> Any time depot server API is changed, the `depot-api.json` on the backend must be updated. No futher changes should 
+> be necessary.
 
 It is up to the backend to decide which integration to use for what purpose and when. Since the backend talks to depot 
 endpoints which provide a unified interface, it doesn't know the underlying implementation of the depot itself nor what 
-the imported data structure looks like. All that backend knows is the priority in which to call a list of depots 
-available to it.
+the imported data structure looks like.
 
 ## Versioning
 Version number of this software program follows the format of `YYYYMM` matching a monthly release period of data dumps 
