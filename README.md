@@ -45,8 +45,9 @@ accomplished by:
 > auto generated (openapi, swagger codegen, etc), or, extracted to another library project with delegate definitions 
 > exposed for implementation.
 3) `booklink-backend`: depot client is auto generated from server [depot definitions](https://github.com/mrazjava/booklink-backend/blob/develop/src/main/resources/depot-api.json).
-> Any time depot server API is changed, the `depot-api.json` on the backend must be updated. No futher changes should 
-> be necessary.
+> Any time depot server API is changed, the `depot-api.json` on the backend must be updated and `servers` section 
+> removed. JSON can be obtained by starting depot server and clicking the `apidocs` link from within the swagger UI. 
+> By default it is minified, so I usually run it through a prettyfier. No futher changes should be necessary.
 
 It is up to the backend to decide which integration to use for what purpose and when. Since the backend talks to depot 
 endpoints which provide a unified interface, it doesn't know the underlying implementation of the depot itself nor what 

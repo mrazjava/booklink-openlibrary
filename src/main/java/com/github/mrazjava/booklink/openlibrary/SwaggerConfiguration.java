@@ -20,6 +20,8 @@ import static springfox.documentation.builders.PathSelectors.regex;
 @Configuration
 public class SwaggerConfiguration {
 
+    public static final String DEPOT_API_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+
     @Bean
     public Docket internalAPI(@Value("${project.version:unknown}") String appVersion) {
         Docket docket = new Docket(DocumentationType.OAS_30)
