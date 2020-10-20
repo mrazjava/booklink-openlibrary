@@ -63,6 +63,7 @@ public class AuthorSchema extends BaseSchemaEnhanced {
 
     private String title;
 
+    @TextIndexed(weight = 4)
     private String bio;
 
     @JsonProperty("by_statement")
@@ -94,6 +95,7 @@ public class AuthorSchema extends BaseSchemaEnhanced {
     @JsonProperty("death_date")
     private String deathDate;
 
+    @TextIndexed(weight = 5)
     private String location;
 
     /**
@@ -118,12 +120,16 @@ public class AuthorSchema extends BaseSchemaEnhanced {
 
     private List<String> series;
 
+    @TextIndexed(weight = 5)
     private List<String> contributions;
 
+    @TextIndexed(weight = 6)
     private String role;
 
+    @TextIndexed(weight = 4)
     private List<String> genres;
 
+    @TextIndexed(weight = 6)
     private String comment;
 
     private TypeValue<String> notes;
