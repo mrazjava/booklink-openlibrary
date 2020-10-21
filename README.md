@@ -270,6 +270,11 @@ Count authors which have a small image:
 ```
 db.getCollection('authors').count({"imageSmall": {$exists: true}})
 ```
+Search authors by [text](https://docs.mongodb.com/manual/reference/operator/query/text/) (case insensitive):
+```
+db.getCollection('authors').find({$text:{$search: "charles"}})
+```
+Above finds all authors where text index matches string `charles` (typically name fields).
 
 ## Links
 
