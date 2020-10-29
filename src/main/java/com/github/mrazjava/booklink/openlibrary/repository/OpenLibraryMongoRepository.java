@@ -12,5 +12,7 @@ import java.util.List;
 public interface OpenLibraryMongoRepository<T> extends MongoRepository<T, String> {
 
     @Query(value = "{}", fields = "{'_id': 1}")
-    List<BaseSchema> findAllIds();
+    List<T> findAllIds();
+
+    List<T> findByAuthors(List<String> authorIds);
 }

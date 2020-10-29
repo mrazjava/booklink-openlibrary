@@ -6,8 +6,8 @@ import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,20 +22,22 @@ public class WorkService extends AbstractMongoSupport {
     }
 
     public List<DepotWork> findById(List<String> ids) {
-        List<DepotWork> results = new LinkedList<>();
-        workRepository.findAllById(ids).forEach(w -> results.add(new DepotWork(w)));
-        return results;
+        return iterableToList(workRepository.findAllById(ids));
     }
 
     public List<DepotWork> findByAuthorId(String authorId) {
-        throw new IllegalStateException("not implemented yet");
+        return workRepository.findByAuthors(List.of(authorId)).stream().map(DepotWork::new).collect(Collectors.toList());
     }
 
     public List<DepotWork> searchText(String search, String langIso, boolean caseSensitive) {
-
         return mongoTemplate.find(prepareTextQuery(search, langIso, caseSensitive), WorkSchema.class)
                 .stream()
-                .map(DepotWork::new)
+                .map(mapper())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected Function<WorkSchema, DepotWork> mapper() {
+        return DepotWork::new;
     }
 }

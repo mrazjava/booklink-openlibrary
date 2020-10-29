@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,9 +22,7 @@ public class AuthorService extends AbstractMongoSupport {
     }
 
     public List<DepotAuthor> findById(List<String> ids) {
-        List<DepotAuthor> results = new LinkedList<>();
-        authorRepository.findAllById(ids).forEach(a -> results.add(new DepotAuthor(a)));
-        return results;
+        return iterableToList(authorRepository.findAllById(ids));
     }
 
     public List<DepotAuthor> searchText(String search, String langIso, boolean caseSensitive) {
@@ -32,5 +31,10 @@ public class AuthorService extends AbstractMongoSupport {
                 .stream()
                 .map(DepotAuthor::new)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    protected Function<AuthorSchema, DepotAuthor> mapper() {
+        return DepotAuthor::new;
     }
 }
