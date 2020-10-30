@@ -97,9 +97,9 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FIL
 ```
 
 ## Docker Images
-MongoDB dependency is assembled for convenience via docker-compose. Import and REST API are packaged into docker 
-images of which only REST API is ran via sandbox. Import can be ran via docker image, but often it's more practical 
-to just run it via maven.
+MongoDB dependency is assembled for convenience via docker-compose. Import and Depot are packaged into docker 
+images of which only Depot (REST API) is ran via sandbox. Import can be ran via docker image, but often it's more 
+practical to just run it via maven.
 #### MongoDB image
 The sample dataset (using authors defined in `src/test/resources/author-id-filter.txt`) is freely available as a docker 
 image on [dockerhub](https://hub.docker.com/repository/docker/mrazjava/booklink-mongo). This database contains embedded 
