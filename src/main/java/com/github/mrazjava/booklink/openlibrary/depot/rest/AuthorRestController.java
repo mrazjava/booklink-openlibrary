@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/v1/depot/author")
 @Slf4j
-public class AuthorRestController {
+public class AuthorRestController implements DepotOperations<DepotAuthor> {
 
     @Autowired
     private AuthorService authorService;
@@ -40,26 +40,11 @@ public class AuthorRestController {
         return ResponseEntity.ok(authorService.findById(authorId));
     }
 
-    @ApiOperation(value = "Free style search")
-    @GetMapping(path = "/text-search")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(
-            {
-                    @ApiResponse(
-                            message = "ok",
-                            code = 200
-                    )
-            }
-    )
-    public ResponseEntity<List<DepotAuthor>> searchText(
-            @ApiParam(value = "free style text search (eg: 'biology religion')", required = true) @RequestParam("s") String searchQuery,
-            @ApiParam(value = "case sensitive?") @RequestParam(value = "case-sensitive", required = false) Boolean caseSensitive,
-            @ApiParam(value = "language ISO") @RequestParam(value = "language-iso", required = false) String languageCode) {
+    @Override
+    public ResponseEntity<List<DepotAuthor>> searchText(String searchQuery, Boolean caseSensitive, String languageCode) {
 
         caseSensitive = BooleanUtils.toBoolean(caseSensitive);
-
         log.info("searchText[{}], caseSensitive[{}], languageCode[{}]", searchQuery, caseSensitive, languageCode);
-
         return ResponseEntity.ok(authorService.searchText(searchQuery, languageCode, caseSensitive));
     }
 }

@@ -11,7 +11,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class WorkService extends AbstractMongoSupport {
+public class WorkService extends AbstractMongoSupport<DepotWork, WorkSchema> {
 
     @Autowired
     private WorkRepository workRepository;
@@ -29,15 +29,13 @@ public class WorkService extends AbstractMongoSupport {
         return workRepository.findByAuthors(List.of(authorId)).stream().map(DepotWork::new).collect(Collectors.toList());
     }
 
-    public List<DepotWork> searchText(String search, String langIso, boolean caseSensitive) {
-        return mongoTemplate.find(prepareTextQuery(search, langIso, caseSensitive), WorkSchema.class)
-                .stream()
-                .map(mapper())
-                .collect(Collectors.toList());
-    }
-
     @Override
     protected Function<WorkSchema, DepotWork> mapper() {
         return DepotWork::new;
+    }
+
+    @Override
+    protected Class<WorkSchema> getSchemaClass() {
+        return WorkSchema.class;
     }
 }

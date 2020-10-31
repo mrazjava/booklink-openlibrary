@@ -6,13 +6,11 @@ import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
-public class AuthorService extends AbstractMongoSupport {
+public class AuthorService extends AbstractMongoSupport<DepotAuthor, AuthorSchema> {
 
     @Autowired
     private AuthorRepository authorRepository;
@@ -25,16 +23,13 @@ public class AuthorService extends AbstractMongoSupport {
         return iterableToList(authorRepository.findAllById(ids));
     }
 
-    public List<DepotAuthor> searchText(String search, String langIso, boolean caseSensitive) {
-
-        return mongoTemplate.find(prepareTextQuery(search, langIso, caseSensitive), AuthorSchema.class)
-                .stream()
-                .map(DepotAuthor::new)
-                .collect(Collectors.toList());
-    }
-
     @Override
     protected Function<AuthorSchema, DepotAuthor> mapper() {
         return DepotAuthor::new;
+    }
+
+    @Override
+    protected Class<AuthorSchema> getSchemaClass() {
+        return AuthorSchema.class;
     }
 }

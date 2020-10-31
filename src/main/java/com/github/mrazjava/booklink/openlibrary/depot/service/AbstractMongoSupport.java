@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-abstract class AbstractMongoSupport<D, S> {
+public abstract class AbstractMongoSupport<D, S> {
 
     @Autowired
     protected MongoTemplate mongoTemplate;
@@ -32,5 +32,14 @@ abstract class AbstractMongoSupport<D, S> {
         return StreamSupport.stream(schemas.spliterator(), false).map(mapper()).collect(Collectors.toList());
     }
 
+    public List<D> searchText(String search, String langIso, boolean caseSensitive) {
+        return mongoTemplate.find(prepareTextQuery(search, langIso, caseSensitive), getSchemaClass())
+                .stream()
+                .map(mapper())
+                .collect(Collectors.toList());
+    }
+
     protected abstract Function<S, D> mapper();
+
+    protected abstract Class<S> getSchemaClass();
 }
