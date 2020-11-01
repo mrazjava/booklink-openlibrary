@@ -12,7 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
-interface DepotOperations<D> {
+interface DepotSearch<D> {
 
     @ApiOperation(value = "Free style search")
     @GetMapping(path = "/text-search")

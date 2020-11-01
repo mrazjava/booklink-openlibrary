@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/v1/depot/work")
 @Slf4j
-public class WorkRestController implements DepotOperations<DepotWork> {
+public class WorkRestController implements DepotSearch<DepotWork> {
 
     @Autowired
     private WorkService workService;

@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/v1/depot/author")
 @Slf4j
-public class AuthorRestController implements DepotOperations<DepotAuthor> {
+public class AuthorRestController implements DepotSearch<DepotAuthor> {
 
     @Autowired
     private AuthorService authorService;
