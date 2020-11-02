@@ -4,20 +4,19 @@ import com.github.mrazjava.booklink.openlibrary.depot.DepotEdition;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.function.Function;
 
 @Service
-public class EditionService extends AbstractMongoSupport<DepotEdition, EditionSchema> {
+public class EditionService extends AbstractDepotService<DepotEdition, EditionSchema> {
 
     @Override
-    public List<DepotEdition> searchText(String search, String langIso, boolean caseSensitive) {
-        throw new IllegalStateException("not implemented yet");
+    protected Function<EditionSchema, DepotEdition> schemaToDepot() {
+        return DepotEdition::new;
     }
 
     @Override
-    protected Function<EditionSchema, DepotEdition> mapper() {
-        return DepotEdition::new;
+    protected DepotEdition depotFallback() {
+        return new DepotEdition();
     }
 
     @Override
