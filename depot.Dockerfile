@@ -4,9 +4,9 @@ ENV TZ=Europe/Berlin
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ENV USER booklink-openlib
-RUN adduser -S ${USER}
+RUN useradd ${USER}
 
-RUN mkdir -p /opt/app/samples
+RUN mkdir -p /opt/app
 WORKDIR /opt/app
 
 COPY target/booklink-openlibrary-*.jar /opt/app/booklink-depot-openlibrary.jar

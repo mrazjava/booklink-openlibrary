@@ -108,19 +108,32 @@ Run it with:
 ```
 docker run -p 27017:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
 ```
+#### Depot image
+A new image should be rebuilt to corelate with MongoDB image.
+```
+docker build -f depot.Dockerfile -t mrazjava/booklink-openlibrary-depot:YYYYMM.vX .
+```
+Where `YYYYMM` is the month of release and the `vX` is the version sequence for that month's release which is handy 
+in case there are multiple release in a month (REST improvements, etc).
+ 
+To run a depot image, make sure mongo is available (via `docker-compose up`):
+```
+docker run -p 8070:8080 --network=booklinkopenlibrary_default --env-file=depot.env mrazjava/booklink-openlibrary-depot:YYYYMM.vX 
+```
+Depot will be available at http://localhost:8070/swagger-ui
+
 #### Import image
 A new image should be rebuilt on monthly basis as openlibrary data dumps are released and schema is updated. The 
 version tag follows a format `YYYYMM`, here for sake of the example we use a version from Aug 2020:
 ```
-docker build -f import.Dockerfile -t mrazjava/booklink-openlibrary-import:202008 .
+docker build -f import.Dockerfile -t mrazjava/booklink-openlibrary-import:YYYYMM .
 ```
 Assuming mongo was started with docker-compose we run the image by attaching to the same default network. We bind a 
 sample file to the container path for test import. Note that we connect to internal container port (`27017`), not 
 exposed host port (`27117`) - see `import.env` for details:
 ```
-docker run --network=booklinkopenlibrary_default -v ~/idea/projects/booklink-openlibrary/src/main/resources/openlibrary/samples:/opt/app/samples --env-file=import.env mrazjava/booklink-openlibrary-import:202008
+docker run --network=booklinkopenlibrary_default -v ~/idea/projects/booklink-openlibrary/src/main/resources/openlibrary/samples:/opt/app/samples --env-file=import.env mrazjava/booklink-openlibrary-import:YYYYMM
 ```
-#### Depot image
 
 ## Filters
 All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. Each 
@@ -142,6 +155,10 @@ without extension per line. Example: `3401366-L`.
 These are large downloads (authors ~320mb, works ~1.7gb, editions 6.1gb) and big files once uncompressed (authors ~2.5gb, works ~10.6gb, editions ~29gb); 
 sizes as of Aug 2020. Row counts (Aug 2020 dumps): authors ~7.4M, works ~19.2M, editions ~27.1M.
 > !!! Avoid working these files in a text editor.
+
+Latest dumps are always available at `https://archive.org/details/ol_dump_YYYY-MM-DD` where the date is typically last 
+day of a month. Openlibrary conveniently links latest files for easy reference:
+
 ```
 wget https://openlibrary.org/data/ol_dump_authors_latest.txt.gz
 wget https://openlibrary.org/data/ol_dump_works_latest.txt.gz
@@ -254,9 +271,11 @@ sed 's/^[^{]*//' ol_dump_authors_latest.txt > authors.txt
 
 #### Mongo Archives
 The database created with `author-id-filter.txt` (with embedded binary images of authors and editions) is used by the 
-sandbox environment. A gzipped mongo archive of a filtered sandbox sample is about `290mb`.
+sandbox environment. See [sandbox persistence](https://github.com/mrazjava/booklink/tree/master/sandbox/persistence) 
+for steps to create a sample mongo docker image. 
 
-Exporting an archive is done from a running docker container:
+A gzipped mongo archive of a filtered sandbox sample is about `290mb`. Exporting an archive is done from a running 
+docker container:
 ```
 docker exec CONTAINER_ID sh -c 'mongodump --username USERNAME --password PASSWORD --db DATABASE --authenticationDatabase admin --gzip --archive' > /tmp/mongodump/openlibrary-mongo.archive
 ```
