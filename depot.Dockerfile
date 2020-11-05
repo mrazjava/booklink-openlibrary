@@ -14,5 +14,3 @@ COPY target/booklink-openlibrary-*.jar /opt/app/booklink-depot-openlibrary.jar
 USER ${USER}
 ENTRYPOINT ["java", "-cp", "/opt/app/booklink-depot-openlibrary.jar"]
 CMD ["-Dloader.main=com.github.mrazjava.booklink.openlibrary.OpenLibraryDepotApp", "org.springframework.boot.loader.PropertiesLauncher"]
-
-EXPOSE 8070

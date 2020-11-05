@@ -242,7 +242,7 @@ Line count is useful for final verification once data is imported into the datab
 #### Remove line metadata
 In order to properly parse each line into a JSON object, we must remove a prefix provided by OpenLibrary:
 ```
-sed 's/^[^{]*//' ol_dump_works_latest.txt > works.txt
+sed 's/^[^{]*//' works.txt > works.json
 ```
 
 #### Parsing, Debugging, Troubleshooting
@@ -262,11 +262,7 @@ it's recommended to process them in order, starting with author, followed by wor
 ## Notes
 To create short samples with specific content use `fgrep` as explained [here](https://stackoverflow.com/questions/13913014/grepping-a-huge-file-80gb-any-way-to-speed-it-up):
 ```
-fgrep -i -A 5 -B 5 'George Orwell' ol_dump_authors_latest.txt
-```
-Dropping prefix types from dump files to produce JSON only:
-```
-sed 's/^[^{]*//' ol_dump_authors_latest.txt > authors.txt
+fgrep -i -A 5 -B 5 'George Orwell' authors.json
 ```
 
 #### Mongo Archives

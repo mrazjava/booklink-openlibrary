@@ -17,13 +17,12 @@ import org.springframework.context.event.EventListener;
 @SpringBootApplication
 public class OpenLibraryDepotApp {
 
-    public static final String PROFILE = "REST";
+    public static final String PROFILE = "DEPOT";
 
     public static void main(String[] args) {
 
         new SpringApplicationBuilder()
                 .sources(OpenLibraryDepotApp.class)
-                .profiles(OpenLibraryDepotApp.PROFILE)
                 .run(args);
     }
 
