@@ -43,6 +43,9 @@ public class Identifiers {
     @JsonProperty("victoria_institutions")
     private List<String> victoriaInstitutions;
 
+    @JsonProperty("standardebooks")
+    private List<String> standardEBooks;
+
     @JsonProperty("ebook_family_friendly_store")
     private List<String> eBookFamilyFriendlyStore;
 
