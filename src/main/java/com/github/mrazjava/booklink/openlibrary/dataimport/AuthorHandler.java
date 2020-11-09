@@ -3,9 +3,11 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -25,6 +27,11 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
     @Autowired
     private AuthorRepository repository;
+
+    private List<String> sampleIds;
+
+    @Value("${booklink.di.frequency-check}")
+    private int frequencyCheck;
 
     @Override
     public void prepare(File workingDirectory) {
@@ -58,6 +65,10 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
                     authorIdFilter.getFilterName(), authorMatchCount,
                     savedCount);
             savedCount = authorMatchCount = 0;
+        }
+
+        if(sequenceNo % frequencyCheck == 0) {
+            sampleIds.add(record.getId());
         }
 
         if(authorIdFilter.isEnabled()) {
@@ -179,5 +190,14 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         return (images.containsKey(S) || record.getImageSmall() != null) &&
                 (images.containsKey(M) || record.getImageMedium() != null) &&
                 (images.containsKey(L) || record.getImageLarge() != null);
+    }
+
+    @Override
+    public void conclude(File dataSource) {
+        super.conclude(dataSource);
+        if(log.isInfoEnabled()) {
+            log.info("sample author IDs:\n{}", StringUtils.join(sampleIds, ","));
+            // TODO: save to file
+        }
     }
 }
