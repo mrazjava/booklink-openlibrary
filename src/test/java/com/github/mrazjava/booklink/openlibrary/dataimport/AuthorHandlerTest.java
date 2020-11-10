@@ -140,7 +140,7 @@ public class AuthorHandlerTest {
         handler.imagePull = true;
 
         when(record.getId()).thenReturn(id);
-        verify(imageDownloader, times(1)).setIdFilter(any());
+        verify(imageDownloader, times(1)).setImageIdFilter(any());
 
         handler.handle(record, 1);
 

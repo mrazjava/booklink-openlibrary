@@ -46,6 +46,11 @@ booklink:
     # bulk (*.tar) archives would be provided in this directory. *.tar archives do not need to be extracted. Importer
     # will read from them directly.
     image-dir: ${BOOKLINK_DI_IMG_DIR:}
+    # If defined, sample author IDs will be generated and saved into this file in the format conforming to author
+    # filter file. Such sample can then be used as an author id filter. If only file name is provided, it will be
+    # saved in the same directory where dump sources are read from. Absolute path is also possible. If not provided,
+    # samples are not recorded and saved.
+    author-sample-output-file: ${BOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE:}
     # Requires that booklink.di.persist=true and booklink.di.persist-override=true, otherwise ignored. If enabled,
     # implies enablement of image download. First, attempt will be made to fetch an image from a file if it exists
     # locally. For author images, exact image will be checked for and used if available. For work and edition, *.tar

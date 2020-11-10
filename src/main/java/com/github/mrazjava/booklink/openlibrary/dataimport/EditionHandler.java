@@ -1,11 +1,8 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.BooklinkUtils;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
-import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,14 +11,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
-
-import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
 @Slf4j
 @Component
@@ -41,7 +34,8 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
 
         super.prepare(workingDirectory);
         workIdFilter.load(workingDirectory);
-        imageDownloader.setThrottleMs(1000);
+
+        imageDownloader.setCoverDirectory("editions");
     }
 
     @Override
@@ -49,12 +43,19 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
 
         cleanBadData(record);
 
-        if((authorIdFilter.isEnabled() || workIdFilter.isEnabled()) && sequenceNo % frequencyCheck == 0) {
-            log.info("FILTER MATCHES -- BY-{}: {}, BY-{}: {}, SAVED: {}",
-                    authorIdFilter.getFilterName(), authorMatchCount,
-                    workIdFilter.getFilterName(), workMatchCount,
-                    savedCount);
-            savedCount = authorMatchCount = workMatchCount = 0;
+        if(sequenceNo % frequencyCheck == 0) {
+            totalSavedCount += savedCount;
+            if ((authorIdFilter.isEnabled() || workIdFilter.isEnabled())) {
+                log.info("FILTER MATCHES -- BY-{}: {}, BY-{}: {}, SAVED: {}({})",
+                        authorIdFilter.getFilterName(), authorMatchCount,
+                        workIdFilter.getFilterName(), workMatchCount,
+                        savedCount, totalSavedCount);
+                authorMatchCount = workMatchCount = 0;
+            }
+            else if(persistData) {
+                log.info("SAVED: {}({})", savedCount, totalSavedCount);
+            }
+            savedCount = 0;
         }
 
         String matchedId = runAuthorIdFilter(record, authorIdFilter, sequenceNo);
@@ -72,7 +73,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
 
         if(BooleanUtils.isTrue(imagePull)) {
-            downloadImages(record, sequenceNo);
+            imageDownloader.downloadImages(record, sequenceNo);
         }
 
         if(persistData) {
@@ -84,99 +85,6 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
             repository.save(record);
             savedCount++;
         }
-    }
-
-    private void downloadImages(EditionSchema record, long sequenceNo) {
-
-        if(CollectionUtils.isEmpty(record.getCovers())) {
-            return;
-        }
-
-        AtomicLong lastId = new AtomicLong(0L);
-        record.getCovers().stream()
-                .filter(id -> id > 0)
-                .filter(id -> {
-                    log.info("edition[{}] img[{}]", record.getId(), id);
-                    if(lastId.get() > 0) {
-                        log.info(".... trying alternate coverId[{}] (edition={}, sequenceNo={})",
-                                id, record.getId(), sequenceNo);
-                    }
-                    boolean success = loadCovers(record, id);
-                    if(!success) {
-                        lastId.set(id);
-                    }
-                    return success;
-                })
-                .findFirst();
-    }
-
-    /**
-     * Attempts to fetch book cover images of all sizes for a specific edition and a cover. Depending
-     * on configuration, may attempt a download from internet (openlibrary) if cover is missing in a
-     * bulk TAR archive. Also depending on configuration, may set fetched cover images as part of a
-     * mongo record.
-     *
-     * @return {@code true} if cover images were loaded successfully using whichever means
-     */
-    private boolean loadCovers(EditionSchema record, Long coverId) {
-
-        // pull images from cover TARs downloaded manually in bulk
-        Set<ImageSize> fetchStatus = imageDownloader.fetchImageToBinary(
-                coverId, record, new File(getCoverDownloadPath())
-        );
-
-        Set<ImageSize> downloadStatus = new HashSet<>();
-
-        // not all covers exist in a bulk archive; those that did not succeed, try to download directly
-        Arrays.stream(ImageSize.values())
-                .filter(size -> !fetchStatus.contains(size) && !ImageSize.O.equals(size))
-                .forEach(size -> {
-            if(downloadMissingCoverAndSet(coverId, size, record)) {
-                downloadStatus.add(size);
-            }
-        });
-
-        return SetUtils.union(fetchStatus, downloadStatus).containsAll(Set.of(S, M, L));
-    }
-
-    /**
-     * @return {@code true} if image was successfully downloaded
-     */
-    private boolean downloadMissingCoverAndSet(Long coverId, ImageSize size, DefaultImageSupport imageSupport) {
-
-        if(size == ImageSize.O && BooleanUtils.isFalse(fetchOriginalImages)) {
-            return true;
-        }
-
-        try {
-            byte[] imageBytes = imageDownloader.downloadImageToFile(
-                    getCoverDownloadPath(),
-                    coverId,
-                    size,
-                    urlProvider.getBookIdUrlTemplate()
-            );
-
-            boolean status = (imageBytes != null) && imageBytes.length > ImageDownloader.MINIMUM_VALID_IMAGE_BYTE_SIZE;
-
-            if(status) {
-                if(BooleanUtils.isTrue(withMongoImages)) {
-                    imageSupport.setImage(
-                            BooklinkUtils.buildImage(Long.toString(coverId), imageBytes),
-                            size
-                    );
-                }
-            }
-
-            return status;
-
-        } catch (IOException e) {
-            log.warn("cover [{}] download error: {}", e.getMessage());
-            return false;
-        }
-    }
-
-    private String getCoverDownloadPath() {
-        return imageDir + File.separator + "editions";
     }
 
     /**

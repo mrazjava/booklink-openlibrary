@@ -41,6 +41,8 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
 
     protected int savedCount = 0;
 
+    protected int totalSavedCount = 0;
+
     @Autowired
     protected ImageDownloader imageDownloader;
 
@@ -61,7 +63,8 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
         authorIdFilter.load(workingDirectory);
         authorImgExclusionFilter.load(workingDirectory);
 
-        imageDownloader.setIdFilter(authorImgExclusionFilter);
+        imageDownloader.setThrottleMs(1000);
+        imageDownloader.setImageIdFilter(authorImgExclusionFilter);
     }
 
     @Override

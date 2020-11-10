@@ -70,6 +70,9 @@ public class OpenLibraryImportApp implements CommandLineRunner {
 	@Value("${booklink.di.fetch-original-images}")
 	private Boolean fetchOriginalImages;
 
+	@Value("${booklink.di.author-sample-output-file}")
+	private String authorSampleFile;
+
 	@Autowired
 	private ApplicationContext context;
 
@@ -107,7 +110,8 @@ public class OpenLibraryImportApp implements CommandLineRunner {
 							" image-pull: {}\n" +
 							" image-dir: {}\n" +
 							" with-mongo-images: {}\n" +
-							" fetch-original-images: {}\n",
+							" fetch-original-images: {}\n" +
+							" author-sample-output-file: {}\n",
 					importFile.getAbsolutePath(),
 					handlerClass,
 					startWithRecordNo,
@@ -117,10 +121,18 @@ public class OpenLibraryImportApp implements CommandLineRunner {
 					imagePull,
 					StringUtils.isBlank(imageDir) ? "feature DISABLED" : imageDir,
 					withMongoImages,
-					fetchOriginalImages
+					fetchOriginalImages,
+					StringUtils.isBlank(authorSampleFile) ? "feature DISABLED" : openFile(importFile.getParent(), authorSampleFile)
 			);
 		}
 
 		importer.runImport(importFile);
+	}
+
+	public static File openFile(String workingDirectory, String file) {
+		File sampleAuthorIdFile = new File(file);
+		return sampleAuthorIdFile.isAbsolute() ?
+				sampleAuthorIdFile :
+				new File(workingDirectory + File.separator + file);
 	}
 }

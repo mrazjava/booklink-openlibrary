@@ -1,7 +1,9 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
+import com.github.mrazjava.booklink.openlibrary.BooklinkUtils;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.io.FileUtils;
@@ -9,8 +11,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.*;
 import java.net.URL;
@@ -20,6 +24,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.buildImage;
@@ -65,7 +70,9 @@ public class ImageDownloader {
 
     final static int MINIMUM_VALID_IMAGE_BYTE_SIZE = 850;
 
-    private IdFilter idFilter;
+    private IdFilter imgIdFilter;
+
+    private String coverDirectory;
 
 
     public ImageDownloader(@Value("${booklink.di.image-dir}") String imgDir) {
@@ -82,8 +89,12 @@ public class ImageDownloader {
         this.throttleMs = throttleMs;
     }
 
-    public void setIdFilter(IdFilter idFilter) {
-        this.idFilter = idFilter;
+    public void setImageIdFilter(IdFilter imgIdFilter) {
+        this.imgIdFilter = imgIdFilter;
+    }
+
+    public void setCoverDirectory(String coverDirectory) {
+        this.coverDirectory = coverDirectory;
     }
 
     /**
@@ -105,7 +116,9 @@ public class ImageDownloader {
             return files;
         }
 
-        if(idFilter.exists(Long.toString(imgId))) {
+        if(Optional.ofNullable(imgIdFilter)
+                .map(f -> f.exists(Long.toString(imgId)))
+                .orElse(false)) {
             log.info("filter matched; ignoring all sizes! {}", imgId);
             return files;
         }
@@ -121,6 +134,106 @@ public class ImageDownloader {
         }
 
         return files;
+    }
+
+    @Autowired
+    protected OpenLibraryUrlProvider urlProvider;
+
+    @Value("${booklink.di.with-mongo-images}")
+    protected Boolean withMongoImages;
+
+
+    public void downloadImages(DefaultImageSupport record, long sequenceNo) {
+
+        if(CollectionUtils.isEmpty(record.getCovers())) {
+            return;
+        }
+
+        AtomicLong lastId = new AtomicLong(0L);
+        record.getCovers().stream()
+                .filter(id -> id > 0)
+                .filter(id -> {
+                    log.info("recordId[{}] img[{}]", record.getId(), id);
+                    if(lastId.get() > 0) {
+                        log.info(".... trying alternate coverId[{}] (recordId={}, sequenceNo={})",
+                                id, record.getId(), sequenceNo);
+                    }
+                    boolean success = loadCovers(record, id);
+                    if(!success) {
+                        lastId.set(id);
+                    }
+                    return success;
+                })
+                .findFirst();
+    }
+
+    /**
+     * Attempts to fetch book cover images of all sizes for a specific edition and a cover. Depending
+     * on configuration, may attempt a download from internet (openlibrary) if cover is missing in a
+     * bulk TAR archive. Also depending on configuration, may set fetched cover images as part of a
+     * mongo record.
+     *
+     * @return {@code true} if cover images were loaded successfully using whichever means
+     */
+    public boolean loadCovers(DefaultImageSupport record, Long coverId) {
+
+        // pull images from cover TARs downloaded manually in bulk
+        Set<ImageSize> fetchStatus = fetchImageToBinary(
+                coverId, record, new File(getCoverDownloadPath(coverDirectory))
+        );
+
+        Set<ImageSize> downloadStatus = new HashSet<>();
+
+        // not all covers exist in a bulk archive; those that did not succeed, try to download directly
+        Arrays.stream(ImageSize.values())
+                .filter(size -> !fetchStatus.contains(size) && !ImageSize.O.equals(size))
+                .forEach(size -> {
+                    if(downloadMissingCoverAndSet(coverId, size, record, coverDirectory)) {
+                        downloadStatus.add(size);
+                    }
+                });
+
+        return SetUtils.union(fetchStatus, downloadStatus).containsAll(Set.of(S, M, L));
+    }
+
+    /**
+     * @return {@code true} if image was successfully downloaded
+     */
+    public boolean downloadMissingCoverAndSet(Long coverId, ImageSize size, DefaultImageSupport imageSupport, String destinationDirName) {
+
+        if(size == ImageSize.O && BooleanUtils.isFalse(fetchOriginalImages)) {
+            return true;
+        }
+
+        try {
+            byte[] imageBytes = downloadImageToFile(
+                    getCoverDownloadPath(destinationDirName),
+                    coverId,
+                    size,
+                    urlProvider.getBookIdUrlTemplate()
+            );
+
+            boolean status = (imageBytes != null) && imageBytes.length > ImageDownloader.MINIMUM_VALID_IMAGE_BYTE_SIZE;
+
+            if(status) {
+                if(BooleanUtils.isTrue(withMongoImages)) {
+                    imageSupport.setImage(
+                            BooklinkUtils.buildImage(Long.toString(coverId), imageBytes),
+                            size
+                    );
+                }
+            }
+
+            return status;
+
+        } catch (IOException e) {
+            log.warn("cover [{}] download error: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    public String getCoverDownloadPath(String destinationDirName) {
+        return imageDirectory.getPath() + File.separator + destinationDirName;
     }
 
     /**
@@ -145,7 +258,9 @@ public class ImageDownloader {
             return FileUtils.readFileToByteArray(imageFile);
         }
 
-        if(idFilter.exists(FilenameUtils.getBaseName(imageFile.getAbsolutePath()))) {
+        if(Optional.ofNullable(imgIdFilter)
+                .map(f -> f.exists(FilenameUtils.getBaseName(imageFile.getAbsolutePath())))
+                .orElse(false)) {
             log.info("filter matched; ignoring! {}", imageFile.getName());
             return null;
         }

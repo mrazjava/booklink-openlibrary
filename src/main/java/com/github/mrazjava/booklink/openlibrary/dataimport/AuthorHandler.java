@@ -1,5 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
+import com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import lombok.extern.slf4j.Slf4j;
@@ -13,11 +14,14 @@ import org.springframework.util.CollectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
@@ -28,15 +32,21 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Autowired
     private AuthorRepository repository;
 
-    private List<String> sampleIds;
+    private List<SampleAuthorIdRecord> sampleIds;
+
+    @Value("${booklink.di.author-sample-output-file}")
+    private String authorSampleFile;
 
     @Value("${booklink.di.frequency-check}")
     private int frequencyCheck;
+
 
     @Override
     public void prepare(File workingDirectory) {
 
         super.prepare(workingDirectory);
+
+        sampleIds = new LinkedList<>();
 
         if(StringUtils.isNotBlank(imageDir)) {
             imageDirectoryLocation = Path.of(imageDir).getParent() == null ?
@@ -60,15 +70,25 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
         if(record == null) return;
 
-        if(authorIdFilter.isEnabled() && (sequenceNo % frequencyCheck) == 0) {
-            log.info("FILTER MATCHES -- BY-{}: {}, SAVED: {}",
-                    authorIdFilter.getFilterName(), authorMatchCount,
-                    savedCount);
-            savedCount = authorMatchCount = 0;
+        if((sequenceNo % frequencyCheck) == 0) {
+            totalSavedCount += savedCount;
+            if (authorIdFilter.isEnabled()) {
+                log.info("FILTER MATCHES -- BY-{}: {}, SAVED: {}({})",
+                        authorIdFilter.getFilterName(), authorMatchCount, savedCount, totalSavedCount);
+                authorMatchCount = 0;
+            }
+            else if(persistData) {
+                log.info("SAVED: {}({})", savedCount, totalSavedCount);
+            }
+            savedCount = 0;
         }
 
-        if(sequenceNo % frequencyCheck == 0) {
-            sampleIds.add(record.getId());
+        if(isAuthorIdSampleEnabled() && (sequenceNo % frequencyCheck == 0)) {
+            sampleIds.add(new SampleAuthorIdRecord(
+                    record.getId(),
+                    StringUtils.firstNonBlank(record.getName(), record.getFullName(), record.getPersonalName()),
+                    sequenceNo
+            ));
         }
 
         if(authorIdFilter.isEnabled()) {
@@ -195,9 +215,57 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Override
     public void conclude(File dataSource) {
         super.conclude(dataSource);
+        if(isAuthorIdSampleEnabled()) {
+            recordSampleAuthorIds(dataSource);
+        }
+    }
+
+    private boolean isAuthorIdSampleEnabled() {
+        return StringUtils.isNotBlank(authorSampleFile);
+    }
+
+    private void recordSampleAuthorIds(File dataSource) {
+
         if(log.isInfoEnabled()) {
-            log.info("sample author IDs:\n{}", StringUtils.join(sampleIds, ","));
-            // TODO: save to file
+            log.info("{} sample author IDs:\n{}",
+                    sampleIds.size(),
+                    StringUtils.join(sampleIds.stream().map(SampleAuthorIdRecord::getId).collect(Collectors.toList()), ",")
+            );
+        }
+        try {
+            FileUtils.writeStringToFile(
+                    OpenLibraryImportApp.openFile(dataSource.getParent(), authorSampleFile),
+                    StringUtils.joinWith("\n", sampleIds.toArray()),
+                    Charset.defaultCharset()
+            );
+        } catch (IOException e) {
+            log.error("problem saving sample author IDs", e);
+        }
+    }
+
+    static class SampleAuthorIdRecord {
+
+        private String id;
+        private String name;
+        private long sequenceNo;
+
+        SampleAuthorIdRecord(String id, String name, long sequenceNo) {
+            this.id = id;
+            this.name = name;
+            this.sequenceNo = sequenceNo;
+        }
+
+        String getId() {
+            return id;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder record = new StringBuilder();
+            record.append("# " + sequenceNo + ": " + name);
+            record.append("\n");
+            record.append(id);
+            return record.toString();
         }
     }
 }
