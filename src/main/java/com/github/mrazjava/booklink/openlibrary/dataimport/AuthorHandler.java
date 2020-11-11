@@ -16,10 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -34,11 +31,16 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
     private List<SampleAuthorIdRecord> sampleIds;
 
+    private Set<Long> indexesToSample;
+
     @Value("${booklink.di.author-sample-output-file}")
     private String authorSampleFile;
 
     @Value("${booklink.di.frequency-check}")
     private int frequencyCheck;
+
+    @Autowired
+    private Optional<AuthorSampleRandomizer> sampleRandomizer;
 
 
     @Override
@@ -47,6 +49,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         super.prepare(workingDirectory);
 
         sampleIds = new LinkedList<>();
+        indexesToSample = sampleRandomizer.map(r -> r.randomize()).orElse(Set.of());
 
         if(StringUtils.isNotBlank(imageDir)) {
             imageDirectoryLocation = Path.of(imageDir).getParent() == null ?
@@ -83,7 +86,11 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             savedCount = 0;
         }
 
-        if(isAuthorIdSampleEnabled() && (sequenceNo % frequencyCheck == 0)) {
+        if(isAuthorIdSampleEnabled() && (
+                (indexesToSample.isEmpty() && (sequenceNo % frequencyCheck == 0)) ||
+                (!indexesToSample.isEmpty() && indexesToSample.contains(sequenceNo))
+            )
+        ) {
             sampleIds.add(new SampleAuthorIdRecord(
                     record.getId(),
                     StringUtils.firstNonBlank(record.getName(), record.getFullName(), record.getPersonalName()),

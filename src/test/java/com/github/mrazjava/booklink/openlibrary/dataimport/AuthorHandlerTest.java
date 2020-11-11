@@ -141,6 +141,7 @@ public class AuthorHandlerTest {
 
         when(record.getId()).thenReturn(id);
         verify(imageDownloader, times(1)).setImageIdFilter(any());
+        verify(imageDownloader, times(1)).setThrottleMs(anyLong());
 
         handler.handle(record, 1);
 
