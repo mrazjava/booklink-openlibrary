@@ -74,9 +74,10 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FIL
 ```
 
 ## Monthly Imports
-These are the commands I use to process monthly imports. On even months, I create sample openlibrary database off the 
-`author-id-filter.txt` provided in the project, so on even months, the database is more less the same. On odd months, 
-I generate author filter off a frequency check.
+These are the commands I use to process monthly imports from latest data dumps. On even months, I generate randomized 
+author filter and use that to create a database. On odd months, I always create sample database off the `author-id-filter.txt` 
+provided in the project. On even months database feature different sets of sample authors. On odd months, databases 
+feature the same set of authors. 
 
 #### Generate Random Author Filter (even months only)
 There are two ways to generate random author IDs. In both cases, this feature is enabled only, if `BOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE` 
