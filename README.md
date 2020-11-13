@@ -35,12 +35,12 @@ structure; that is, 1) provide import into some persistent store with its own ap
 The goal of booklink data integration is to provide author/book data to the backend over the unified API. This is 
 accomplished by building this project into two modules:
 
-1) IMPORT: transform raw dumps from openlibrary.org into mongo records which can be served over REST API by the depot
-2) DEPOT SERVER: implements a book 'query' over the uniform REST API
+1) `IMPORT`: transform raw dumps from openlibrary.org into mongo records which can be served over REST API by the depot
+2) `DEPOT SERVER`: implements a book querying mechanism over the uniform REST API
 > As long as there is a single depot implementation (OpenLibrary), server definitions are hand crafted. If in the 
 > future another data integration is introduced (eg: google books), server API definitions will have to be either 
 > extracted to another library project with something like delegate definitions; or, auto generated with something like 
-> swagger codegen. For now, depot server API is manually written "by hand".
+> swagger codegen.
 
 The consumer of DEPOT SERVER is [booklink-backend](https://github.com/mrazjava/booklink-backend). On the backend side, 
 depot client is auto generated from [depot definitions](https://github.com/mrazjava/booklink-backend/blob/develop/src/main/resources/depot-api.json). 
