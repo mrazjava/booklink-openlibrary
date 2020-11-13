@@ -42,7 +42,7 @@ accomplished by building this project into two modules:
 > extracted to another library project with something like delegate definitions; or, auto generated with something like 
 > swagger codegen.
 
-The consumer of DEPOT SERVER is [booklink-backend](https://github.com/mrazjava/booklink-backend). On the backend side, 
+The consumer of `DEPOT SERVER` is [booklink-backend](https://github.com/mrazjava/booklink-backend). On the backend side, 
 depot client is auto generated from [depot definitions](https://github.com/mrazjava/booklink-backend/blob/develop/src/main/resources/depot-api.json). 
 > Any time depot server API is changed, the `depot-api.json` on the backend must be updated and `servers` section 
 > removed. JSON can be obtained by starting depot server and clicking the `apidocs` link from within the swagger UI. 
