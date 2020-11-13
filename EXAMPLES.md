@@ -86,13 +86,13 @@ is enabled.
 Default randomizer samples IDs off `BOOKLINK_DI_FREQUENCY_CHECK` value. Every time record is logged according to 
 frequency check, its ID is recorded as a sample: 
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE=author-id-sample.txt"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE=author-id-filter.txt"
 ```
 
 Explicit randomizer creates a random set of indexes over the domain of entire dump record count. This feature requires 
 additional configuration `BOOKLINK_DI_AUTHOR_ID_SAMPLE_RANDOMIZE`. See `application.yml` for additional documentation.
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE=/tmp/author-id-sample.txt -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_RANDOMIZE=75|7972562"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE=/tmp/author-id-filter.txt -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_RANDOMIZE=75|7972562"
 ```
 
 #### Authors
