@@ -52,14 +52,6 @@ depot client is auto generated from [depot definitions](https://github.com/mrazj
 > removed. JSON can be obtained by starting depot server and clicking the `apidocs` link from within the swagger UI. 
 > By default it is minified, so I usually run it through a prettyfier. No futher changes should be necessary.
 
-## Versioning
-Version number of this software program follows the format of `YYYYMM` matching a monthly release period of data dumps 
-from openlibrary.org. Since schema of data dumps is regularly extended, software needs to be updated to be compatiblie. 
-We can check tags to track up to which point in time is our software compatible with a data dump from openlibrary.org.
-
-Even if there were no changes required after a new dump release from openlibary.org, this software will be tagged to 
-indicate compatibility.
-
 ## Quick Start
 See `application.yml` for available configuration options. Each spring boot config is driven by environment variable.
 
