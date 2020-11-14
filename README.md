@@ -102,7 +102,7 @@ docker run -p 27017:27017/tcp mrazjava/booklink-mongo:202008-4.4.0
 #### Depot image
 A new image should be rebuilt to corelate with MongoDB image.
 ```
-docker build -f depot.Dockerfile -t mrazjava/booklink-openlibrary-depot:YYYYMM.vX .
+docker build -f depot.Dockerfile -t mrazjava/booklink-openlibrary-depot:YYYYMM .
 ```
 Where `YYYYMM` is the month of release and the `vX` is the version sequence for that month's release which is handy 
 in case there are multiple release in a month (REST improvements, etc).
