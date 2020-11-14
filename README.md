@@ -31,6 +31,10 @@ structure; that is, 1) provide import into some persistent store with its own ap
 * [Lombok](https://projectlombok.org/)
 * [MongoDB](https://www.mongodb.com/)
 
+## Version
+POM version follows the format `YYYYMMrX` which is date based. `r` stands for "release" and `X` is the sequence number 
+starting with `1` and resetting each month.
+
 ## Architecture
 The goal of booklink data integration is to provide author/book data to the backend over the unified API. This is 
 accomplished by building this project into two modules:
@@ -268,11 +272,11 @@ for steps to create a sample mongo docker image.
 A gzipped mongo archive of a filtered sandbox sample is about `290mb`. Exporting an archive is done from a running 
 docker container:
 ```
-docker exec CONTAINER_ID sh -c 'mongodump --username USERNAME --password PASSWORD --db DATABASE --authenticationDatabase admin --gzip --archive' > /tmp/mongodump/openlibrary-mongo.archive
+docker exec CONTAINER_ID sh -c 'mongodump --username USERNAME --password PASSWORD --db DATABASE --authenticationDatabase admin --gzip --archive' > /tmp/openlibrary-mongo.archive
 ```
 Importing an archive is typically done into another docker container (see sandbox), but the basic command would be:
 ```
-mongorestore --username root --password pass123 --authenticationDatabase admin --nsInclude=openlibrary.* --verbose --gzip --archive=/tmp/mongodump/openlibrary-mongo.archive
+mongorestore --username root --password pass123 --authenticationDatabase admin --nsInclude=openlibrary.* --verbose --gzip --archive=/tmp/openlibrary-mongo.archive
 ```
 
 #### Mongo Queries

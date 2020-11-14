@@ -1,0 +1,114 @@
+# Fyodor Dostoyevsky
+# main
+OL22242A
+OL7953630A
+OL8015172A
+
+# George Orwell
+OL118077A
+
+# Roman Dmowski
+OL75099A
+
+# Hillary Clinton
+OL3554865A
+
+# Edward Gierek
+OL629520A
+
+# Arthur Schopenhauer
+OL119580A
+
+# Leo Tolstoy
+OL26783A
+
+# Daniel Dennet
+OL342699A
+
+# Richard Dawkins
+OL6427154A
+
+# Sigmund Freud
+OL108452A
+
+# Franz Kafka
+OL33146A
+
+# Adam Mickiewicz
+OL114808A
+
+# Alexis de Toqueville
+OL30442A
+
+# James Madison
+OL240767A
+
+# Alexander Hamilton
+OL363754A
+
+# George Washington
+OL17013A
+
+# Manning Johnson
+OL5081609A
+
+# Jean-Jacques Rousseau
+# main
+OL29048A
+OL7546659A
+
+# Jan Kochanowski
+OL69572A
+
+# Ivor Horton
+OL59415A
+
+# Karl Marx
+OL48230A
+
+# J.K. Rowling
+OL23919A
+
+# Milton Friedman
+OL403122A
+
+# Harry Adam Knight
+OL3487940A
+
+# Graham Masterton
+OL60759A
+
+# Paweł Sariel Kmieć
+OL7330300A
+
+# Friedrich Nietzsche
+# main
+OL20157A
+OL7881642A
+OL7389797A
+
+# Ignacy Jan Paderewski
+OL602104A
+
+# Wolfgang Amadeus Mozart
+OL5017833A
+
+# Donald Trump
+# main
+OL500499A
+OL7483449A
+OL3577152A
+
+# Zofia Nałkowska
+OL31466A
+
+# Remigiusz Mróz
+# main
+OL7434435A
+OL7925018A
+
+# Joseph Stalin
+OL7411649A
+
+# Simon Beckett
+OL579379A
