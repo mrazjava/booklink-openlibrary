@@ -23,6 +23,7 @@ public class OpenLibraryDepotApp {
 
         new SpringApplicationBuilder()
                 .sources(OpenLibraryDepotApp.class)
+                .profiles(OpenLibraryDepotApp.PROFILE)
                 .run(args);
     }
 
