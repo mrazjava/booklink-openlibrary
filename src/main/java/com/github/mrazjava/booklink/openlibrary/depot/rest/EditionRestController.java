@@ -79,6 +79,10 @@ public class EditionRestController implements DepotSearch<DepotEdition> {
 
     @Override
     public ResponseEntity<List<DepotEdition>> randomWithImage(Integer sampleCount) {
-        return ResponseEntity.ok(editionService.random(Optional.ofNullable(sampleCount).orElse(1)));
+        return ResponseEntity.ok(editionService.random(
+                Optional.ofNullable(sampleCount).orElse(1),
+                false, false, true, null
+                )
+        );
     }
 }

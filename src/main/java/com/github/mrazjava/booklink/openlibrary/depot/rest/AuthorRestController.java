@@ -54,6 +54,10 @@ public class AuthorRestController implements DepotSearch<DepotAuthor> {
 
     @Override
     public ResponseEntity<List<DepotAuthor>> randomWithImage(Integer sampleCount) {
-        return ResponseEntity.ok(authorService.random(Optional.ofNullable(sampleCount).orElse(1)));
+        return ResponseEntity.ok(authorService.random(
+                Optional.ofNullable(sampleCount).orElse(1),
+                false, false, true, null
+                )
+        );
     }
 }

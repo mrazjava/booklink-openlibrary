@@ -79,6 +79,10 @@ public class WorkRestController implements DepotSearch<DepotWork> {
 
     @Override
     public ResponseEntity<List<DepotWork>> randomWithImage(Integer sampleCount) {
-        return ResponseEntity.ok(workService.random(Optional.ofNullable(sampleCount).orElse(1)));
+        return ResponseEntity.ok(workService.random(
+                Optional.ofNullable(sampleCount).orElse(1),
+                false, false, true, null
+            )
+        );
     }
 }
