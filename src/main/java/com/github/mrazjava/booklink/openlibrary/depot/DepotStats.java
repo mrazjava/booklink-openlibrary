@@ -33,15 +33,15 @@ public class DepotStats {
     }
 
     public int getAuthorSmallImageCount() {
-        return Optional.ofNullable(authorCounts).map(c -> c.getSmallCount()).orElse(0);
+        return Optional.ofNullable(authorCounts).map(c -> c.getSmallImgCount()).orElse(0);
     }
 
     public int getAuthorMediumImageCount() {
-        return Optional.ofNullable(authorCounts).map(c -> c.getMediumCount()).orElse(0);
+        return Optional.ofNullable(authorCounts).map(c -> c.getMediumImgCount()).orElse(0);
     }
 
     public int getAuthorLargeImageCount() {
-        return Optional.ofNullable(authorCounts).map(c -> c.getLargeCount()).orElse(0);
+        return Optional.ofNullable(authorCounts).map(c -> c.getLargeImgCount()).orElse(0);
     }
 
     public int getWorksTotalCount() {
@@ -49,15 +49,15 @@ public class DepotStats {
     }
 
     public int getWorksSmallImageCount() {
-        return Optional.ofNullable(workCounts).map(c -> c.getSmallCount()).orElse(0);
+        return Optional.ofNullable(workCounts).map(c -> c.getSmallImgCount()).orElse(0);
     }
 
     public int getWorksMediumImageCount() {
-        return Optional.ofNullable(workCounts).map(c -> c.getMediumCount()).orElse(0);
+        return Optional.ofNullable(workCounts).map(c -> c.getMediumImgCount()).orElse(0);
     }
 
     public int getWorksLargeImageCount() {
-        return Optional.ofNullable(workCounts).map(c -> c.getLargeCount()).orElse(0);
+        return Optional.ofNullable(workCounts).map(c -> c.getLargeImgCount()).orElse(0);
     }
 
     public int getEditionTotalCount() {
@@ -65,14 +65,14 @@ public class DepotStats {
     }
 
     public int getEditionSmallImageCount() {
-        return Optional.ofNullable(editionCounts).map(c -> c.getSmallCount()).orElse(0);
+        return Optional.ofNullable(editionCounts).map(c -> c.getSmallImgCount()).orElse(0);
     }
 
     public int getEditionMediumImageCount() {
-        return Optional.ofNullable(editionCounts).map(c -> c.getMediumCount()).orElse(0);
+        return Optional.ofNullable(editionCounts).map(c -> c.getMediumImgCount()).orElse(0);
     }
 
     public int getEditionLargeImageCount() {
-        return Optional.ofNullable(editionCounts).map(c -> c.getLargeCount()).orElse(0);
+        return Optional.ofNullable(editionCounts).map(c -> c.getLargeImgCount()).orElse(0);
     }
 }

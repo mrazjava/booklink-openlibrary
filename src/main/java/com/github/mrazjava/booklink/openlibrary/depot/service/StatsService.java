@@ -82,17 +82,17 @@ public class StatsService {
         private List<Map<String, Integer>> large;
         private List<Map<String, Integer>> total;
 
-        public Integer getSmallCount() {
+        public Integer getSmallImgCount() {
             return Optional.ofNullable(small)
                     .map(l -> l.get(0)).stream().findFirst().map(m -> m.get(KEY_SMALL)).orElse(0);
         }
 
-        public Integer getMediumCount() {
+        public Integer getMediumImgCount() {
             return Optional.ofNullable(medium)
                     .map(l -> l.get(0)).stream().findFirst().map(m -> m.get(KEY_MEDIUM)).orElse(0);
         }
 
-        public Integer getLargeCount() {
+        public Integer getLargeImgCount() {
             return Optional.ofNullable(large)
                     .map(l -> l.get(0)).stream().findFirst().map(m -> m.get(KEY_LARGE)).orElse(0);
         }
