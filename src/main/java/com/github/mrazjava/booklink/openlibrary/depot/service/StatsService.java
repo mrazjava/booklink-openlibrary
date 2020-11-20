@@ -1,5 +1,8 @@
 package com.github.mrazjava.booklink.openlibrary.depot.service;
 
+import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
+import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
+import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -31,15 +34,15 @@ public class StatsService {
     private MongoTemplate mongoTemplate;
 
     public CountResults countAuthors() {
-        return countCollection("authors");
+        return countCollection(AuthorRepository.COLLECTION_NAME);
     }
 
     public CountResults countWorks() {
-        return countCollection("works");
+        return countCollection(WorkRepository.COLLECTION_NAME);
     }
 
     public CountResults countEditions() {
-        return countCollection("editions");
+        return countCollection(EditionRepository.COLLECTION_NAME);
     }
 
     private CountResults countCollection(String collectionName) {

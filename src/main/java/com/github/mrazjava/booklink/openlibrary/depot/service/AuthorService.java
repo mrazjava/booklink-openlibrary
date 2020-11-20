@@ -1,6 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.depot.service;
 
 import com.github.mrazjava.booklink.openlibrary.depot.DepotAuthor;
+import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,6 @@ public class AuthorService extends AbstractDepotService<DepotAuthor, AuthorSchem
 
     @Override
     protected String getCollectionName() {
-        return "authors";
+        return AuthorRepository.COLLECTION_NAME;
     }
 }

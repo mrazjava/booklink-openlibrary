@@ -1,6 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.depot.service;
 
 import com.github.mrazjava.booklink.openlibrary.depot.DepotEdition;
+import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,6 @@ public class EditionService extends AbstractDepotService<DepotEdition, EditionSc
 
     @Override
     protected String getCollectionName() {
-        return "editions";
+        return EditionRepository.COLLECTION_NAME;
     }
 }

@@ -1,6 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.depot.service;
 
 import com.github.mrazjava.booklink.openlibrary.depot.DepotWork;
+import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,6 @@ public class WorkService extends AbstractDepotService<DepotWork, WorkSchema> {
 
     @Override
     protected String getCollectionName() {
-        return "works";
+        return WorkRepository.COLLECTION_NAME;
     }
 }
