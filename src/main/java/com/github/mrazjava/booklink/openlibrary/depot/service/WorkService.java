@@ -23,4 +23,9 @@ public class WorkService extends AbstractDepotService<DepotWork, WorkSchema> {
     protected Class<WorkSchema> getSchemaClass() {
         return WorkSchema.class;
     }
+
+    @Override
+    protected String getCollectionName() {
+        return "works";
+    }
 }

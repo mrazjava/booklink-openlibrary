@@ -1,5 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.depot;
 
+import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,4 +17,12 @@ public class DepotPicture {
     private long sizeBytes;
     private String sizeText;
     private String info;
+
+    public DepotPicture(CoverImage coverImage) {
+        id = coverImage.getId();
+        graphics = coverImage.getImage().getData();
+        sizeBytes = coverImage.getSizeBytes();
+        sizeText = coverImage.getSizeText();
+        info = coverImage.getInfo();
+    }
 }

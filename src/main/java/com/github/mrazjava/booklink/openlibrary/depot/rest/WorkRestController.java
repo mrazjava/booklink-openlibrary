@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Optional;
 
 @Api(
         tags = {"Work"}
@@ -74,5 +75,10 @@ public class WorkRestController implements DepotSearch<DepotWork> {
         caseSensitive = BooleanUtils.toBoolean(caseSensitive);
         log.info("searchText[{}], caseSensitive[{}], languageCode[{}]", searchQuery, caseSensitive, languageCode);
         return ResponseEntity.ok(workService.searchText(searchQuery, languageCode, caseSensitive));
+    }
+
+    @Override
+    public ResponseEntity<List<DepotWork>> randomWithImage(Integer sampleCount) {
+        return ResponseEntity.ok(workService.random(Optional.ofNullable(sampleCount).orElse(1)));
     }
 }

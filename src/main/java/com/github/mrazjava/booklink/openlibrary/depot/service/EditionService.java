@@ -23,4 +23,9 @@ public class EditionService extends AbstractDepotService<DepotEdition, EditionSc
     protected Class<EditionSchema> getSchemaClass() {
         return EditionSchema.class;
     }
+
+    @Override
+    protected String getCollectionName() {
+        return "editions";
+    }
 }

@@ -57,8 +57,8 @@ public class DepotAuthor {
         notes = Optional.ofNullable(schema.getNotes()).map(tv -> tv.getValue()).orElse(null);
         created = Optional.ofNullable(schema.getCreated()).map(tv -> tv.getValue()).orElse(null);
         modified = Optional.ofNullable(schema.getLastModified()).map(tv -> tv.getValue()).orElse(null);
-        imageSmall = Optional.ofNullable(imageSmall).orElse(null);
-        imageMedium = Optional.ofNullable(imageMedium).orElse(null);
-        imageLarge = Optional.ofNullable(imageLarge).orElse(null);
+        imageSmall = Optional.ofNullable(schema.getImageSmall()).map(DepotPicture::new).orElse(null);
+        imageMedium = Optional.ofNullable(schema.getImageMedium()).map(DepotPicture::new).orElse(null);
+        imageLarge = Optional.ofNullable(schema.getImageLarge()).map(DepotPicture::new).orElse(null);
     }
 }

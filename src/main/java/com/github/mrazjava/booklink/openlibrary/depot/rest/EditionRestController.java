@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Optional;
 
 @Api(
         tags = {"Edition"}
@@ -74,5 +75,10 @@ public class EditionRestController implements DepotSearch<DepotEdition> {
         caseSensitive = BooleanUtils.toBoolean(caseSensitive);
         log.info("searchText[{}], caseSensitive[{}], languageCode[{}]", searchQuery, caseSensitive, languageCode);
         return ResponseEntity.ok(editionService.searchText(searchQuery, languageCode, caseSensitive));
+    }
+
+    @Override
+    public ResponseEntity<List<DepotEdition>> randomWithImage(Integer sampleCount) {
+        return ResponseEntity.ok(editionService.random(Optional.ofNullable(sampleCount).orElse(1)));
     }
 }

@@ -4,14 +4,22 @@ import com.github.mrazjava.booklink.openlibrary.repository.OpenLibraryMongoRepos
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.SampleOperation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.data.mongodb.core.query.TextQuery;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
 
 public abstract class AbstractDepotService<D, S> {
 
@@ -55,9 +63,20 @@ public abstract class AbstractDepotService<D, S> {
                 .collect(Collectors.toList());
     }
 
+    public List<D> random(int sampleSize) {
+
+        SampleOperation sampleStage = Aggregation.sample(sampleSize);
+        Aggregation aggregation = Aggregation.newAggregation(match(where("imageLarge").exists(true)), sampleStage);
+        AggregationResults<S> output = mongoTemplate.aggregate(aggregation, getCollectionName(), getSchemaClass());
+
+        return output.getMappedResults().stream().map(schemaToDepot()).collect(Collectors.toList());
+    }
+
     protected abstract Function<S, D> schemaToDepot();
 
     protected abstract Class<S> getSchemaClass();
+
+    protected abstract String getCollectionName();
 
     protected abstract D depotFallback();
 }

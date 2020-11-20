@@ -23,4 +23,9 @@ public class AuthorService extends AbstractDepotService<DepotAuthor, AuthorSchem
     protected Class<AuthorSchema> getSchemaClass() {
         return AuthorSchema.class;
     }
+
+    @Override
+    protected String getCollectionName() {
+        return "authors";
+    }
 }

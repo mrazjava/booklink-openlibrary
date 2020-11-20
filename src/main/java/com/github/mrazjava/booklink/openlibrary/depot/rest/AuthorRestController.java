@@ -7,11 +7,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
+import java.util.Optional;
 
 @Api(
         tags = {"Author"}
@@ -46,5 +50,10 @@ public class AuthorRestController implements DepotSearch<DepotAuthor> {
         caseSensitive = BooleanUtils.toBoolean(caseSensitive);
         log.info("searchText[{}], caseSensitive[{}], languageCode[{}]", searchQuery, caseSensitive, languageCode);
         return ResponseEntity.ok(authorService.searchText(searchQuery, languageCode, caseSensitive));
+    }
+
+    @Override
+    public ResponseEntity<List<DepotAuthor>> randomWithImage(Integer sampleCount) {
+        return ResponseEntity.ok(authorService.random(Optional.ofNullable(sampleCount).orElse(1)));
     }
 }

@@ -29,4 +29,19 @@ interface DepotSearch<D> {
             @ApiParam(value = "free style text search (eg: 'biology religion')", required = true) @RequestParam("s") String searchQuery,
             @ApiParam(value = "case sensitive?") @RequestParam(value = "case-sensitive", required = false) Boolean caseSensitive,
             @ApiParam(value = "language ISO") @RequestParam(value = "language-iso", required = false) String languageCode);
+
+    @ApiOperation(value = "Random record which has an image")
+    @GetMapping(path = "/random-with-image")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(
+            {
+                    @ApiResponse(
+                            message = "ok",
+                            code = 200
+                    )
+            }
+    )
+    public ResponseEntity<List<D>> randomWithImage(
+            @ApiParam(value = "number of samples to return; defaults to 1") @RequestParam(value = "sample-count", required = false) Integer sampleCount
+    );
 }
