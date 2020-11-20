@@ -1,7 +1,5 @@
 package com.github.mrazjava.booklink.openlibrary.repository;
 
-import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
-import com.mongodb.DBRef;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
