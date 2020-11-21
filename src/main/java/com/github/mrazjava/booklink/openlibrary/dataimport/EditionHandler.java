@@ -74,6 +74,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
 
         if(BooleanUtils.isTrue(imagePull)) {
             imageDownloader.downloadImages(record, sequenceNo);
+            checkImages(record);
         }
 
         if(persistData) {

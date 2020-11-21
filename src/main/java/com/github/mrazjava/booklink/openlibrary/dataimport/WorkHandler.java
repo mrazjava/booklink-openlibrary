@@ -71,6 +71,7 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
 
         if(BooleanUtils.isTrue(imagePull)) {
             imageDownloader.downloadImages(record, sequenceNo);
+            checkImages(record);
         }
 
         if(persistData) {

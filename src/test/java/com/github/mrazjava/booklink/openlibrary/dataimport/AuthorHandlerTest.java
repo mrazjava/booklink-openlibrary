@@ -183,7 +183,7 @@ public class AuthorHandlerTest {
         );
         verify(pulledImageMocks, times(3)).containsKey(any());
         verify(record, times(1)).getImageSmall();
-        verify(record, times(1)).getImageMedium();
-        verify(record, times(1)).getImageLarge();
+        verify(record, times(2)).getImageMedium();
+        verify(record, times(2)).getImageLarge();
     }
 }

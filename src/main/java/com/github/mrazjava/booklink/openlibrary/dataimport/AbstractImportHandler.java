@@ -2,12 +2,18 @@ package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
+import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.io.File;
+import java.util.Optional;
 import java.util.Set;
+
+import static java.util.Optional.ofNullable;
 
 @Slf4j
 abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
@@ -96,6 +102,22 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
             failedDownloads.stream().forEach(url -> urls.append(url + "\n"));
             log.info("{} failed downloads:\n{}", failedDownloads.size(), urls.toString());
         }
+    }
+
+    /**
+     * Some images duplicate across sizes. Make sure that if such duplication is detected, one of
+     * the images is removed.
+     *
+     * @param record to check
+     */
+    protected void checkImages(BaseSchema record) {
+        ofNullable(record.getImageMedium()).ifPresent(imgM -> {
+            ofNullable(record.getImageLarge()).ifPresent(imgL -> {
+                if(imgM.getSizeBytes() == imgL.getSizeBytes()) {
+                    record.setImageLarge(null);
+                }
+            });
+        });
     }
 
     protected abstract Class<R> getSchemaType();

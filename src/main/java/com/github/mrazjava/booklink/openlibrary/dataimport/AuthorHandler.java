@@ -137,6 +137,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         if(BooleanUtils.isTrue(imagePull)) {
             try {
                 downloadImages(author, sequenceNo);
+                checkImages(author);
             } catch (IOException e) {
                 throw new OpenLibraryImportException("problem downloading author images", e);
             }
