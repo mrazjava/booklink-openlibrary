@@ -7,7 +7,7 @@ import lombok.Data;
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Data
-public class Excerpt extends TypeValue {
+public class Excerpt extends TypeValue<String> {
 
     String excerpt;
 

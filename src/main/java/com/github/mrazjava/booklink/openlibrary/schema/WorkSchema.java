@@ -66,7 +66,7 @@ public class WorkSchema extends BaseSchema {
      */
     private String ocaid;
 
-    private TypeValue notes;
+    private TypeValue<String> notes;
 
     private List<Excerpt> excerpts;
 
