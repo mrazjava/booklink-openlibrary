@@ -12,7 +12,7 @@
 
 	<groupId>com.github.mrazjava.booklink</groupId>
 	<artifactId>booklink-openlibrary</artifactId>
-	<version>202011r1</version>
+	<version>202011v1</version>
 	<name>Booklink support for Openlibrary.org</name>
 
 	<properties>

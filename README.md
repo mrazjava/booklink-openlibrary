@@ -32,7 +32,7 @@ structure; that is, 1) provide import into some persistent store with its own ap
 * [MongoDB](https://www.mongodb.com/)
 
 ## Version
-POM version follows the format `YYYYMMrX` which is date based. `r` stands for "release" and `X` is the sequence number 
+POM version follows the format `YYYYMMvX` which is date based. `v` indicates version by `X` which is the sequence number 
 starting with `1` and resetting each month.
 
 ## Architecture
