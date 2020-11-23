@@ -7,7 +7,7 @@ on:
     paths:
       - 'src/**'
       - 'pom.xml'
-      - 'Dockerfile'
+      - 'depot.Dockerfile'
       - '.github/workflows/snapshot.yml'
 
 env:
@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: ${{ env.ARTIFACT_DIR }}
-          path: Dockerfile
+          path: depot.Dockerfile
   publish:
     runs-on: ubuntu-latest
     name: Package and Deploy
@@ -60,7 +60,7 @@ jobs:
         run: |
           mkdir -p target
           mv $ARTIFACT_DIR/booklink-openlibrary.jar target/
-          mv $ARTIFACT_DIR/Dockerfile .
+          mv $ARTIFACT_DIR/depot.Dockerfile Dockerfile
           docker build -t $DOCKER_IMAGE:$DOCKER_IMG_TAG .
       - name: push snapshot image to dockerhub
         run: |
