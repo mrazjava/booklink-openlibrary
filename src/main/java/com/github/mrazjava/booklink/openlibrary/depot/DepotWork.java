@@ -21,7 +21,8 @@ import static java.util.Optional.ofNullable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class DepotWork {
+public class DepotWork implements DepotRecord {
+
     private String id;
     private String title;
     private Series series;

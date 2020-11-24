@@ -1,7 +1,10 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
 import com.github.mrazjava.booklink.openlibrary.depot.DepotWork;
+import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
 import com.github.mrazjava.booklink.openlibrary.depot.service.WorkService;
+import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.ListUtils;
@@ -14,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
 
 @Api(
         tags = {"Work"}
@@ -22,7 +26,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/rest/v1/depot/work")
 @Slf4j
-public class WorkRestController implements DepotSearch<DepotWork> {
+public class WorkRestController extends AbstractRestController<DepotWork> {
 
     @Autowired
     private WorkService workService;
@@ -78,11 +82,14 @@ public class WorkRestController implements DepotSearch<DepotWork> {
     }
 
     @Override
-    public ResponseEntity<List<DepotWork>> randomWithImage(Integer sampleCount) {
-        return ResponseEntity.ok(workService.random(
-                Optional.ofNullable(sampleCount).orElse(1),
-                false, false, true, null
-            )
-        );
+    public ResponseEntity<List<DepotWork>> randomRecord(
+            Integer sampleCount, Boolean imgS, Boolean imgM, Boolean imgL, SearchOperator operator
+    ) {
+        return getRandomRecords(sampleCount, imgS, imgM, imgL, operator);
+    }
+
+    @Override
+    AbstractDepotService<DepotWork, WorkSchema> getService() {
+        return workService;
     }
 }

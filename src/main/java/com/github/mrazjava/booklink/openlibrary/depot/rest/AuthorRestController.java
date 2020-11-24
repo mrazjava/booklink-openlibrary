@@ -1,7 +1,10 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
 import com.github.mrazjava.booklink.openlibrary.depot.DepotAuthor;
+import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
 import com.github.mrazjava.booklink.openlibrary.depot.service.AuthorService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
+import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
@@ -15,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
-import java.util.Optional;
 
 @Api(
         tags = {"Author"}
@@ -23,7 +25,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/rest/v1/depot/author")
 @Slf4j
-public class AuthorRestController implements DepotSearch<DepotAuthor> {
+public class AuthorRestController extends AbstractRestController<DepotAuthor> {
 
     @Autowired
     private AuthorService authorService;
@@ -53,11 +55,14 @@ public class AuthorRestController implements DepotSearch<DepotAuthor> {
     }
 
     @Override
-    public ResponseEntity<List<DepotAuthor>> randomWithImage(Integer sampleCount) {
-        return ResponseEntity.ok(authorService.random(
-                Optional.ofNullable(sampleCount).orElse(1),
-                false, false, true, null
-                )
-        );
+    public ResponseEntity<List<DepotAuthor>> randomRecord(
+            Integer sampleCount, Boolean imgS, Boolean imgM, Boolean imgL, SearchOperator operator) {
+
+        return getRandomRecords(sampleCount, imgS, imgM, imgL, operator);
+    }
+
+    @Override
+    AbstractDepotService<DepotAuthor, AuthorSchema> getService() {
+        return authorService;
     }
 }

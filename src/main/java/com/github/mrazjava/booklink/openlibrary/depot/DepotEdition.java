@@ -19,7 +19,7 @@ import static com.github.mrazjava.booklink.openlibrary.SwaggerConfiguration.DEPO
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class DepotEdition {
+public class DepotEdition implements DepotRecord {
 
     private String id;
     private String title;
