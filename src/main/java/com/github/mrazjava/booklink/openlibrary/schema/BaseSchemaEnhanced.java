@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.util.CollectionUtils;
 
@@ -15,6 +17,7 @@ import java.util.Set;
 
 @JsonIgnoreProperties({"m", "type"})
 @Data
+@EqualsAndHashCode(callSuper = true)
 public abstract class BaseSchemaEnhanced extends BaseSchema {
 
     @Indexed // IDs
