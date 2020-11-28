@@ -16,17 +16,10 @@ public class OpenLibraryUrlProvider {
 
     private static final char KEY_BOOK = 'b';
 
-    private static final String KEY_ISBN = "isbn";
-
     private static final String KEY_ID = "id";
 
     private static final String KEY_OLID = "olid";
 
-    private static final String KEY_LCCN = "lccn";
-
-    private static final String KEY_GOODREADS = "goodreads";
-
-    private static final String KEY_LIBRARYTHING = "librarything";
 
     public String getAuthorIdUrlTemplate() {
         return String.format(OPENLIBRARY_URL_IMG_TEMPLATE, KEY_AUTHOR, KEY_ID, "%s", "%s");

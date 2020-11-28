@@ -1,22 +1,23 @@
 package com.github.mrazjava.booklink.openlibrary;
 
-import com.github.mrazjava.booklink.openlibrary.dataimport.DataImport;
-import com.github.mrazjava.booklink.openlibrary.dataimport.ImportInputValidator;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.File;
+import com.github.mrazjava.booklink.openlibrary.dataimport.DataImport;
+import com.github.mrazjava.booklink.openlibrary.dataimport.ImportInputValidator;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Imports data dump from openlibrary.org into a mongo database. Supports imports for authors,
@@ -33,13 +34,10 @@ public class OpenLibraryImportApp implements CommandLineRunner {
 	public static final String PROFILE = "IMPORT";
 
 	@Autowired
-	private DataImport importer;
+	private DataImport<File> importer;
 
 	@Value("${booklink.di.ol-dump-file}")
 	private String dumpFilePath;
-
-	@Autowired
-	private ApplicationContext context;
 
 	@Autowired
 	private ImportInputValidator inputValidator;
