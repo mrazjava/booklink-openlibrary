@@ -1,7 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import static com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp.openFile;
-import static java.util.Optional.of;
+import static org.apache.commons.lang3.StringUtils.rightPad;
 
 import java.io.File;
 
@@ -18,8 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class ImportInputValidator {
-
-	private static final String LBL_DISABLED = "DISABLED";
 	
     @Value("${booklink.di.ol-dump-file}")
     private String dumpFilePath;
@@ -68,44 +66,40 @@ public class ImportInputValidator {
 
     public void validate(File importDumpFile) {
 
+    	final int PAD = 30;
+    	final String LBL_DISABLED = "DISABLED";
+    	
         if(log.isInfoEnabled()) {
 
             log.info("Booklink-OpenLibrary Import\n\n" +
                             "booklink.di:\n" +
-                            " ol-dump-file: {}\n" +
-                            " handler-class: {}\n" +
-                            " start-from-record-no: {}\n" +
-                            " frequency-check: {}\n" +
-                            " persist: {}\n" +
-                            " persist-override: {}\n" +
-                            " image-pull: {}\n" +
-                            " image-dir: {}\n" +
-                            " with-mongo-images: {}\n" +
-                            " fetch-original-images: {}\n" +
-                            " author-sample-output-file: {}\n" +
-                            " author-sample-randomize: {}\n",
-                    StringUtils.leftPad(of(importDumpFile.getAbsolutePath()).map(p -> StringUtils.abbreviate(p, "...", p.length(), 65)).get(), iSize(18)),
-                    StringUtils.leftPad(importConfig.getHandlerClass().getCanonicalName(), iSize(17)),
-                    StringUtils.leftPad(Integer.toString(startWithRecordNo), iSize(10)),
-                    StringUtils.leftPad(Integer.toString(frequencyCheck), iSize(15)),
-                    StringUtils.leftPad(Boolean.toString(persistData), iSize(23)),
-                    StringUtils.leftPad(Boolean.toString(persistDataOverride), iSize(14)),
-                    StringUtils.leftPad(Boolean.toString(imagePull), iSize(20)),
-                    StringUtils.leftPad(StringUtils.isBlank(imageDir) ? LBL_DISABLED : imageDir, iSize(21)),
-                    StringUtils.leftPad(Boolean.toString(withMongoImages), iSize(13)),
-                    StringUtils.leftPad(Boolean.toString(fetchOriginalImages), iSize(9)),
-                    StringUtils.leftPad(StringUtils.isBlank(authorSampleFile) ? LBL_DISABLED : openFile(importDumpFile.getParent(), authorSampleFile).getPath(), iSize(5)),
-                    StringUtils.leftPad(StringUtils.isBlank(authorSampleRandomization) ? LBL_DISABLED : authorSampleRandomization, iSize(7))
+                            rightPad(" ol-dump-file:", PAD) + "{}\n" +
+                            rightPad(" handler-class:", PAD) + "{}\n" +
+                            rightPad(" start-from-record-no:", PAD) + "{}\n" +
+                            rightPad(" frequency-check:", PAD) + "{}\n" +
+                            rightPad(" persist:", PAD) + "{}\n" +
+                            rightPad(" persist-override:", PAD) + "{}\n" +
+                            rightPad(" image-pull:", PAD) + "{}\n" +
+                            rightPad(" image-dir:", PAD) + "{}\n" +
+                            rightPad(" with-mongo-images:", PAD) + "{}\n" +
+                            rightPad(" fetch-original-images:", PAD) + "{}\n" +
+                            rightPad(" author-sample-output-file:", PAD) + "{}\n" +
+                            rightPad(" author-sample-randomize:", PAD) + "{}\n",
+                    importDumpFile.getAbsolutePath(),
+                    importConfig.getHandlerClass().getCanonicalName(),
+                    startWithRecordNo,
+                    frequencyCheck,
+                    persistData,
+                    persistDataOverride,
+                    imagePull,
+                    StringUtils.isBlank(imageDir) ? LBL_DISABLED : imageDir,
+                    withMongoImages,
+                    fetchOriginalImages,
+                    StringUtils.isBlank(authorSampleFile) ? LBL_DISABLED : openFile(importDumpFile.getParent(), authorSampleFile).getPath(),
+                    StringUtils.isBlank(authorSampleRandomization) ? LBL_DISABLED : authorSampleRandomization
             );
         }
 
-    }
-    
-    /**
-     * @return indentation size
-     */
-    private int iSize(int size) {
-    	return 50 + size;
     }
 
     @ConditionalOnProperty(name = "booklink.di.author-sample-randomize")
