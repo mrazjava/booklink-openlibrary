@@ -1,21 +1,22 @@
 package com.github.mrazjava.booklink.openlibrary.depot;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.github.mrazjava.booklink.openlibrary.schema.Series;
-import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import static com.github.mrazjava.booklink.openlibrary.SwaggerConfiguration.DEPOT_API_DATE_FORMAT;
+import static java.util.Optional.ofNullable;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
-import static com.github.mrazjava.booklink.openlibrary.SwaggerConfiguration.DEPOT_API_DATE_FORMAT;
-import static java.util.Optional.ofNullable;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.github.mrazjava.booklink.openlibrary.schema.Series;
+import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Builder
 @NoArgsConstructor
@@ -26,6 +27,7 @@ public class DepotWork implements DepotRecord {
     private String id;
     private String title;
     private Series series;
+    private Set<String> authors;
     private List<String> genres;
     private String firstPublishedDate;
     private String editionCoverId;
@@ -47,6 +49,7 @@ public class DepotWork implements DepotRecord {
     public DepotWork(WorkSchema schema) {
 
         id = schema.getId();
+        authors = schema.getAuthors();
         title = schema.getTitle();
         series = schema.getSeries();
         genres = schema.getGenres();
