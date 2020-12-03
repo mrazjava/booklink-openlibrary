@@ -62,10 +62,12 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             }
         }
 
-        log.info("[AUTHOR IMG DOWNLOAD DIR] - {}", Optional.ofNullable(imageDirectoryLocation).map(
-                f -> f.getAbsolutePath()
-            ).orElse("DISABLED")
-        );
+        if(log.isDebugEnabled()) {
+	        log.debug("[AUTHOR IMG DOWNLOAD DIR] - {}", Optional.ofNullable(imageDirectoryLocation).map(
+	                f -> f.getAbsolutePath()
+	            ).orElse("DISABLED")
+	        );
+        }
     }
 
     @Override

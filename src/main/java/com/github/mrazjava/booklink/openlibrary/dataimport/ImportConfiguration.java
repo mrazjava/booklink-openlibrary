@@ -1,60 +1,84 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.io.IOException;
+
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.ResourceLoader;
 
-import java.io.File;
-import java.io.IOException;
+import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
 public class ImportConfiguration {
 
-    @Autowired
-    private ResourceLoader resourceLoader;
+    @Value("${booklink.di.ol-dump-file}")
+    private String dumpFilePath;
+    
+    @Value("${booklink.di.handler-class}")
+    private String configuredHandlerClass;
+	
+    public Class<?> getHandlerClass() {
+    	
+    	File dumpFile = null;
+    	
+        try {
+			dumpFile = StringUtils.startsWith(dumpFilePath, "/") ?
+			        new File(dumpFilePath) :
+			        (new ClassPathResource(dumpFilePath)).getFile();
+		} catch (IOException e) {
+			throw new OpenLibraryImportException("cannot locate import file", e);
+		}
 
+        if(dumpFile == null || !dumpFile.exists()) {
+            throw new OpenLibraryImportException(String.format("invalid import source: %s", dumpFilePath));
+        }
+
+        
+        if(StringUtils.containsAny(configuredHandlerClass, AuthorHandler.class.getSimpleName(), WorkHandler.class.getSimpleName(), EditionHandler.class.getSimpleName())) {
+            try {
+				return Class.forName(configuredHandlerClass);
+			} catch (ClassNotFoundException e) {
+				throw new OpenLibraryImportException("invalid configution: ${booklink.di.handler-class}", e);
+			}
+        }
+
+        if(StringUtils.containsIgnoreCase(dumpFilePath, "author")) {
+            return AuthorHandler.class;
+        }
+        else if(StringUtils.containsIgnoreCase(dumpFilePath, "work")) {
+            return WorkHandler.class;
+        }
+        else if(StringUtils.containsIgnoreCase(dumpFilePath, "edition")) {
+            return EditionHandler.class;
+        }
+        
+        throw new OpenLibraryImportException("invalid configuration");
+    }
+	
     @Primary
     @Bean
-    ImportHandler produceImportHanlder(
-            @Value("${booklink.di.ol-dump-file}") String dumpFilePath,
-            @Value("${booklink.di.handler-class}") String configuredHandlerClass,
+    AbstractImportHandler<? extends BaseSchema> produceImportHanlder(
             AuthorHandler authorHandler,
             WorkHandler workHandler,
             EditionHandler editionHandler
     ) throws IOException {
 
-        File dumpFile = StringUtils.startsWith(dumpFilePath, "/") ?
-            new File(dumpFilePath) :
-            (new ClassPathResource(dumpFilePath)).getFile();
+    	Class<?> clazz = getHandlerClass();
 
-        if(!dumpFile.exists()) {
-            throw new OpenLibraryImportException(String.format("invalid import source: %s", dumpFilePath));
-        }
-
-        if(StringUtils.containsIgnoreCase(dumpFilePath, "author")) {
+        if(AuthorHandler.class.equals(clazz)) {
             return authorHandler;
         }
-        else if(StringUtils.containsIgnoreCase(dumpFilePath, "work")) {
+        else if(WorkHandler.class.equals(clazz)) {
             return workHandler;
         }
-        else if(StringUtils.containsIgnoreCase(dumpFilePath, "edition")) {
-            return editionHandler;
-        }
-
-        if(StringUtils.contains(configuredHandlerClass, authorHandler.getClass().getSimpleName())) {
-            return authorHandler;
-        }
-        else if(StringUtils.contains(configuredHandlerClass, workHandler.getClass().getSimpleName())) {
-            return workHandler;
-        }
-        else if(StringUtils.contains(configuredHandlerClass, editionHandler.getClass().getSimpleName())) {
+        else if(EditionHandler.class.equals(clazz)) {
             return editionHandler;
         }
 
@@ -62,6 +86,6 @@ public class ImportConfiguration {
                 ImportHandler.class.getCanonicalName(),
                 dumpFilePath, configuredHandlerClass);
 
-        throw new OpenLibraryImportException("invalid configuration");
+        throw new OpenLibraryImportException("import handler can't be determined");
     }
 }

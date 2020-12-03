@@ -1,6 +1,6 @@
 package com.github.mrazjava.booklink.openlibrary.depot.service;
 
-public enum ServiceOperator {
+public enum SearchOperator {
 
     AND,
     OR

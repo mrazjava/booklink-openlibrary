@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class DepotPicture {
+public class DepotPicture implements DepotRecord {
 
     private String id;
     private byte[] graphics;

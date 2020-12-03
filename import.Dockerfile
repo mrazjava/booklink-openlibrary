@@ -9,7 +9,7 @@ RUN adduser -S ${USER}
 RUN mkdir -p /opt/app/samples
 WORKDIR /opt/app
 
-COPY target/booklink-openlibrary-*.jar /opt/app/booklink-openlibrary.jar
+COPY target/booklink-openlibrary.jar /opt/app/
 
 USER ${USER}
 ENTRYPOINT ["java", "-cp", "/opt/app/booklink-openlibrary.jar"]

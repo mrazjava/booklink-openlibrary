@@ -13,13 +13,14 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.data.mongodb.core.query.TextQuery;
 
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.github.mrazjava.booklink.openlibrary.depot.service.ServiceOperator.OR;
+import static com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator.AND;
+import static java.util.Optional.ofNullable;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
@@ -67,33 +68,29 @@ public abstract class AbstractDepotService<D, S> {
     }
 
     public List<D> random(int sampleSize,
-                          boolean withSmallImg, boolean withMediumImg, boolean withLargeImg,
-                          ServiceOperator operator) {
+                          Boolean withSmallImg, Boolean withMediumImg, Boolean withLargeImg,
+                          SearchOperator operator) {
 
-        Criteria whereCriteria = null;
+        List<Criteria> imgCriteria = new LinkedList<>();
 
-        if(withSmallImg) {
-            whereCriteria = where("imageSmall").exists(true);
-        }
-        if(withMediumImg) {
-            Criteria whereMediumImg = where("imageMedium").exists(true);
-            whereCriteria = Optional.ofNullable(whereCriteria)
-                    .map(w -> operator == OR ? w.orOperator(whereMediumImg) : w.andOperator(whereMediumImg))
-                    .orElse(whereMediumImg);
-        }
-        if(withLargeImg) {
-            Criteria whereLargeImg = where("imageLarge").exists(true);
-            whereCriteria = Optional.ofNullable(whereCriteria)
-                    .map(w -> operator == OR ? w.orOperator(whereLargeImg) : w.andOperator(whereLargeImg))
-                    .orElse(whereLargeImg);
-        }
+        ofNullable(withSmallImg).ifPresent(b -> imgCriteria.add(where("imageSmall").exists(b)));
+        ofNullable(withMediumImg).ifPresent(b -> imgCriteria.add(where("imageMedium").exists(b)));
+        ofNullable(withLargeImg).ifPresent(b -> imgCriteria.add(where("imageLarge").exists(b)));
 
-        MatchOperation matchOperation = Optional.ofNullable(whereCriteria)
-                .map(criteria -> match(criteria)).orElse(null);
+        MatchOperation matchOperation = ofNullable(operator)
+                .filter(op -> imgCriteria.size() > 0)
+                .map(op ->
+        {
+            Criteria where = new Criteria();
+            Criteria[] criteria = imgCriteria.toArray(new Criteria[imgCriteria.size()]);
+            return op == AND ? where.andOperator(criteria) : where.orOperator(criteria);
+        })
+                .map(where -> match(where))
+                .orElse(imgCriteria.size() == 1 ? match(imgCriteria.get(0)) : null);
 
-        SampleOperation sampleStage = Aggregation.sample(sampleSize);
-        Aggregation aggregation = Optional.ofNullable(matchOperation)
-                .map(op -> newAggregation(op, sampleStage)).orElse(newAggregation(sampleStage));
+        SampleOperation sampleOp = Aggregation.sample(sampleSize);
+        Aggregation aggregation = ofNullable(matchOperation)
+                .map(matchOp -> newAggregation(matchOp, sampleOp)).orElse(newAggregation(sampleOp));
         AggregationResults<S> output = mongoTemplate.aggregate(aggregation, getCollectionName(), getSchemaClass());
 
         return output.getMappedResults().stream().map(schemaToDepot()).collect(Collectors.toList());

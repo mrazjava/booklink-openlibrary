@@ -1,20 +1,33 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
-import com.github.mrazjava.booklink.openlibrary.depot.DepotEdition;
-import com.github.mrazjava.booklink.openlibrary.depot.service.EditionService;
-import io.swagger.annotations.*;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
-import java.util.Optional;
+import com.github.mrazjava.booklink.openlibrary.depot.DepotEdition;
+import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.EditionService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
+import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 
 @Api(
         tags = {"Edition"}
@@ -22,7 +35,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/rest/v1/depot/edition")
 @Slf4j
-public class EditionRestController implements DepotSearch<DepotEdition> {
+public class EditionRestController extends AbstractRestController<DepotEdition> {
 
     @Autowired
     private EditionService editionService;
@@ -78,11 +91,14 @@ public class EditionRestController implements DepotSearch<DepotEdition> {
     }
 
     @Override
-    public ResponseEntity<List<DepotEdition>> randomWithImage(Integer sampleCount) {
-        return ResponseEntity.ok(editionService.random(
-                Optional.ofNullable(sampleCount).orElse(1),
-                false, false, true, null
-                )
-        );
+    public ResponseEntity<List<DepotEdition>> randomRecord(
+            Integer sampleCount, Boolean imgS, Boolean imgM, Boolean imgL, SearchOperator operator
+    ) {
+        return getRandomRecords(sampleCount, imgS, imgM, imgL, operator);
+    }
+
+    @Override
+    AbstractDepotService<DepotEdition, EditionSchema> getService() {
+        return editionService;
     }
 }

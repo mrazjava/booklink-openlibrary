@@ -9,8 +9,8 @@ RUN useradd ${USER}
 RUN mkdir -p /opt/app
 WORKDIR /opt/app
 
-COPY target/booklink-openlibrary-*.jar /opt/app/booklink-depot-openlibrary.jar
+COPY target/booklink-openlibrary.jar /opt/app/
 
 USER ${USER}
-ENTRYPOINT ["java", "-cp", "/opt/app/booklink-depot-openlibrary.jar"]
+ENTRYPOINT ["java", "-cp", "/opt/app/booklink-openlibrary.jar"]
 CMD ["-Dloader.main=com.github.mrazjava.booklink.openlibrary.OpenLibraryDepotApp", "org.springframework.boot.loader.PropertiesLauncher"]

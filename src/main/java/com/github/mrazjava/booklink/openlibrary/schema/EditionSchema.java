@@ -1,19 +1,24 @@
 package com.github.mrazjava.booklink.openlibrary.schema;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.CollectionUtils;
 
-import java.util.LinkedList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = "editions")
 public class EditionSchema extends BaseSchemaEnhanced {
 
@@ -58,13 +63,13 @@ public class EditionSchema extends BaseSchemaEnhanced {
     @JsonProperty("openlibrary")
     private String openLibrary;
 
-    private TypeValue stats;
+    private TypeValue<String> stats;
 
-    private TypeValue news;
+    private TypeValue<String> news;
 
     private Dimensions dimensions;
 
-    private TypeValue body;
+    private TypeValue<String> body;
 
     @JsonProperty("bookweight")
     private Weight bookWeight;
@@ -94,7 +99,7 @@ public class EditionSchema extends BaseSchemaEnhanced {
     @JsonIgnore
     private Object classifications;
 
-    private TypeValue macro;
+    private TypeValue<String> macro;
 
     private List<String> contributions;
 

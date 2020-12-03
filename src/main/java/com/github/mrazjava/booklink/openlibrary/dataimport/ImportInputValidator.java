@@ -1,21 +1,24 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import lombok.extern.slf4j.Slf4j;
+import static com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp.openFile;
+import static org.apache.commons.lang3.StringUtils.rightPad;
+
+import java.io.File;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-
-import static com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp.openFile;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class ImportInputValidator {
-
+	
     @Value("${booklink.di.ol-dump-file}")
     private String dumpFilePath;
 
@@ -57,39 +60,46 @@ public class ImportInputValidator {
 
     @Value("${booklink.di.author-sample-randomize}")
     private String authorSampleRandomization;
+    
+    @Autowired
+    private ImportConfiguration importConfig;
 
     public void validate(File importDumpFile) {
 
+    	final int PAD = 30;
+    	final String LBL_DISABLED = "DISABLED";
+    	
         if(log.isInfoEnabled()) {
 
             log.info("Booklink-OpenLibrary Import\n\n" +
                             "booklink.di:\n" +
-                            " ol-dump-file: {}\n" +
-                            " handler-class: {}\n" +
-                            " start-from-record-no: {}\n" +
-                            " frequency-check: {}\n" +
-                            " persist: {}\n" +
-                            " persist-override: {}\n" +
-                            " image-pull: {}\n" +
-                            " image-dir: {}\n" +
-                            " with-mongo-images: {}\n" +
-                            " fetch-original-images: {}\n" +
-                            " author-sample-output-file: {}\n" +
-                            " author-sample-randomize: {}\n",
+                            rightPad(" ol-dump-file:", PAD) + "{}\n" +
+                            rightPad(" handler-class:", PAD) + "{}\n" +
+                            rightPad(" start-from-record-no:", PAD) + "{}\n" +
+                            rightPad(" frequency-check:", PAD) + "{}\n" +
+                            rightPad(" persist:", PAD) + "{}\n" +
+                            rightPad(" persist-override:", PAD) + "{}\n" +
+                            rightPad(" image-pull:", PAD) + "{}\n" +
+                            rightPad(" image-dir:", PAD) + "{}\n" +
+                            rightPad(" with-mongo-images:", PAD) + "{}\n" +
+                            rightPad(" fetch-original-images:", PAD) + "{}\n" +
+                            rightPad(" author-sample-output-file:", PAD) + "{}\n" +
+                            rightPad(" author-sample-randomize:", PAD) + "{}\n",
                     importDumpFile.getAbsolutePath(),
-                    handlerClass,
+                    importConfig.getHandlerClass().getCanonicalName(),
                     startWithRecordNo,
                     frequencyCheck,
                     persistData,
                     persistDataOverride,
                     imagePull,
-                    StringUtils.isBlank(imageDir) ? "feature DISABLED" : imageDir,
+                    StringUtils.isBlank(imageDir) ? LBL_DISABLED : imageDir,
                     withMongoImages,
                     fetchOriginalImages,
-                    StringUtils.isBlank(authorSampleFile) ? "feature DISABLED" : openFile(importDumpFile.getParent(), authorSampleFile),
-                    authorSampleRandomization
+                    StringUtils.isBlank(authorSampleFile) ? LBL_DISABLED : openFile(importDumpFile.getParent(), authorSampleFile).getPath(),
+                    StringUtils.isBlank(authorSampleRandomization) ? LBL_DISABLED : authorSampleRandomization
             );
         }
+
     }
 
     @ConditionalOnProperty(name = "booklink.di.author-sample-randomize")

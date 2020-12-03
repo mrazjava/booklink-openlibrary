@@ -1,17 +1,19 @@
 package com.github.mrazjava.booklink.openlibrary.schema;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.Data;
-import org.apache.commons.lang3.builder.ToStringBuilder;
+import java.util.List;
+
 import org.apache.commons.lang3.math.NumberUtils;
-import org.bson.BsonBinarySubType;
-import org.bson.types.Binary;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @JsonIgnoreProperties(value = {
         "m", "     _date",
@@ -23,6 +25,7 @@ import java.util.List;
         "id_wikidata", "id_viaf" // RemoteId dupes
 })
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = "authors")
 public class AuthorSchema extends BaseSchemaEnhanced {
 

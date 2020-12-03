@@ -1,27 +1,33 @@
 package com.github.mrazjava.booklink.openlibrary.depot;
 
+import static com.github.mrazjava.booklink.openlibrary.SwaggerConfiguration.DEPOT_API_DATE_FORMAT;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.github.mrazjava.booklink.openlibrary.schema.Dimensions;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 import com.github.mrazjava.booklink.openlibrary.schema.Weight;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import static com.github.mrazjava.booklink.openlibrary.SwaggerConfiguration.DEPOT_API_DATE_FORMAT;
-
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class DepotEdition {
+public class DepotEdition implements DepotRecord {
 
     private String id;
+    private Set<String> authors;
+    private Set<String> works;
+    private List<String> authorNames;
+    private List<String> workTitles;
     private String title;
     private String editionName;
     private String publisher;
@@ -53,6 +59,10 @@ public class DepotEdition {
 
     public DepotEdition(EditionSchema schema) {
         id = schema.getId();
+        authors = schema.getAuthors();
+        works = schema.getWorks();
+        authorNames = schema.getAuthorNames();
+        workTitles = schema.getWorkTitles();
         title = schema.getTitle();
         editionName = schema.getEditionName();
         publisher = schema.getPublisher();
