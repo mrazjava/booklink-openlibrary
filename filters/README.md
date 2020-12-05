@@ -1,4 +1,7 @@
 # Import Filters
+Filter definitions used for openlibrary import.
+
+## Monto Releases
 Odd month mongo releases are unique because they are generated off authors selected randomly. Even month mongo 
 releases are based on a fixed [filter](author-id-filter.txt), which may be periodically updated (see git history). 
 
