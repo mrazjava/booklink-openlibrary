@@ -12,7 +12,7 @@
 
 	<groupId>com.github.mrazjava.booklink</groupId>
 	<artifactId>booklink-openlibrary</artifactId>
-	<version>202011v1</version>
+	<version>202012v1</version>
 	<name>Booklink support for Openlibrary.org</name>
 
 	<properties>
@@ -82,7 +82,6 @@
 		<dependency>
 			<groupId>io.dropwizard.metrics</groupId>
 			<artifactId>metrics-core</artifactId>
-			<version>3.2.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
