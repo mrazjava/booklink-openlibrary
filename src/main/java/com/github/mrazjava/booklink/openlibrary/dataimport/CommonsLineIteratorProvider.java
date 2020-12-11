@@ -1,16 +1,14 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.LineIterator;
-import org.springframework.stereotype.Component;
-
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
-@Slf4j
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.LineIterator;
+import org.springframework.stereotype.Component;
+
 @Component
 public class CommonsLineIteratorProvider implements IteratorProvider<String, File> {
 

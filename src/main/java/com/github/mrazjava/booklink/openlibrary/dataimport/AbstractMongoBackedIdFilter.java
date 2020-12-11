@@ -19,7 +19,7 @@ abstract class AbstractMongoBackedIdFilter<T extends BaseSchema> extends Abstrac
 
     private OpenLibraryMongoRepository<T> repository;
 
-    AbstractMongoBackedIdFilter(OpenLibraryMongoRepository repository, String filterFilename) {
+    AbstractMongoBackedIdFilter(OpenLibraryMongoRepository<T> repository, String filterFilename) {
         super(filterFilename);
         this.repository = repository;
     }
