@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
+
 import java.io.Closeable;
 import java.io.File;
 import java.util.Iterator;
@@ -19,7 +21,7 @@ import java.util.Iterator;
 public class FileDataImport implements DataImport<File> {
 
     @Autowired
-    private ImportHandler importHandler;
+    private AbstractImportHandler<BaseSchema> importHandler;
 
     @Autowired
     private IteratorProvider<String, File> iteratorProvider;
@@ -54,7 +56,7 @@ public class FileDataImport implements DataImport<File> {
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
 
-            Object pojo = null;
+            BaseSchema pojo = null;
 
             // process 1st record explicitly
             if(iterator.hasNext()) {

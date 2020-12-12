@@ -15,7 +15,7 @@ import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
+abstract class AbstractImportHandler<R extends BaseSchema> implements ImportHandler<File, R> {
 
     @Autowired
     protected ObjectMapper objectMapper;

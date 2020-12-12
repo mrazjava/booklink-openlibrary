@@ -1,5 +1,18 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.io.Closeable;
+import java.io.File;
+import java.util.Iterator;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -8,15 +21,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import java.io.Closeable;
-import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 
 @BooklinkTestPropertySource
 @SpringJUnitConfig
@@ -32,7 +37,7 @@ public class FileDataImportTest {
     private IteratorProvider<String, File> iteratorProvider;
 
     @MockBean
-    private ImportHandler handler;
+    private AbstractImportHandler<BaseSchema> handler;
 
     @BeforeEach
     void prepare() {
@@ -43,9 +48,9 @@ public class FileDataImportTest {
     public void shouldIterateSource() {
 
         Closeable closeable = mock(Closeable.class);
-        Iterator<String> iterator = mock(Iterator.class);
+        @SuppressWarnings("unchecked") Iterator<String> iterator = mock(Iterator.class);
         File jsonSource = mock(File.class);
-        Object record = mock(Object.class);
+        BaseSchema record = mock(BaseSchema.class);
         String[] mockSource = new String[]{"foo", "abc", "bar"};
 
         when(jsonSource.getParentFile()).thenReturn(jsonSource);
