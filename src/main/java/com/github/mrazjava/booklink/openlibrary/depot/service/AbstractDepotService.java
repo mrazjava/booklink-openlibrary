@@ -1,6 +1,18 @@
 package com.github.mrazjava.booklink.openlibrary.depot.service;
 
-import com.github.mrazjava.booklink.openlibrary.repository.OpenLibraryMongoRepository;
+import static com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator.AND;
+import static java.util.Optional.ofNullable;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -9,22 +21,16 @@ import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.MatchOperation;
 import org.springframework.data.mongodb.core.aggregation.SampleOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Field;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.data.mongodb.core.query.TextQuery;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import com.github.mrazjava.booklink.openlibrary.repository.OpenLibraryMongoRepository;
 
-import static com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator.AND;
-import static java.util.Optional.ofNullable;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
-import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
-import static org.springframework.data.mongodb.core.query.Criteria.where;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public abstract class AbstractDepotService<D, S> {
 
     @Autowired
@@ -36,6 +42,24 @@ public abstract class AbstractDepotService<D, S> {
 
     public D findById(String id) {
         return repository.findById(id).map(schemaToDepot()).orElse(depotFallback());
+    }
+    
+    public D findById(String id, boolean withSmallImg, boolean withMediumImg, boolean withLargeImg) {
+    	log.debug("id[{}], withSmallImg[{}], withMediumImg[{}], withLargeImg[{}]", id, withSmallImg, withMediumImg, withLargeImg);
+    	Query query = new Query().addCriteria(Criteria.where("_id").is(id));
+    	Field queryFields = query.fields();
+    	if(!withSmallImg) {
+    		queryFields = queryFields.exclude("imageSmall");
+    	}
+    	if(!withMediumImg) {
+    		queryFields = queryFields.exclude("imageMedium");
+    	}
+    	if(!withLargeImg) {
+    		queryFields = queryFields.exclude("imageLarge");
+    	}
+    	return Optional.ofNullable(mongoTemplate.findOne(query, getSchemaClass()))
+    		.map(schemaToDepot())
+    		.orElse(depotFallback());
     }
 
     public List<D> findById(List<String> ids) {

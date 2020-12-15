@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 
@@ -44,6 +45,32 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> {
     public ResponseEntity<DepotAuthor> findById(@ApiParam(value = "unique author ID", required = true) @PathVariable("id") String authorId) {
         log.info("id: {}", authorId);
         return ResponseEntity.ok(authorService.findById(authorId));
+    }
+    
+    @ApiOperation(value = "Find author matching a specific ID optionally exlude image(s)")
+    @GetMapping(path = "/flex/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(
+            {
+                    @ApiResponse(
+                            message = "ok",
+                            code = 200
+                    )
+            }
+    )
+    public ResponseEntity<DepotAuthor> findById(
+    		@ApiParam(value = "unique author ID", required = true) @PathVariable("id") String authorId,
+    		@ApiParam(value = "fetch small img?") @QueryParam(value = "imgS") Boolean imgS,
+    		@ApiParam(value = "fetch medium img?") @QueryParam(value = "imgM") Boolean imgM,
+    		@ApiParam(value = "fetch large img?") @QueryParam(value = "imgL") Boolean imgL) {
+
+    	log.info("id: {}", authorId);
+    	return ResponseEntity.ok(authorService.findById(
+    			authorId, 
+    			BooleanUtils.toBoolean(imgS), 
+    			BooleanUtils.toBoolean(imgM), 
+    			BooleanUtils.toBoolean(imgL))
+    			);
     }
 
     @Override
