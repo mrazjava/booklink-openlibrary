@@ -20,6 +20,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
 import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
 
 @Slf4j
@@ -146,6 +147,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         }
 
         if(persistData) {
+        	cleanData(author);
             repository.save(author);
             savedCount++;
         }
@@ -234,7 +236,13 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         return StringUtils.isNotBlank(authorSampleFile);
     }
 
-    private void recordSampleAuthorIds(File dataSource) {
+    @Override
+	protected void cleanData(AuthorSchema record) {
+
+    	ofNullable(record.getBio()).ifPresent(b -> record.setBio(cleanText(b)));
+	}
+
+	private void recordSampleAuthorIds(File dataSource) {
 
         if(log.isInfoEnabled()) {
             log.info("{} sample author IDs:\n{}",

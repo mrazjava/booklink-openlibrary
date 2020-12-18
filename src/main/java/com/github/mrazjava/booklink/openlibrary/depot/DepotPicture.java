@@ -1,5 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.depot;
 
+import java.util.Optional;
+
 import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +22,7 @@ public class DepotPicture implements DepotRecord {
 
     public DepotPicture(CoverImage coverImage) {
         id = coverImage.getId();
-        graphics = coverImage.getImage().getData();
+        Optional.ofNullable(coverImage.getImage()).ifPresent(i -> graphics = i.getData());
         sizeBytes = coverImage.getSizeBytes();
         sizeText = coverImage.getSizeText();
         info = coverImage.getInfo();

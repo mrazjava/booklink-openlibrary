@@ -16,6 +16,8 @@ import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 
 import lombok.extern.slf4j.Slf4j;
 
+import static java.util.Optional.ofNullable;
+
 @Slf4j
 @Component
 public class EditionHandler extends AbstractImportHandler<EditionSchema> {
@@ -83,6 +85,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
                     return;
                 }
             }
+            cleanData(record);
             repository.save(record);
             savedCount++;
         }
@@ -129,6 +132,13 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     }
 
     @Override
+	protected void cleanData(EditionSchema record) {
+
+    	ofNullable(record.getTitle()).ifPresent(t -> record.setTitle(cleanText(t)));
+    	ofNullable(record.getFullTitle()).ifPresent(ft -> record.setFullTitle(cleanText(ft)));
+	}
+
+	@Override
     protected Class<EditionSchema> getSchemaType() {
         return EditionSchema.class;
     }
