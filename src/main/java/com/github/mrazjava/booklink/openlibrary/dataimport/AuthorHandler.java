@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Optional.ofNullable;
 import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
+import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.extractSampleText;
 
 @Slf4j
 @Component
@@ -147,7 +148,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         }
 
         if(persistData) {
-        	cleanData(author);
+        	enhanceData(author);
             repository.save(author);
             savedCount++;
         }
@@ -237,9 +238,9 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     }
 
     @Override
-	protected void cleanData(AuthorSchema record) {
+	protected void enhanceData(AuthorSchema record) {
 
-    	ofNullable(record.getBio()).ifPresent(b -> record.setBio(cleanText(b)));
+    	ofNullable(record.getBio()).ifPresent(b -> record.setBioSample(extractSampleText(b)));
 	}
 
 	private void recordSampleAuthorIds(File dataSource) {

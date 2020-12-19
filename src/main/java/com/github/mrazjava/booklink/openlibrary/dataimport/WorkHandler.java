@@ -1,6 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import static java.util.Optional.ofNullable;
+import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.extractSampleText;
 
 import java.io.File;
 import java.util.Optional;
@@ -84,16 +85,16 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
                     return;
                 }
             }
-            cleanData(record);
+            enhanceData(record);
             repository.save(record);
             savedCount++;
         }
     }
 
     @Override
-	protected void cleanData(WorkSchema record) {
+	protected void enhanceData(WorkSchema record) {
 
-    	ofNullable(record.getTitle()).ifPresent(t -> record.setTitle(cleanText(t)));
+    	ofNullable(record.getTitle()).ifPresent(t -> record.setTitleSample(extractSampleText(t)));
 	}
 
 	@Override

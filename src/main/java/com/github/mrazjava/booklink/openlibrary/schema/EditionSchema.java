@@ -25,9 +25,21 @@ public class EditionSchema extends BaseSchemaEnhanced {
     @TextIndexed(weight = 3)
     private String title;
 
+    /**
+     * short beginning of title, without special characters (used for sorting, preview, etc)
+     */
+    @JsonProperty("title_sample")
+    private String titleSample;
+
     @TextIndexed(weight = 3)
     @JsonProperty("full_title")
     private String fullTitle;
+    
+    /**
+     * short beginning of fullTitle, without special characters (used for sorting, preview, etc)
+     */
+    @JsonProperty("full_title_sample")
+    private String fullTitleSample;
 
     @JsonProperty("edition_name")
     private String editionName;

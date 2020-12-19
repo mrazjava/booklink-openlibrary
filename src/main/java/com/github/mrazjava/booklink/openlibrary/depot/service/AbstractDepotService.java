@@ -15,6 +15,9 @@ import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -47,19 +50,25 @@ public abstract class AbstractDepotService<D, S> {
     public D findById(String id, boolean withSmallImg, boolean withMediumImg, boolean withLargeImg) {
     	log.debug("id[{}], withSmallImg[{}], withMediumImg[{}], withLargeImg[{}]", id, withSmallImg, withMediumImg, withLargeImg);
     	Query query = new Query().addCriteria(Criteria.where("_id").is(id));
-    	Field queryFields = query.fields();
-    	if(!withSmallImg) {
-    		queryFields = queryFields.exclude("imageSmall");
-    	}
-    	if(!withMediumImg) {
-    		queryFields = queryFields.exclude("imageMedium");
-    	}
-    	if(!withLargeImg) {
-    		queryFields = queryFields.exclude("imageLarge");
-    	}
+    	handleImageFields(query, withSmallImg, withMediumImg, withLargeImg);
     	return Optional.ofNullable(mongoTemplate.findOne(query, getSchemaClass()))
     		.map(schemaToDepot())
     		.orElse(depotFallback());
+    }
+    
+    private Field handleImageFields(Query query, boolean imgS, boolean imgM, boolean imgL) {
+    	
+    	Field queryFields = query.fields();
+    	if(!imgS) {
+    		queryFields = queryFields.exclude("imageSmall.image");
+    	}
+    	if(!imgM) {
+    		queryFields = queryFields.exclude("imageMedium.image");
+    	}
+    	if(!imgL) {
+    		queryFields = queryFields.exclude("imageLarge.image");
+    	}
+    	return queryFields;
     }
 
     public List<D> findById(List<String> ids) {
@@ -118,6 +127,14 @@ public abstract class AbstractDepotService<D, S> {
         AggregationResults<S> output = mongoTemplate.aggregate(aggregation, getCollectionName(), getSchemaClass());
 
         return output.getMappedResults().stream().map(schemaToDepot()).collect(Collectors.toList());
+    }
+
+    public List<D> findAll(int pageNo, int size, Sort sort, boolean withImgS, boolean withImgM, boolean withImgL) {
+    	Pageable pageable = PageRequest.of(pageNo, size, sort);
+    	Query query = new Query().with(pageable);
+    	handleImageFields(query, withImgS, withImgM, withImgL);
+    	return mongoTemplate.find(query, getSchemaClass())
+    			.stream().map(schemaToDepot()).collect(Collectors.toList());
     }
 
     protected abstract Function<S, D> schemaToDepot();

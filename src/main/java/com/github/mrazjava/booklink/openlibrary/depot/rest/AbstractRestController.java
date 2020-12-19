@@ -1,17 +1,19 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
-import com.github.mrazjava.booklink.openlibrary.depot.DepotRecord;
-import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
-import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
-import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.lang3.BooleanUtils;
-import org.springframework.http.ResponseEntity;
+import static java.util.Optional.ofNullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Optional.ofNullable;
+import org.apache.commons.lang3.BooleanUtils;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
+
+import com.github.mrazjava.booklink.openlibrary.depot.DepotRecord;
+import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 abstract class AbstractRestController<T extends DepotRecord> implements DepotSearch<T> {
@@ -48,6 +50,21 @@ abstract class AbstractRestController<T extends DepotRecord> implements DepotSea
     	log.info("result: \n{}", result);
     	
     	return ResponseEntity.ok(result);
+    }
+    
+    protected List<T> getAll(int pageNo, int size, Sort sort, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+    	imgS = BooleanUtils.toBoolean(imgS);
+    	imgM = BooleanUtils.toBoolean(imgM);
+    	imgL = BooleanUtils.toBoolean(imgL);
+
+    	log.info("pageNo[{}], size[{}], sort[{}], imgS[{}], imgM[{}], imgL[{}]", pageNo, size, sort, imgS, imgM, imgL);
+    	
+    	List<T> results = getService().findAll(pageNo, size, sort, imgS, imgM, imgL);
+    	
+    	log.info("found {} result(s)", results.size());
+    	
+    	return results;
     }
 
     abstract AbstractDepotService<T, ?> getService();

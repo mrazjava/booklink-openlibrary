@@ -68,6 +68,12 @@ public class AuthorSchema extends BaseSchemaEnhanced {
 
     @TextIndexed(weight = 4)
     private String bio;
+    
+    /**
+     * short beginning of bio, without special characters (used for sorting, preview, etc)
+     */
+    @JsonProperty("bio_sample")
+    private String bioSample;
 
     @JsonProperty("by_statement")
     private String byStatement;

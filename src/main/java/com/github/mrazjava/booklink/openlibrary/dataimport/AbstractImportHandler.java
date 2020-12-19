@@ -120,9 +120,5 @@ abstract class AbstractImportHandler<R extends BaseSchema> implements ImportHand
     }
 
     protected abstract Class<R> getSchemaType();
-    protected abstract void cleanData(R record);
-    
-    protected String cleanText(String text) {
-    	return text.replaceAll("[^\\w\\s]", "");
-    }
+    protected abstract void enhanceData(R record);   
 }
