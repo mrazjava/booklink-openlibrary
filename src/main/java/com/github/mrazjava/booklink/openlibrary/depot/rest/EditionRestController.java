@@ -9,6 +9,8 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/rest/v1/depot/edition")
 @Slf4j
-public class EditionRestController extends AbstractRestController<DepotEdition> {
+public class EditionRestController extends AbstractRestController<DepotEdition> implements DepotPageable<DepotEdition> {
 
     @Autowired
     private EditionService editionService;
@@ -98,6 +100,21 @@ public class EditionRestController extends AbstractRestController<DepotEdition> 
     }
 
     @Override
+	public ResponseEntity<List<DepotEdition>> getAll(
+			Integer pageNo, Integer pageSize, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+    	List<DepotEdition> results = getAll(
+    			pageNo, 
+    			pageSize == null ? DEFAULT_PAGE_SIZE : pageSize, 
+    			Sort.by(Order.asc("titleSample")), 
+    			imgS, 
+    			imgM, 
+    			imgL
+    	);
+    	return ResponseEntity.ok(results);    
+	}
+
+	@Override
     AbstractDepotService<DepotEdition, EditionSchema> getService() {
         return editionService;
     }

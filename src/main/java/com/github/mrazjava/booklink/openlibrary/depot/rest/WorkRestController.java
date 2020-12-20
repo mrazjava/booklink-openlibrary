@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/rest/v1/depot/work")
 @Slf4j
-public class WorkRestController extends AbstractRestController<DepotWork> {
+public class WorkRestController extends AbstractRestController<DepotWork> implements DepotPageable<DepotWork> {
 
     @Autowired
     private WorkService workService;
@@ -99,30 +99,22 @@ public class WorkRestController extends AbstractRestController<DepotWork> {
         return getRandomRecords(sampleCount, imgS, imgM, imgL, operator);
     }
     
-    @ApiOperation(value = "Get all records, paginated")
-    @GetMapping(path = "paged/all")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(
-            {
-                    @ApiResponse(
-                            message = "ok",
-                            code = 200
-                    )
-            }
-    )
-    public ResponseEntity<List<DepotWork>> getAll(
-    		@ApiParam(value = "page number starting with 1", required = true) @RequestParam("pageNo") Integer pageNo, 
-    		@ApiParam(value = "number of rows per page") @RequestParam(value = "pageSize", required = false) Integer size, 
-    		@ApiParam(value = "include small img?") @RequestParam(value = "imgS", required = false) Boolean imgS, 
-    		@ApiParam(value = "include medium img?") @RequestParam(value = "imgM", required = false) Boolean imgM, 
-    		@ApiParam(value = "include large img?") @RequestParam(value = "imgL", required = false) Boolean imgL) {
+    @Override
+	public ResponseEntity<List<DepotWork>> getAll(
+			Integer pageNo, Integer pageSize, Boolean imgS, Boolean imgM, Boolean imgL) {
 
-    	return ResponseEntity.ok(
-    			getAll(pageNo, size == null ? 5 : size, Sort.by(Order.asc("titleSample")), imgS, imgM, imgL)
-    			);
+    	List<DepotWork> results = getAll(
+    			pageNo, 
+    			pageSize == null ? DEFAULT_PAGE_SIZE : pageSize, 
+    			Sort.by(Order.asc("titleSample")), 
+    			imgS, 
+    			imgM, 
+    			imgL
+    	);
+    	return ResponseEntity.ok(results);    
     }
 
-    @Override
+	@Override
     AbstractDepotService<DepotWork, WorkSchema> getService() {
         return workService;
     }

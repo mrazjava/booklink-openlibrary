@@ -63,6 +63,9 @@ abstract class AbstractRestController<T extends DepotRecord> implements DepotSea
     	List<T> results = getService().findAll(pageNo, size, sort, imgS, imgM, imgL);
     	
     	log.info("found {} result(s)", results.size());
+    	if(log.isDebugEnabled()) {
+    		log.debug("{}", results.stream().map(DepotRecord::getId).collect(Collectors.toList()));
+    	}
     	
     	return results;
     }

@@ -9,6 +9,8 @@ import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,7 +28,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/v1/depot/author")
 @Slf4j
-public class AuthorRestController extends AbstractRestController<DepotAuthor> {
+public class AuthorRestController extends AbstractRestController<DepotAuthor> implements DepotPageable<DepotAuthor> {
 
     @Autowired
     private AuthorService authorService;
@@ -89,6 +91,21 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> {
     }
 
     @Override
+	public ResponseEntity<List<DepotAuthor>> getAll(
+			Integer pageNo, Integer pageSize, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+    	List<DepotAuthor> results = getAll(
+    			pageNo, 
+    			pageSize == null ? DEFAULT_PAGE_SIZE : pageSize, 
+    			Sort.by(Order.asc("name")), 
+    			imgS, 
+    			imgM, 
+    			imgL
+    	);
+    	return ResponseEntity.ok(results); 
+	}
+
+	@Override
     AbstractDepotService<DepotAuthor, AuthorSchema> getService() {
         return authorService;
     }
