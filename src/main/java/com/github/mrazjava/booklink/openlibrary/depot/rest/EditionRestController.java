@@ -58,7 +58,12 @@ public class EditionRestController extends AbstractRestController<DepotEdition> 
         return ResponseEntity.ok(editionService.findById(editionId));
     }
 
-    @ApiOperation(value = "Find editions matching one or more keys")
+    @Override
+	public ResponseEntity<DepotEdition> findById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
+		return flexById(id, imgS, imgM, imgL);
+	}
+
+	@ApiOperation(value = "Find editions matching one or more keys")
     @GetMapping
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(

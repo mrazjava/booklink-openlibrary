@@ -58,7 +58,12 @@ public class WorkRestController extends AbstractRestController<DepotWork> implem
         return ResponseEntity.ok(workService.findById(workId));
     }
 
-    @ApiOperation(value = "Find work matching one or more keys")
+	@Override
+	public ResponseEntity<DepotWork> findById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
+		return flexById(id, imgS, imgM, imgL);
+	}
+
+	@ApiOperation(value = "Find work matching one or more keys")
     @GetMapping
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(

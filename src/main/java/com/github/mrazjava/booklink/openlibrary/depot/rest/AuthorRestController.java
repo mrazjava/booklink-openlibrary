@@ -1,12 +1,10 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
-import com.github.mrazjava.booklink.openlibrary.depot.DepotAuthor;
-import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
-import com.github.mrazjava.booklink.openlibrary.depot.service.AuthorService;
-import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
-import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
-import io.swagger.annotations.*;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -17,10 +15,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
+import com.github.mrazjava.booklink.openlibrary.depot.DepotAuthor;
+import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.AuthorService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
+import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 
 @Api(
         tags = {"Author"}
@@ -48,34 +54,13 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> im
         log.info("id: {}", authorId);
         return ResponseEntity.ok(authorService.findById(authorId));
     }
-    
-    @ApiOperation(value = "Find author matching a specific ID optionally exlude image(s)")
-    @GetMapping(path = "/flex/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(
-            {
-                    @ApiResponse(
-                            message = "ok",
-                            code = 200
-                    )
-            }
-    )
-    public ResponseEntity<DepotAuthor> findById(
-    		@ApiParam(value = "unique author ID", required = true) @PathVariable("id") String authorId,
-    		@ApiParam(value = "fetch small img?") @QueryParam(value = "imgS") Boolean imgS,
-    		@ApiParam(value = "fetch medium img?") @QueryParam(value = "imgM") Boolean imgM,
-    		@ApiParam(value = "fetch large img?") @QueryParam(value = "imgL") Boolean imgL) {
 
-    	log.info("id: {}", authorId);
-    	return ResponseEntity.ok(authorService.findById(
-    			authorId, 
-    			BooleanUtils.toBoolean(imgS), 
-    			BooleanUtils.toBoolean(imgM), 
-    			BooleanUtils.toBoolean(imgL))
-    			);
-    }
+	@Override
+	public ResponseEntity<DepotAuthor> findById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
+		return flexById(id, imgS, imgM, imgL);
+	}
 
-    @Override
+	@Override
     public ResponseEntity<List<DepotAuthor>> searchText(String searchQuery, Boolean caseSensitive, String languageCode) {
 
         caseSensitive = BooleanUtils.toBoolean(caseSensitive);

@@ -1,17 +1,22 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
+import java.util.List;
+
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
+
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
 
 interface DepotSearch<D> {
 
@@ -49,4 +54,21 @@ interface DepotSearch<D> {
             @ApiParam(value = "with LARGE image? (requires operator)") @RequestParam(value = "imgL", required = false) Boolean imgL,
             @ApiParam(value = "(AND) must have all defined images (OR) at least one (requires at least 1 image param)") SearchOperator imgOperator
     );
+    
+    @ApiOperation(value = "Find record matching a specific ID optionally exluding image(s)")
+    @GetMapping(path = "/flex/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiResponses(
+            {
+                    @ApiResponse(
+                            message = "ok",
+                            code = 200
+                    )
+            }
+    )
+    public ResponseEntity<D> findById(
+    		@ApiParam(value = "unique record ID", required = true) @PathVariable("id") String id,
+    		@ApiParam(value = "fetch small img?") @QueryParam(value = "imgS") Boolean imgS,
+    		@ApiParam(value = "fetch medium img?") @QueryParam(value = "imgM") Boolean imgM,
+    		@ApiParam(value = "fetch large img?") @QueryParam(value = "imgL") Boolean imgL);
 }

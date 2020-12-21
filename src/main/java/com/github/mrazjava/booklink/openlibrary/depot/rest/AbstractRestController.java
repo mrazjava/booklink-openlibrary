@@ -37,7 +37,7 @@ abstract class AbstractRestController<T extends DepotRecord> implements DepotSea
         return ResponseEntity.ok(results);
     }
     
-    protected ResponseEntity<T> getById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
+    protected ResponseEntity<T> flexById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
     	
     	imgS = BooleanUtils.toBoolean(imgS);
     	imgM = BooleanUtils.toBoolean(imgM);
