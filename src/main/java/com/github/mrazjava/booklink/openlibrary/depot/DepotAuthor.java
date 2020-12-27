@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Builder
 @NoArgsConstructor
@@ -28,11 +29,16 @@ public class DepotAuthor implements DepotRecord {
     private String name;
     private String nameFull;
     private String namePersonal;
+    
+    @ToString.Exclude
     private String bio;
+
     private String birthDate;
     private String deathDate;
     private String comment;
     private List<String> publishers;
+    
+    @ToString.Exclude
     private String notes;
 
     @JsonFormat(pattern = DEPOT_API_DATE_FORMAT)

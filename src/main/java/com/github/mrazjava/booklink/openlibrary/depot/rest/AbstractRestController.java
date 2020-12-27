@@ -47,7 +47,7 @@ abstract class AbstractRestController<T extends DepotRecord> implements DepotSea
     	
     	T result = getService().findById(id, imgS, imgM, imgL);
     	
-    	log.info("result: \n{}", result);
+    	log.info("result: {}", result);
     	
     	return ResponseEntity.ok(result);
     }
