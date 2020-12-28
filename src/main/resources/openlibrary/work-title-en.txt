@@ -1,0 +1,2 @@
+# Many titles are set in non-english. This file provides English title translations by work ID
+OL1183449W=The Wisdom of Life
