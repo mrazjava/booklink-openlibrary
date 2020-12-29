@@ -48,6 +48,8 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Override
     public void prepare(File workingDirectory) {
 
+    	authorIdFilter.setIdTransformer(s -> s.startsWith("SA:") ? s.substring(3) : s);
+    	
         super.prepare(workingDirectory);
 
         sampleIds = new LinkedList<>();

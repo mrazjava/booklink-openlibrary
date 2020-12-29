@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.ResponseEntity;
 
 import com.github.mrazjava.booklink.openlibrary.depot.DepotRecord;
@@ -26,7 +27,7 @@ abstract class AbstractRestController<T extends DepotRecord> implements DepotSea
         log.info("sampleCount[{}], imgS[{}], imgM[{}], imgL[{}], operator[{}]",
                 sampleCount, imgS, imgM, imgL, operator);
 
-        List<T> results = getService().random(sampleCount, imgS, imgM, imgL, operator);
+        List<T> results = getService().random(sampleCount, imgS, imgM, imgL, operator, getRandomRecordsBaseCriteria());
 
         if(log.isInfoEnabled()) {
             log.info("found {} results(s): {}",
@@ -35,6 +36,10 @@ abstract class AbstractRestController<T extends DepotRecord> implements DepotSea
         }
 
         return ResponseEntity.ok(results);
+    }
+    
+    protected Criteria getRandomRecordsBaseCriteria() {
+    	return null;
     }
     
     protected ResponseEntity<T> flexById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {

@@ -1,5 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
 import java.util.List;
 
 import javax.ws.rs.Produces;
@@ -11,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -103,6 +106,11 @@ public class EditionRestController extends AbstractRestController<DepotEdition> 
     ) {
         return getRandomRecords(sampleCount, imgS, imgM, imgL, operator);
     }
+
+    @Override
+	protected Criteria getRandomRecordsBaseCriteria() {
+		return where("authors").size(1);
+	}
 
     @Override
 	public ResponseEntity<List<DepotEdition>> getAll(

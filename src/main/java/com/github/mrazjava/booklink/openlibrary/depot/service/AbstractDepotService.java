@@ -102,7 +102,8 @@ public abstract class AbstractDepotService<D, S> {
 
     public List<D> random(int sampleSize,
                           Boolean withSmallImg, Boolean withMediumImg, Boolean withLargeImg,
-                          SearchOperator operator) {
+                          SearchOperator operator,
+                          Criteria baseCriteria) {
 
         List<Criteria> imgCriteria = new LinkedList<>();
 
@@ -118,8 +119,8 @@ public abstract class AbstractDepotService<D, S> {
             Criteria[] criteria = imgCriteria.toArray(new Criteria[imgCriteria.size()]);
             return op == AND ? where.andOperator(criteria) : where.orOperator(criteria);
         })
-                .map(where -> match(where))
-                .orElse(imgCriteria.size() == 1 ? match(imgCriteria.get(0)) : null);
+                .map(where -> match(buildCriteria(baseCriteria, where)))
+                .orElse(imgCriteria.size() == 1 ? match(buildCriteria(baseCriteria, imgCriteria.get(0))) : ofNullable(baseCriteria).map(bc -> match(bc)).orElse(null));
 
         SampleOperation sampleOp = Aggregation.sample(sampleSize);
         Aggregation aggregation = ofNullable(matchOperation)
@@ -127,6 +128,19 @@ public abstract class AbstractDepotService<D, S> {
         AggregationResults<S> output = mongoTemplate.aggregate(aggregation, getCollectionName(), getSchemaClass());
 
         return output.getMappedResults().stream().map(schemaToDepot()).collect(Collectors.toList());
+    }
+    
+    private Criteria buildCriteria(Criteria base, Criteria other) {
+    	Criteria where = base;
+    	if(where != null) {
+    		if(other != null) {
+    			base.andOperator(other);
+    		}
+    	}
+    	else {
+    		where = other;
+    	}
+    	return where;
     }
 
     public List<D> findAll(int pageNo, int size, Sort sort, boolean withImgS, boolean withImgM, boolean withImgL) {
