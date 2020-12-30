@@ -282,6 +282,11 @@ db.getCollection('authors').find({$text:{$search: "charles"}})
 ```
 Above finds all authors where text index matches string `charles` (typically name fields).
 
+[Search](https://docs.mongodb.com/manual/reference/operator/query/size/) by array field of a specific size:
+```
+db.collection.find( { field: { $size: 2 } } )
+```
+
 ## Links
 
 [Base64 Image Converter](https://codebeautify.org/base64-to-image-converter)
