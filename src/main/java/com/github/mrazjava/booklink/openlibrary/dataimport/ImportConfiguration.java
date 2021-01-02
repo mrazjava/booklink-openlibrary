@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 
-import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -64,7 +62,7 @@ public class ImportConfiguration {
 	
     @Primary
     @Bean
-    AbstractImportHandler<? extends BaseSchema> produceImportHanlder(
+    AbstractImportHandler<?> produceImportHanlder(
             AuthorHandler authorHandler,
             WorkHandler workHandler,
             EditionHandler editionHandler

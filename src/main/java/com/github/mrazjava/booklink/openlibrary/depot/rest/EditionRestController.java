@@ -1,5 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
+import static org.springframework.data.mongodb.core.query.Criteria.where;
+
 import java.util.List;
 
 import javax.ws.rs.Produces;
@@ -9,6 +11,9 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/rest/v1/depot/edition")
 @Slf4j
-public class EditionRestController extends AbstractRestController<DepotEdition> {
+public class EditionRestController extends AbstractRestController<DepotEdition> implements DepotPageable<DepotEdition> {
 
     @Autowired
     private EditionService editionService;
@@ -56,7 +61,12 @@ public class EditionRestController extends AbstractRestController<DepotEdition> 
         return ResponseEntity.ok(editionService.findById(editionId));
     }
 
-    @ApiOperation(value = "Find editions matching one or more keys")
+    @Override
+	public ResponseEntity<DepotEdition> findById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
+		return flexById(id, imgS, imgM, imgL);
+	}
+
+	@ApiOperation(value = "Find editions matching one or more keys")
     @GetMapping
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(
@@ -98,6 +108,26 @@ public class EditionRestController extends AbstractRestController<DepotEdition> 
     }
 
     @Override
+	protected Criteria getRandomRecordsBaseCriteria() {
+		return where("authors").size(1);
+	}
+
+    @Override
+	public ResponseEntity<List<DepotEdition>> getAll(
+			Integer pageNo, Integer pageSize, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+    	List<DepotEdition> results = getAll(
+    			pageNo, 
+    			pageSize == null ? DEFAULT_PAGE_SIZE : pageSize, 
+    			Sort.by(Order.asc("titleSample")), 
+    			imgS, 
+    			imgM, 
+    			imgL
+    	);
+    	return ResponseEntity.ok(results);    
+	}
+
+	@Override
     AbstractDepotService<DepotEdition, EditionSchema> getService() {
         return editionService;
     }

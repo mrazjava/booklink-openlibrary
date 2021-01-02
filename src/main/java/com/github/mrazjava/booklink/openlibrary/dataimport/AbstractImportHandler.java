@@ -1,22 +1,21 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
-import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import static java.util.Optional.ofNullable;
+
+import java.io.File;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.io.File;
-import java.util.Optional;
-import java.util.Set;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 
-import static java.util.Optional.ofNullable;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
+abstract class AbstractImportHandler<R extends BaseSchema> implements ImportHandler<File, R> {
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -121,4 +120,5 @@ abstract class AbstractImportHandler<R> implements ImportHandler<File, R> {
     }
 
     protected abstract Class<R> getSchemaType();
+    protected abstract void enhanceData(R record);   
 }

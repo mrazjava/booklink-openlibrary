@@ -2,8 +2,11 @@ package com.github.mrazjava.booklink.openlibrary.depot;
 
 import com.github.mrazjava.booklink.openlibrary.depot.service.StatsService;
 
+import lombok.ToString;
+
 import java.util.Optional;
 
+@ToString
 public class DepotStats {
 
     private StatsService.CountResults authorCounts;

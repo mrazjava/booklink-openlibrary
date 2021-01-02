@@ -15,4 +15,10 @@ public final class BooklinkUtils {
                 .sizeText(FileUtils.byteCountToDisplaySize(image.length))
                 .build();
     }
+    
+    public static String extractSampleText(String text) {
+    	
+    	String sampleTxt = text.replaceFirst("[^\\w]*", "");
+    	return sampleTxt.length() > 15 ? sampleTxt.substring(0, 10) : sampleTxt;
+    }
 }

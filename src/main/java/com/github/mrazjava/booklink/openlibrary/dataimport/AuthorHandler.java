@@ -20,7 +20,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import static java.util.Optional.ofNullable;
 import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
+import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.extractSampleText;
 
 @Slf4j
 @Component
@@ -46,6 +48,8 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     @Override
     public void prepare(File workingDirectory) {
 
+    	authorIdFilter.setIdTransformer(s -> s.startsWith("SA:") ? s.substring(3) : s);
+    	
         super.prepare(workingDirectory);
 
         sampleIds = new LinkedList<>();
@@ -146,6 +150,7 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         }
 
         if(persistData) {
+        	enhanceData(author);
             repository.save(author);
             savedCount++;
         }
@@ -234,7 +239,13 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         return StringUtils.isNotBlank(authorSampleFile);
     }
 
-    private void recordSampleAuthorIds(File dataSource) {
+    @Override
+	protected void enhanceData(AuthorSchema record) {
+
+    	ofNullable(record.getBio()).ifPresent(b -> record.setBioSample(extractSampleText(b)));
+	}
+
+	private void recordSampleAuthorIds(File dataSource) {
 
         if(log.isInfoEnabled()) {
             log.info("{} sample author IDs:\n{}",

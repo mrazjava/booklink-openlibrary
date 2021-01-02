@@ -1,23 +1,32 @@
 package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
-import com.github.mrazjava.booklink.openlibrary.depot.DepotAuthor;
-import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
-import com.github.mrazjava.booklink.openlibrary.depot.service.AuthorService;
-import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
-import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
-import io.swagger.annotations.*;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-import java.util.List;
+import com.github.mrazjava.booklink.openlibrary.depot.DepotAuthor;
+import com.github.mrazjava.booklink.openlibrary.depot.service.AbstractDepotService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.AuthorService;
+import com.github.mrazjava.booklink.openlibrary.depot.service.SearchOperator;
+import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import lombok.extern.slf4j.Slf4j;
 
 @Api(
         tags = {"Author"}
@@ -25,7 +34,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/v1/depot/author")
 @Slf4j
-public class AuthorRestController extends AbstractRestController<DepotAuthor> {
+public class AuthorRestController extends AbstractRestController<DepotAuthor> implements DepotPageable<DepotAuthor> {
 
     @Autowired
     private AuthorService authorService;
@@ -46,7 +55,12 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> {
         return ResponseEntity.ok(authorService.findById(authorId));
     }
 
-    @Override
+	@Override
+	public ResponseEntity<DepotAuthor> findById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
+		return flexById(id, imgS, imgM, imgL);
+	}
+
+	@Override
     public ResponseEntity<List<DepotAuthor>> searchText(String searchQuery, Boolean caseSensitive, String languageCode) {
 
         caseSensitive = BooleanUtils.toBoolean(caseSensitive);
@@ -62,6 +76,21 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> {
     }
 
     @Override
+	public ResponseEntity<List<DepotAuthor>> getAll(
+			Integer pageNo, Integer pageSize, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+    	List<DepotAuthor> results = getAll(
+    			pageNo, 
+    			pageSize == null ? DEFAULT_PAGE_SIZE : pageSize, 
+    			Sort.by(Order.asc("name")), 
+    			imgS, 
+    			imgM, 
+    			imgL
+    	);
+    	return ResponseEntity.ok(results); 
+	}
+
+	@Override
     AbstractDepotService<DepotAuthor, AuthorSchema> getService() {
         return authorService;
     }

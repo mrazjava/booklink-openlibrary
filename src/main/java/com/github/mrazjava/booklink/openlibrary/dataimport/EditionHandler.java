@@ -1,20 +1,23 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
-import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
-import lombok.extern.slf4j.Slf4j;
+import java.io.File;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
+import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
+import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
+
+import lombok.extern.slf4j.Slf4j;
+
+import static java.util.Optional.ofNullable;
+import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.extractSampleText;
 
 @Slf4j
 @Component
@@ -83,6 +86,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
                     return;
                 }
             }
+            enhanceData(record);
             repository.save(record);
             savedCount++;
         }
@@ -129,6 +133,13 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
     }
 
     @Override
+	protected void enhanceData(EditionSchema record) {
+
+    	ofNullable(record.getTitle()).ifPresent(t -> record.setTitleSample(extractSampleText(t)));
+    	ofNullable(record.getFullTitle()).ifPresent(ft -> record.setFullTitleSample(extractSampleText(ft)));
+	}
+
+	@Override
     protected Class<EditionSchema> getSchemaType() {
         return EditionSchema.class;
     }

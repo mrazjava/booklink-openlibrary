@@ -1,9 +1,25 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
-import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
-import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.L;
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.M;
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.S;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,16 +28,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
+import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
+import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
 
 
 @BooklinkTestPropertySource
@@ -155,8 +165,8 @@ public class AuthorHandlerTest {
         AuthorSchema record = mock(AuthorSchema.class);
         String id = "foo-bar";
         Long imgId = 6746285L;
-        Map<ImageSize, byte[]> pulledImageMocks = mock(Map.class);
-        CoverImage mockImage = mock(CoverImage.class);
+        @SuppressWarnings("unchecked") Map<ImageSize, byte[]> pulledImageMocks = mock(Map.class);
+		CoverImage mockImage = mock(CoverImage.class);
 
         handler.imagePull = handler.withMongoImages = true;
         handler.imageDir = "/tmp/test"; // for the test purposes value irrelevant so long not blank

@@ -1,15 +1,20 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
-import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
-import lombok.extern.slf4j.Slf4j;
+import static java.util.Optional.ofNullable;
+import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.extractSampleText;
+
+import java.io.File;
+import java.util.Optional;
+
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.io.File;
-import java.util.Optional;
+import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
+import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -73,19 +78,26 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
             imageDownloader.downloadImages(record, sequenceNo);
             checkImages(record);
         }
-
+        
         if(persistData) {
             if(!persistDataOverride) {
                 if(repository.findById(record.getId()).isPresent()) {
                     return;
                 }
             }
+            enhanceData(record);
             repository.save(record);
             savedCount++;
         }
     }
 
     @Override
+	protected void enhanceData(WorkSchema record) {
+
+    	ofNullable(record.getTitle()).ifPresent(t -> record.setTitleSample(extractSampleText(t)));
+	}
+
+	@Override
     protected Class<WorkSchema> getSchemaType() {
         return WorkSchema.class;
     }

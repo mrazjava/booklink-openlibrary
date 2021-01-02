@@ -1,6 +1,12 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-public interface ImportHandler<T, R> {
+import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
+
+/**
+ * @param <T> format of data source from which to import
+ * @param <R> record schema
+ */
+public interface ImportHandler<T, R extends BaseSchema> {
 
     /**
      * Prepares the import process. This is a one time operation invoked prior to the

@@ -1,22 +1,36 @@
 package com.github.mrazjava.booklink.openlibrary.schema;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.databind.JsonNode;
-import lombok.*;
-import org.springframework.data.mongodb.core.index.Indexed;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.CollectionUtils;
 
-import java.util.LinkedList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.JsonNode;
+
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Document(collection = "works")
 public class WorkSchema extends BaseSchema {
 
     @TextIndexed(weight = 2)
     private String title;
+    
+    /**
+     * short beginning of title, without special characters (used for sorting, preview, etc)
+     */
+    @JsonProperty("title_sample")
+    private String titleSample;
 
     @TextIndexed(weight = 2)
     private String subtitle;

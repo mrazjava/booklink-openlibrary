@@ -43,6 +43,8 @@ public class StatsRestController {
         DepotStats depotStats = new DepotStats(
                 statsService.countAuthors(), statsService.countWorks(), statsService.countEditions()
         );
+        
+        log.info("results: {}", depotStats);
 
         return ResponseEntity.ok(depotStats);
     }
