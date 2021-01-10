@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorImgExclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 
 import lombok.extern.slf4j.Slf4j;

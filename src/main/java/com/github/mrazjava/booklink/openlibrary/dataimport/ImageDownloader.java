@@ -1,6 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import com.github.mrazjava.booklink.openlibrary.BooklinkUtils;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.IdFilter;
 import com.github.mrazjava.booklink.openlibrary.schema.DefaultImageSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.SetUtils;

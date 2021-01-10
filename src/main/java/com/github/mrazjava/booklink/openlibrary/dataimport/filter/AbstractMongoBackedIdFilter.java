@@ -1,4 +1,4 @@
-package com.github.mrazjava.booklink.openlibrary.dataimport;
+package com.github.mrazjava.booklink.openlibrary.dataimport.filter;
 
 import com.github.mrazjava.booklink.openlibrary.repository.OpenLibraryMongoRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;

@@ -1,6 +1,8 @@
-package com.github.mrazjava.booklink.openlibrary.dataimport;
+package com.github.mrazjava.booklink.openlibrary.dataimport.filter;
 
 import org.springframework.stereotype.Component;
+
+import com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize;
 
 @Component
 public class AuthorImgExclusionFilter extends AbstractIdFilter {
@@ -23,7 +25,7 @@ public class AuthorImgExclusionFilter extends AbstractIdFilter {
     }
 
     @Override
-    protected String getFilterName() {
+    public String getFilterName() {
         return FILTER_NAME;
     }
 }

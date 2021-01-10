@@ -1,4 +1,4 @@
-package com.github.mrazjava.booklink.openlibrary.dataimport;
+package com.github.mrazjava.booklink.openlibrary.dataimport.filter;
 
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class CustomAuthorImgFilter extends AbstractIdFilter {
     }
 
     @Override
-    protected String getFilterName() {
+    public String getFilterName() {
         return FILENAME_WORK_FILTER;
     }
 }
