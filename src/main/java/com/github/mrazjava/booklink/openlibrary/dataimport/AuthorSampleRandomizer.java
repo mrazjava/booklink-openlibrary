@@ -28,7 +28,8 @@ public class AuthorSampleRandomizer {
 
     public Set<Long> randomize() {
         Set<Long> randomIndexes = new HashSet<>();
-        for(long x = 0; x < sampleCount; x++) {
+        long max = sampleCount/2;
+        for(long x = 0; x < max; x++) {
             randomIndexes.add(1L + (long)(Math.random()*(totalCount-1L)));
         }
         log.info("generated {} random indexes:\n{}", randomIndexes.size(), randomIndexes);

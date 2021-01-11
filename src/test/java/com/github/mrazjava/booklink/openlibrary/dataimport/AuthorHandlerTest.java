@@ -64,6 +64,8 @@ public class AuthorHandlerTest {
     @MockBean
     private AuthorRepository authorRepository;
 
+    @MockBean
+    private SampleAuthorTracker sampleAuthorTracker;
 
     @BeforeEach
     public void prepare() throws IOException {
