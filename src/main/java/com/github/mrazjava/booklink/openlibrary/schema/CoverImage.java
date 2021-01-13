@@ -20,4 +20,10 @@ public class CoverImage {
     private String sizeText;
 
     private String info;
+    
+    /**
+     * Many valid covers are plain in appearance. If set and true, then a cover is 
+     * identified as such.
+     */
+    private Boolean plain;
 }
