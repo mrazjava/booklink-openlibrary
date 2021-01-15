@@ -17,7 +17,7 @@ public class AuthorImgExclusionFilter extends AbstractIdFilter {
      * from {@link ImageSize}. Comments are allowed and start with a #. Empty lines are allowed and
      * ignored.
      */
-    public static final String FILTER_FILENAME = "src/test/resources/author-img-exclusions.txt";
+    public static final String FILTER_FILENAME = "author-img-exclusions.txt";
 
 
     AuthorImgExclusionFilter() {
