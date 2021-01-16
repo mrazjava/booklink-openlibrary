@@ -11,7 +11,7 @@ public class PlainWorkCoverFilter extends AbstractIdFilter {
      * Optional file; if exists, covers matching IDs in this filter will be marked as 
      * plain ({@link CoverImage#setPlain(Boolean)).
      */
-    public static final String FILTER_FILENAME = "author-img-exclusions.txt";
+    public static final String FILTER_FILENAME = "work-plain-covers-filter.txt";
 
 
     PlainWorkCoverFilter(String filterFilename) {
