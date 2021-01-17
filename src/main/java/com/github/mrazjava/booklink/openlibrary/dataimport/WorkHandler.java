@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.PlainWorkCoverFilter;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
+import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
 
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,9 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
 
     @Autowired
     private AuthorIdFilter authorIdFilter;
+    
+    @Autowired
+    private PlainWorkCoverFilter plainCoverFilter;
 
     private int authorMatchCount = 0;
 
@@ -35,6 +40,7 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
 
         super.prepare(workingDirectory);
         imageDownloader.setCoverDirectory("works");
+        plainCoverFilter.load(workingDirectory);
     }
 
     @Override
@@ -90,6 +96,22 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
             repository.save(record);
             savedCount++;
         }
+    }
+
+    @Override
+    protected void checkImages(BaseSchema record) {
+
+        super.checkImages(record);
+
+        ofNullable(record.getImageSmall()).ifPresent(imgS -> {
+            imgS.setPlain(plainCoverFilter.exists(imgS.getId()));
+        });
+        ofNullable(record.getImageMedium()).ifPresent(imgM -> {
+            imgM.setPlain(plainCoverFilter.exists(imgM.getId()));
+        });
+        ofNullable(record.getImageLarge()).ifPresent(imgL -> {
+            imgL.setPlain(plainCoverFilter.exists(imgL.getId()));
+        });
     }
 
     @Override

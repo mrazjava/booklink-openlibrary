@@ -2,6 +2,10 @@ package com.github.mrazjava.booklink.openlibrary.dataimport.filter;
 
 import org.springframework.stereotype.Component;
 
+/**
+ * Tracks IDs of work cover images which are plain, without any text or image. Many hard 
+ * covers are like this.
+ */
 @Component
 public class PlainWorkCoverFilter extends AbstractIdFilter {
 
@@ -14,7 +18,7 @@ public class PlainWorkCoverFilter extends AbstractIdFilter {
     public static final String FILTER_FILENAME = "work-plain-covers-filter.txt";
 
 
-    PlainWorkCoverFilter(String filterFilename) {
+    PlainWorkCoverFilter() {
         super(FILTER_NAME);
     }
 
