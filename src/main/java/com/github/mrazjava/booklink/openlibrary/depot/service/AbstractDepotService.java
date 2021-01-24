@@ -93,8 +93,10 @@ public abstract class AbstractDepotService<D, S> {
         return repository.findByAuthors(List.of(authorId)).stream().map(schemaToDepot()).collect(Collectors.toList());
     }
 
-    public List<D> searchText(String search, String langIso, boolean caseSensitive) {
-        return mongoTemplate.find(prepareTextQuery(search, langIso, caseSensitive), getSchemaClass())
+    public List<D> searchText(String search, String langIso, boolean caseSensitive, boolean imgS, boolean imgM, boolean imgL) {
+        Query query = prepareTextQuery(search, langIso, caseSensitive);
+        handleImageFields(query, imgS, imgM, imgL);
+        return mongoTemplate.find(query, getSchemaClass())
                 .stream()
                 .map(schemaToDepot())
                 .collect(Collectors.toList());

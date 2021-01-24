@@ -34,7 +34,11 @@ interface DepotSearch<D> {
     public ResponseEntity<List<D>> searchText(
             @ApiParam(value = "free style text search (eg: 'biology religion')", required = true) @RequestParam("s") String searchQuery,
             @ApiParam(value = "case sensitive?") @RequestParam(value = "case-sensitive", required = false) Boolean caseSensitive,
-            @ApiParam(value = "language ISO") @RequestParam(value = "language-iso", required = false) String languageCode);
+            @ApiParam(value = "language ISO") @RequestParam(value = "language-iso", required = false) String languageCode,
+            @ApiParam(value = "return small image? (default: false)") @RequestParam(value = "img-s", required = false) Boolean imgS,
+            @ApiParam(value = "return medium image? (default: false)") @RequestParam(value = "img-m", required = false) Boolean imgM,
+            @ApiParam(value = "return large image? (default: false)") @RequestParam(value = "img-l", required = false) Boolean imgL
+            );
 
     @ApiOperation(value = "Random record which has an image")
     @GetMapping(path = "/random-record")

@@ -61,11 +61,16 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> im
 	}
 
 	@Override
-    public ResponseEntity<List<DepotAuthor>> searchText(String searchQuery, Boolean caseSensitive, String languageCode) {
+    public ResponseEntity<List<DepotAuthor>> searchText(
+            String searchQuery, Boolean caseSensitive, String languageCode, Boolean imgS, Boolean imgM, Boolean imgL) {
 
+	    imgS = BooleanUtils.toBooleanDefaultIfNull(imgS, false);
+	    imgM = BooleanUtils.toBooleanDefaultIfNull(imgM, false);
+	    imgL = BooleanUtils.toBooleanDefaultIfNull(imgL, false);
+	    
         caseSensitive = BooleanUtils.toBoolean(caseSensitive);
-        log.info("searchText[{}], caseSensitive[{}], languageCode[{}]", searchQuery, caseSensitive, languageCode);
-        return ResponseEntity.ok(authorService.searchText(searchQuery, languageCode, caseSensitive));
+        log.info("searchText[{}], caseSensitive[{}], languageCode[{}], imgS[{}], imgM[{}], imgL[{}]", searchQuery, caseSensitive, languageCode, imgS, imgM, imgL);
+        return ResponseEntity.ok(authorService.searchText(searchQuery, languageCode, caseSensitive, imgS, imgM, imgL));
     }
 
     @Override
