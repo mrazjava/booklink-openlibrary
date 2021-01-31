@@ -6,6 +6,7 @@ import static org.springframework.data.mongodb.core.aggregation.Aggregation.matc
 import static org.springframework.data.mongodb.core.aggregation.Aggregation.newAggregation;
 import static org.springframework.data.mongodb.core.query.Criteria.where;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -76,13 +77,14 @@ public abstract class AbstractDepotService<D, S> {
     }
 
     protected Query prepareTextQuery(String search, String langIso, boolean caseSensitive) {
-
+        log.debug("search input: [{}]", search);
+        List<String> searchTerms = Arrays.stream(search.split(" ")).map(t -> t.trim()).collect(Collectors.toList());
+        log.info("search terms: {}", searchTerms);
         TextCriteria txtCriteria = StringUtils.isEmpty(langIso) ?
                 TextCriteria.forDefaultLanguage() : TextCriteria.forLanguage(langIso);
-        txtCriteria.caseSensitive(caseSensitive).matching(search);
+        txtCriteria.caseSensitive(caseSensitive).matchingAny(searchTerms.toArray(String[]::new));
 
-        return TextQuery.queryText(txtCriteria.caseSensitive(caseSensitive).matching(search))
-                .sortByScore();
+        return TextQuery.queryText(txtCriteria).sortByScore();
     }
 
     protected List<D> iterableToList(Iterable<S> schemas) {
@@ -96,10 +98,12 @@ public abstract class AbstractDepotService<D, S> {
     public List<D> searchText(String search, String langIso, boolean caseSensitive, boolean imgS, boolean imgM, boolean imgL) {
         Query query = prepareTextQuery(search, langIso, caseSensitive);
         handleImageFields(query, imgS, imgM, imgL);
-        return mongoTemplate.find(query, getSchemaClass())
+        List<D> results = mongoTemplate.find(query, getSchemaClass())
                 .stream()
                 .map(schemaToDepot())
                 .collect(Collectors.toList());
+        log.info("found {} result(s)", results.size());
+        return results;
     }
 
     public List<D> random(int sampleSize,
