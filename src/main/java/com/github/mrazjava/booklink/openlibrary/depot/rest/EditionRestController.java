@@ -118,6 +118,12 @@ public class EditionRestController extends AbstractRestController<DepotEdition> 
 	}
 
     @Override
+    public ResponseEntity<List<DepotEdition>> findAllById(String commaSeparatedIds, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+        return multipleById(commaSeparatedIds, imgS, imgM, imgL);
+    }
+
+    @Override
 	public ResponseEntity<List<DepotEdition>> getAll(
 			Integer pageNo, Integer pageSize, Boolean imgS, Boolean imgM, Boolean imgL) {
 

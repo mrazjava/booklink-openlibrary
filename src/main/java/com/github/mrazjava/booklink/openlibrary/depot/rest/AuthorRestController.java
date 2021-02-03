@@ -54,8 +54,8 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> im
         log.info("id: {}", authorId);
         return ResponseEntity.ok(authorService.findById(authorId));
     }
-
-	@Override
+    
+    @Override
 	public ResponseEntity<DepotAuthor> findById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
 		return flexById(id, imgS, imgM, imgL);
 	}
@@ -78,6 +78,12 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> im
             Integer sampleCount, Boolean imgS, Boolean imgM, Boolean imgL, SearchOperator operator) {
 
         return getRandomRecords(sampleCount, imgS, imgM, imgL, operator);
+    }
+
+    @Override
+    public ResponseEntity<List<DepotAuthor>> findAllById(String commaSeparatedIds, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+        return multipleById(commaSeparatedIds, imgS, imgM, imgL);
     }
 
     @Override

@@ -118,6 +118,12 @@ public class WorkRestController extends AbstractRestController<DepotWork> implem
 	}
 
 	@Override
+    public ResponseEntity<List<DepotWork>> findAllById(String commaSeparatedIds, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+        return multipleById(commaSeparatedIds, imgS, imgM, imgL);
+    }
+
+    @Override
 	public ResponseEntity<List<DepotWork>> getAll(
 			Integer pageNo, Integer pageSize, Boolean imgS, Boolean imgM, Boolean imgL) {
 

@@ -72,8 +72,14 @@ public abstract class AbstractDepotService<D, S> {
     	return queryFields;
     }
 
-    public List<D> findById(List<String> ids) {
-        return iterableToList(repository.findAllById(ids));
+    public List<D> findById(List<String> ids, boolean imgS, boolean imgM, boolean imgL) {
+        
+        Query query = Query.query(Criteria.where("_id").in(ids));
+        handleImageFields(query, imgS, imgM, imgL);
+        return mongoTemplate.find(query, getSchemaClass())
+                .stream()
+                .map(schemaToDepot())
+                .collect(Collectors.toList());
     }
 
     protected Query prepareTextQuery(String search, String langIso, boolean caseSensitive) {
