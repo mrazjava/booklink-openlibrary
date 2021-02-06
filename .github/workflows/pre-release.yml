@@ -9,7 +9,6 @@ on:
       - 'pom.xml'
       - '*.Dockerfile'
       - '.github/workflows/pre-release.yml'
-      - '.aws/pre-release.json'
 
 env:
   DOCKER_IMAGE: docker.io/mrazjava/booklink-openlibrary-depot
