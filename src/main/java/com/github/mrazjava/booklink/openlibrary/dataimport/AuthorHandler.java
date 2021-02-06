@@ -1,9 +1,22 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp;
-import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
-import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
-import lombok.extern.slf4j.Slf4j;
+import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.extractSampleText;
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.L;
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.M;
+import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.S;
+import static java.util.Optional.ofNullable;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -12,17 +25,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
+import com.github.mrazjava.booklink.openlibrary.OpenLibraryImportApp;
+import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
+import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 
-import static java.util.Optional.ofNullable;
-import static com.github.mrazjava.booklink.openlibrary.dataimport.ImageSize.*;
-import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.extractSampleText;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -30,8 +37,6 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
     @Autowired
     private AuthorRepository repository;
-
-    private List<SampleAuthorIdRecord> sampleIds;
 
     private Set<Long> indexesToSample;
 
@@ -43,7 +48,9 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
     @Autowired
     private Optional<AuthorSampleRandomizer> sampleRandomizer;
-
+    
+    @Autowired
+    private SampleAuthorTracker sampleAuthorTracker;
 
     @Override
     public void prepare(File workingDirectory) {
@@ -52,7 +59,6 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
     	
         super.prepare(workingDirectory);
 
-        sampleIds = new LinkedList<>();
         indexesToSample = sampleRandomizer.map(r -> r.randomize()).orElse(Set.of());
 
         if(StringUtils.isNotBlank(imageDir)) {
@@ -92,16 +98,30 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
             savedCount = 0;
         }
 
-        if(isAuthorIdSampleEnabled() && (
-                (indexesToSample.isEmpty() && (sequenceNo % frequencyCheck == 0)) ||
-                (!indexesToSample.isEmpty() && indexesToSample.contains(sequenceNo))
-            )
-        ) {
-            sampleIds.add(new SampleAuthorIdRecord(
-                    record.getId(),
-                    StringUtils.firstNonBlank(record.getName(), record.getFullName(), record.getPersonalName()),
-                    sequenceNo
-            ));
+        if(isAuthorIdSampleEnabled()) {
+            
+            if((indexesToSample.isEmpty() && (sequenceNo % frequencyCheck == 0)) ||
+                (!indexesToSample.isEmpty() && indexesToSample.contains(sequenceNo))) {
+            
+                sampleAuthorTracker.addSampleId(new SampleAuthorIdRecord(
+                        record.getId(),
+                        StringUtils.firstNonBlank(record.getName(), record.getFullName(), record.getPersonalName()),
+                        sequenceNo
+                   )
+                   .withImage(!CollectionUtils.isEmpty(record.getPhotos()))
+                );
+            }
+            else if(sampleAuthorTracker.sampleIdCount() > sampleAuthorTracker.sampleIdWithImageCount()) {
+                if(!CollectionUtils.isEmpty(record.getPhotos())) {
+                    sampleAuthorTracker.addSampleIdWithImage(new SampleAuthorIdRecord(
+                        record.getId(),
+                        StringUtils.firstNonBlank(record.getName(), record.getFullName(), record.getPersonalName()),
+                        sequenceNo
+                   )
+                   .withImage(true)
+                   );
+                }
+            }
         }
 
         if(authorIdFilter.isEnabled()) {
@@ -247,16 +267,21 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
 
 	private void recordSampleAuthorIds(File dataSource) {
 
+	    List<SampleAuthorIdRecord> sampleAuthors = sampleAuthorTracker.buildSample(20);
+	    
         if(log.isInfoEnabled()) {
             log.info("{} sample author IDs:\n{}",
-                    sampleIds.size(),
-                    StringUtils.join(sampleIds.stream().map(SampleAuthorIdRecord::getId).collect(Collectors.toList()), ",")
+                    sampleAuthors.size(),
+                    StringUtils.join(sampleAuthors.stream().map(SampleAuthorIdRecord::getId).collect(Collectors.toList()), ",")
             );
+
         }
         try {
+            File sampleAuthorIds = OpenLibraryImportApp.openFile(dataSource.getParent(), authorSampleFile);
+            log.info("saving random samples to: {}", sampleAuthorIds.getAbsolutePath());
             FileUtils.writeStringToFile(
-                    OpenLibraryImportApp.openFile(dataSource.getParent(), authorSampleFile),
-                    StringUtils.joinWith("\n", sampleIds.toArray()),
+                    sampleAuthorIds,
+                    StringUtils.joinWith("\n", sampleAuthors.toArray()),
                     Charset.defaultCharset()
             );
         } catch (IOException e) {
@@ -264,11 +289,12 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         }
     }
 
-    static class SampleAuthorIdRecord {
+    static class SampleAuthorIdRecord implements Comparable<SampleAuthorIdRecord> {
 
         private String id;
         private String name;
         private long sequenceNo;
+        private boolean image;
 
         SampleAuthorIdRecord(String id, String name, long sequenceNo) {
             this.id = id;
@@ -279,11 +305,27 @@ public class AuthorHandler extends AbstractImportHandler<AuthorSchema> {
         String getId() {
             return id;
         }
+        
+        SampleAuthorIdRecord withImage(boolean image) {
+            this.image = image;
+            return this;
+        }
+        
+        boolean hasImage() {
+            return image;
+        }
+
+        @Override
+        public int compareTo(SampleAuthorIdRecord that) {            
+            return (int)(this.sequenceNo - that.sequenceNo);
+        }
 
         @Override
         public String toString() {
             StringBuilder record = new StringBuilder();
-            record.append("# " + sequenceNo + ": " + name);
+            record.append("# " + sequenceNo + ": " + name + 
+                    String.format(" (IMG ? %s)", BooleanUtils.toStringYesNo(image))
+            );
             record.append("\n");
             record.append(id);
             return record.toString();

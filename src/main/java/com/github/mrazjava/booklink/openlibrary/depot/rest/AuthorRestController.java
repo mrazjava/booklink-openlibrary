@@ -54,18 +54,23 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> im
         log.info("id: {}", authorId);
         return ResponseEntity.ok(authorService.findById(authorId));
     }
-
-	@Override
+    
+    @Override
 	public ResponseEntity<DepotAuthor> findById(String id, Boolean imgS, Boolean imgM, Boolean imgL) {
 		return flexById(id, imgS, imgM, imgL);
 	}
 
 	@Override
-    public ResponseEntity<List<DepotAuthor>> searchText(String searchQuery, Boolean caseSensitive, String languageCode) {
+    public ResponseEntity<List<DepotAuthor>> searchText(
+            String searchQuery, Boolean caseSensitive, String languageCode, Boolean imgS, Boolean imgM, Boolean imgL) {
 
+	    imgS = BooleanUtils.toBooleanDefaultIfNull(imgS, false);
+	    imgM = BooleanUtils.toBooleanDefaultIfNull(imgM, false);
+	    imgL = BooleanUtils.toBooleanDefaultIfNull(imgL, false);
+	    
         caseSensitive = BooleanUtils.toBoolean(caseSensitive);
-        log.info("searchText[{}], caseSensitive[{}], languageCode[{}]", searchQuery, caseSensitive, languageCode);
-        return ResponseEntity.ok(authorService.searchText(searchQuery, languageCode, caseSensitive));
+        log.info("searchText[{}], caseSensitive[{}], languageCode[{}], imgS[{}], imgM[{}], imgL[{}]", searchQuery, caseSensitive, languageCode, imgS, imgM, imgL);
+        return ResponseEntity.ok(authorService.searchText(searchQuery, languageCode, caseSensitive, imgS, imgM, imgL));
     }
 
     @Override
@@ -73,6 +78,12 @@ public class AuthorRestController extends AbstractRestController<DepotAuthor> im
             Integer sampleCount, Boolean imgS, Boolean imgM, Boolean imgL, SearchOperator operator) {
 
         return getRandomRecords(sampleCount, imgS, imgM, imgL, operator);
+    }
+
+    @Override
+    public ResponseEntity<List<DepotAuthor>> findAllById(String commaSeparatedIds, Boolean imgS, Boolean imgM, Boolean imgL) {
+
+        return multipleById(commaSeparatedIds, imgS, imgM, imgL);
     }
 
     @Override

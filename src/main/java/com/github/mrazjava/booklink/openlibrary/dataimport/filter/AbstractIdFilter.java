@@ -1,4 +1,4 @@
-package com.github.mrazjava.booklink.openlibrary.dataimport;
+package com.github.mrazjava.booklink.openlibrary.dataimport.filter;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,7 @@ import static java.util.Optional.ofNullable;
  * default no file will be present.
  */
 @Slf4j
-abstract class AbstractIdFilter implements IdFilter {
+public abstract class AbstractIdFilter implements IdFilter {
 
     protected Set<String> allowedIds = new HashSet<>();
 
@@ -76,5 +76,5 @@ abstract class AbstractIdFilter implements IdFilter {
         return allowedIds.contains(id);
     }
 
-    protected abstract String getFilterName();
+    public abstract String getFilterName();
 }

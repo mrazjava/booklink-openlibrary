@@ -1,4 +1,4 @@
-package com.github.mrazjava.booklink.openlibrary.dataimport;
+package com.github.mrazjava.booklink.openlibrary.dataimport.filter;
 
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.WorkSchema;
@@ -21,7 +21,7 @@ public class WorkIdFilter extends AbstractMongoBackedIdFilter<WorkSchema> {
     }
 
     @Override
-    protected String getFilterName() {
+    public String getFilterName() {
         return FILTER_NAME;
     }
 }

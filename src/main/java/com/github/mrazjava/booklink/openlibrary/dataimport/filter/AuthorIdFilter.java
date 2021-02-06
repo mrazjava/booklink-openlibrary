@@ -1,4 +1,4 @@
-package com.github.mrazjava.booklink.openlibrary.dataimport;
+package com.github.mrazjava.booklink.openlibrary.dataimport.filter;
 
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
@@ -22,7 +22,7 @@ public class AuthorIdFilter extends AbstractMongoBackedIdFilter<AuthorSchema> {
     }
 
     @Override
-    protected String getFilterName() {
+    public String getFilterName() {
         return FILTER_NAME;
     }
 }

@@ -2,6 +2,7 @@ package com.github.mrazjava.booklink.openlibrary.depot.rest;
 
 import static java.util.Optional.ofNullable;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,6 +58,23 @@ abstract class AbstractRestController<T extends DepotRecord> implements DepotSea
     	return ResponseEntity.ok(result);
     }
     
+    
+    protected ResponseEntity<List<T>> multipleById(String commaSeparatedIds, Boolean imgS, Boolean imgM, Boolean imgL) {
+        
+        List<String> ids = Arrays.stream(commaSeparatedIds.split(",")).map(id -> id.trim()).collect(Collectors.toList());
+        imgS = BooleanUtils.toBooleanDefaultIfNull(imgS, false);
+        imgM = BooleanUtils.toBooleanDefaultIfNull(imgM, false);
+        imgL = BooleanUtils.toBooleanDefaultIfNull(imgL, false);
+        
+        log.info("ids: {}, imgS[{}], imgM[{}], imgL[{}]", ids, imgS, imgM, imgL);
+
+        List<T> results = getService().findById(ids, imgS, imgM, imgL);
+        
+        log.info("found {} result(s)", results.size());
+        
+        return ResponseEntity.ok(results);
+    }
+
     protected List<T> getAll(int pageNo, int size, Sort sort, Boolean imgS, Boolean imgM, Boolean imgL) {
 
     	imgS = BooleanUtils.toBoolean(imgS);

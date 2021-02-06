@@ -52,7 +52,8 @@ booklink:
     # samples are not recorded and saved.
     author-sample-output-file: ${BOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE:}
     # FORMAT: DESIRED_NUMBER_OF_SAMPLE_AUTHORS|AUTHOR_DUMP_COUNT
-    # Example: 75|9555444 - generated 75 authors randomly chosen from all 9555444 authors in the dump file.
+    # Example: 20|9555444 - generates 20 randomly chosen authors from all 9555444 records in the dump file of which 
+    # more less half will contain an image.
     # Optional. If provided, author sample is randomly generated across the range of the entire dump file count. If
     # omitted, then sample is generated from each record logged via BOOKLINK_DI_FREQUENCY_CHECK. This value has an
     # effect only if BOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE is defined.

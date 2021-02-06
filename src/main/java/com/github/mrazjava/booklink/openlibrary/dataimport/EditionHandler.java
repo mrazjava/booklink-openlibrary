@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AbstractIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.WorkIdFilter;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
 

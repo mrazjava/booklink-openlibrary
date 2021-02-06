@@ -1,0 +1,3 @@
+# some cover images are all plain in a fixed color (eg: hardcovers)
+# this file identifies them by ID and a filter allows to set a 
+# plain cover flag accordingly 

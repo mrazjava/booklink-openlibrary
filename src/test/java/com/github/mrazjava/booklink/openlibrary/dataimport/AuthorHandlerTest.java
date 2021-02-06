@@ -29,6 +29,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorImgExclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
 import com.github.mrazjava.booklink.openlibrary.schema.CoverImage;
@@ -62,6 +64,8 @@ public class AuthorHandlerTest {
     @MockBean
     private AuthorRepository authorRepository;
 
+    @MockBean
+    private SampleAuthorTracker sampleAuthorTracker;
 
     @BeforeEach
     public void prepare() throws IOException {
