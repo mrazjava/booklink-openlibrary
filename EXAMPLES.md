@@ -96,8 +96,9 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FIL
 ```
 
 #### Authors
+NOTE: if running mongo via docker-compose from project dir, then we must match its port (last var)
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_IMG_DIR=/media/azimowski/booklink-500GB-e/openlibrary/authors -DBOOKLINK_DI_PERSIST=true -DBOOKLINK_DI_PERSIST_OVERRIDE=true -DBOOKLINK_DI_IMAGE_PULL=true -DBOOKLINK_DI_WITH_MONGO_IMGS=true"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_IMG_DIR=/media/azimowski/booklink-500GB-e/openlibrary/authors -DBOOKLINK_DI_PERSIST=true -DBOOKLINK_DI_PERSIST_OVERRIDE=true -DBOOKLINK_DI_IMAGE_PULL=true -DBOOKLINK_DI_WITH_MONGO_IMGS=true -DBOOKLINK_MONGO_PORT=27117"
 ```
 
 #### Works
