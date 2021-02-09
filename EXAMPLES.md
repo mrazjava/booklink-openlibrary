@@ -30,7 +30,7 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FIL
 ```
 
 #### Author
-Process full openlibrary data dump but load into mongo only authors defined in `src/main/resources/author-id-filter.txt` (assuming file had been copied to 
+Process full openlibrary data dump but load into mongo only authors defined in `src/main/resources/author-id-incl-filter.txt` (assuming file had been copied to 
 the same location where the dump file is). Use author images in the provided `BOOKLINK_DI_IMG_DIR` and make them part of a 
 mongo record (as a binary field, in all three sizes: small, medium, large). If the image is not available, try to 
 download it from the Internet. Any author records that may have existed in mongo will be overriden.
@@ -75,7 +75,7 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FIL
 
 ## Monthly Imports
 These are the commands I use to process monthly imports from latest data dumps. On even months, I generate randomized 
-author filter and use that to create a database. On odd months, I always create sample database off the `author-id-filter.txt` 
+author filter and use that to create a database. On odd months, I always create sample database off the `author-id-incl-filter.txt` 
 provided in the project. On even months database feature different sets of sample authors. On odd months, databases 
 feature the same set of authors. 
 
@@ -86,13 +86,13 @@ is enabled.
 Default randomizer samples IDs off `BOOKLINK_DI_FREQUENCY_CHECK` value. Every time record is logged according to 
 frequency check, its ID is recorded as a sample: 
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE=author-id-filter.txt"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE=author-id-incl-filter.txt"
 ```
 
 Explicit randomizer creates a random set of indexes over the domain of entire dump record count. This feature requires 
 additional configuration `BOOKLINK_DI_AUTHOR_ID_SAMPLE_RANDOMIZE`. See `application.yml` for additional documentation.
 ```
-mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE=/tmp/author-id-filter.txt -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_RANDOMIZE=75|7972562"
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_OUTPUT_FILE=/tmp/author-id-incl-filter.txt -DBOOKLINK_DI_AUTHOR_ID_SAMPLE_RANDOMIZE=75|7972562"
 ```
 
 #### Authors

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdInclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.dataimport.filter.PlainWorkCoverFilter;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
@@ -27,7 +27,7 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
     private WorkRepository repository;
 
     @Autowired
-    private AuthorIdFilter authorIdFilter;
+    private AuthorIdInclusionFilter authorIdFilter;
     
     @Autowired
     private PlainWorkCoverFilter plainCoverFilter;

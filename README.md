@@ -78,7 +78,7 @@ mvn clean spring-boot:run -Pdepot
 Depot runs over REST and provides Swagger interface which will be available at `localhost:8080/swagger-ui/`.
 
 #### Sandbox Dataset
-The following commands create sample dataset (using authors defined in `src/test/resources/author-id-filter.txt`) used 
+The following commands create sample dataset (using authors defined in `src/test/resources/author-id-incl-filter.txt`) used 
 by the sandbox. Assuming that openlibrary dumps have been prepped, and that the dumps and cover images exist in 
 `/tmp/openlibrary/`:
 ```
@@ -92,7 +92,7 @@ MongoDB dependency is assembled for convenience via docker-compose. Import and D
 images of which only Depot (REST API) is ran via sandbox. Import can be ran via docker image, but often it's more 
 practical to just run it via maven.
 #### MongoDB image
-The sample dataset (using authors defined in `src/test/resources/author-id-filter.txt`) is freely available as a docker 
+The sample dataset (using authors defined in `src/test/resources/author-id-incl-filter.txt`) is freely available as a docker 
 image on [dockerhub](https://hub.docker.com/repository/docker/mrazjava/booklink-mongo). This database contains embedded 
 images of authors and editions (if available) as per openlibrary specification. This same image is used by the sandbox. 
 Run it with:
@@ -130,7 +130,7 @@ docker run --network=booklinkopenlibrary_default -v ~/idea/projects/booklink-ope
 All filters allow comments. A comment starts with a `#` and is ignored. Empty lines are also allowed and ignored. Each 
 filtered item should appear on its own line. Typically a filtered item is some form of an ID. All filters are optional 
 and should live in the working directory (same location as dump file).
-#### `author-id-filter.txt`
+#### `author-id-incl-filter.txt`
 If enabled, then only authors listed in that file will be handled (persisted, etc). All other authors from the dump 
 file will be still parsed, but will be ignored. The format of this file is one author ID (eg: `OL1179289A`) per line.
 #### `author-img-exclusions.txt`
@@ -257,7 +257,7 @@ fgrep -i -A 5 -B 5 'George Orwell' authors.json
 ```
 
 #### Mongo Archives
-The database created with `author-id-filter.txt` (with embedded binary images of authors and editions) is used by the 
+The database created with `author-id-incl-filter.txt` (with embedded binary images of authors and editions) is used by the 
 sandbox environment. See [sandbox persistence](https://github.com/mrazjava/booklink/tree/master/sandbox/persistence) 
 for steps to create a sample mongo docker image. 
 
