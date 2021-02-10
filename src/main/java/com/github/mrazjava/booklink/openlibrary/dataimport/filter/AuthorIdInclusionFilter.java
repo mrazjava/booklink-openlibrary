@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthorIdInclusionFilter extends AbstractMongoBackedIdFilter<AuthorSchema> {
 
-    public static final String FILTER_NAME = "AUTHOR-ID";
+    public static final String FILTER_NAME = "AUTHOR-ID-INCLUSION";
 
     /**
      * Optional file; if exists, only authors in that list will be persisted.
