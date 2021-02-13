@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
  * @param <T> schema to use when checking mongo for IDs to filter
  */
 @Slf4j
-abstract class AbstractMongoBackedIdFilter<T extends BaseSchema> extends AbstractIdFilter {
+abstract class AbstractMongoBackedIdFilter<S extends BaseSchema> extends AbstractIdFilter<String> {
 
-    private OpenLibraryMongoRepository<T> repository;
+    private OpenLibraryMongoRepository<S> repository;
 
-    AbstractMongoBackedIdFilter(OpenLibraryMongoRepository<T> repository, String filterFilename) {
-        super(filterFilename);
+    AbstractMongoBackedIdFilter(OpenLibraryMongoRepository<S> repository, String filterFilename) {
+        super(filterFilename, line -> line);
         this.repository = repository;
     }
 

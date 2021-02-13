@@ -112,7 +112,7 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
     }
 
-    private String runAuthorIdFilter(EditionSchema record, AbstractIdFilter filter, long sequenceNo) {
+    private String runAuthorIdFilter(EditionSchema record, AbstractIdFilter<String> filter, long sequenceNo) {
 
         String matchedId = null;
         Set<String> ids = AuthorIdInclusionFilter.FILTER_NAME.equals(filter.getFilterName()) ?

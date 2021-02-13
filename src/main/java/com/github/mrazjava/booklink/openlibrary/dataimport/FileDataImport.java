@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.LineExclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 
 import java.io.Closeable;
@@ -26,6 +27,9 @@ public class FileDataImport implements DataImport<File> {
     @Autowired
     private IteratorProvider<String, File> iteratorProvider;
 
+    @Autowired
+    private LineExclusionFilter lineExclusionFilter;
+    
     @Value("${booklink.di.frequency-check}")
     private int frequencyCheck;
 
@@ -52,6 +56,7 @@ public class FileDataImport implements DataImport<File> {
             log.info("working directory: {}", workingDirectory);
 
             importHandler.prepare(workingDirectory);
+            lineExclusionFilter.load(workingDirectory);
 
             StopWatch stopWatch = new StopWatch();
             stopWatch.start();
@@ -61,16 +66,21 @@ public class FileDataImport implements DataImport<File> {
             // process 1st record explicitly
             if(iterator.hasNext()) {
                 line = iterator.next();
-                pojo = importHandler.toRecord(line);
-                log.debug("raw JSON #{}:\n{}", ++counter, line);
-                if(log.isInfoEnabled()) { // always log 1st record
-                    if (counter < startWithRecordNo) {
-                        log.info("pass through check; raw JSON #{}:\n{}", counter, line);
-                    } else {
-                        log.info("JSON #{}:\n{}", counter, importHandler.toText(pojo));
+                if(!lineExclusionFilter.exists(++counter)) {                    
+                    pojo = importHandler.toRecord(line);
+                    log.debug("raw JSON #{}:\n{}", ++counter, line);
+                    if(log.isInfoEnabled()) { // always log 1st record
+                        if (counter < startWithRecordNo) {
+                            log.info("pass through check; raw JSON #{}:\n{}", counter, line);
+                        } else {
+                            log.info("JSON #{}:\n{}", counter, importHandler.toText(pojo));
+                        }
                     }
+                    importHandler.handle(pojo, counter);
                 }
-                importHandler.handle(pojo, counter);
+                else {
+                    lineExclusionFilter.logSkipMsg(counter, line);
+                }
             }
 
             while(iterator.hasNext()) {
@@ -79,6 +89,10 @@ public class FileDataImport implements DataImport<File> {
                     if(counter % frequencyCheck == 0) {
                         log.info("pass through check; raw JSON #{}:\n{}", counter, line);
                     }
+                    continue;
+                }
+                if(lineExclusionFilter.exists(counter)) {
+                    lineExclusionFilter.logSkipMsg(counter, line);
                     continue;
                 }
 
