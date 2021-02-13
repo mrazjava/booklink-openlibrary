@@ -52,7 +52,7 @@ public abstract class AbstractIdFilter<T> implements IdFilter<T> {
         filterFile = new File(workingDirectory.getAbsolutePath() + File.separator + filterFile.getName());
 
         if(isEnabled()) {
-            log.info("[{} FILTER] detected ID file: {}", getFilterName(), filterFile.getAbsoluteFile());
+            log.info("{} FILTER detected ID file: {}", getFilterName(), filterFile.getAbsoluteFile());
             try {
                 LineIterator iterator = FileUtils.lineIterator(filterFile, "UTF-8");
                 while(iterator.hasNext()) {
@@ -61,9 +61,9 @@ public abstract class AbstractIdFilter<T> implements IdFilter<T> {
                         allowedIds.add(ofNullable(idTransformer).map(t -> t.apply(line)).orElseThrow(() -> new OpenLibraryImportException("transformer error")));
                     }
                 }
-                log.info("[{} FILTER] loaded {} IDs:\n{}", getFilterName(), allowedIds.size(), allowedIds);
+                log.info("{} FILTER loaded {} IDs:\n{}", getFilterName(), allowedIds.size(), allowedIds);
             } catch (IOException e) {
-                log.error("[{} FILTER] problem loading id file [{}]: {}", getFilterName(), filterFile.getAbsolutePath(), e.getMessage());
+                log.error("{} FILTER problem loading id file [{}]: {}", getFilterName(), filterFile.getAbsolutePath(), e.getMessage());
                 allowedIds.clear();
             }
         }
