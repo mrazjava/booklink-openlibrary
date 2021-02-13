@@ -68,7 +68,7 @@ public class FileDataImport implements DataImport<File> {
                 line = iterator.next();
                 if(!lineExclusionFilter.exists(++counter)) {                    
                     pojo = importHandler.toRecord(line);
-                    log.debug("raw JSON #{}:\n{}", ++counter, line);
+                    log.debug("raw JSON #{}:\n{}", counter, line);
                     if(log.isInfoEnabled()) { // always log 1st record
                         if (counter < startWithRecordNo) {
                             log.info("pass through check; raw JSON #{}:\n{}", counter, line);
