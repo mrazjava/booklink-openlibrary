@@ -1,0 +1,7 @@
+# Each row number in this filter will cause import to exclude the record 
+# from processing. Each line must be numeric. First row index = 1.
+#
+# This filter is useful for filtering out bad rows posted by openlibrary.org, 
+# or just in general to skip certain records.
+#
+# This filter can be applied to any import type (author, works, edition) 

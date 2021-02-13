@@ -1,0 +1,170 @@
+# SA (s)econdary (a)uthors - works can have more than one author. 
+# Typically a work has a primary author and it can have one or 
+# more secondary authors. ID prefixed with SA: indicates to the 
+# import to also fetch those authors, but work and edition handler 
+# would not fetch their records for those (secondary) authors.
+# 
+SA:OL5631454A
+SA:OL5796598A
+SA:OL1368A
+SA:OL7462922A
+SA:OL3706483A
+SA:OL2538892A
+SA:OL1193932A
+SA:OL529210A
+SA:OL8474208A
+SA:OL4673253A
+SA:OL2641147A
+SA:OL446393A
+SA:OL5043187A
+SA:OL1368A
+SA:OL65554A
+SA:OL51844A
+SA:OL383202A
+SA:OL410659A
+SA:OL6000410A
+SA:OL354192A
+SA:OL7426215A
+SA:OL1069783A
+SA:OL248236A
+SA:OL158864A
+SA:OL3134419A
+SA:OL61682A
+SA:OL7844408A
+SA:OL3103146A
+SA:OL7510291A
+SA:OL2962680A
+SA:OL244727A
+SA:OL445702A
+SA:OL5990541A
+SA:OL1368A
+SA:OL2493710A
+SA:OL8583884A
+SA:OL2386569A
+SA:OL6034700A
+SA:OL8019984A
+SA:OL1151040A
+SA:OL244727A
+SA:OL4536016A
+SA:OL354192A
+SA:OL4360319A
+SA:OL599247A
+SA:OL2634342A
+SA:OL7426215A
+SA:OL6027786A
+SA:OL1368A
+
+# Fyodor Dostoyevsky
+# main
+OL22242A
+OL7953630A
+OL8015172A
+
+# George Orwell
+OL118077A
+
+# Roman Dmowski
+OL75099A
+
+# Hillary Clinton
+OL3554865A
+
+# Edward Gierek
+OL629520A
+
+# Arthur Schopenhauer
+OL119580A
+
+# Leo Tolstoy
+OL26783A
+
+# Daniel Dennet
+OL342699A
+
+# Richard Dawkins
+OL6427154A
+
+# Sigmund Freud
+OL108452A
+
+# Franz Kafka
+OL33146A
+
+# Adam Mickiewicz
+OL114808A
+
+# Alexis de Toqueville
+OL30442A
+
+# James Madison
+OL240767A
+
+# Alexander Hamilton
+OL363754A
+
+# George Washington
+OL17013A
+
+# Manning Johnson
+OL5081609A
+
+# Jean-Jacques Rousseau
+# main
+OL29048A
+OL7546659A
+
+# Jan Kochanowski
+OL69572A
+
+# Ivor Horton
+OL59415A
+
+# Karl Marx
+OL48230A
+
+# J.K. Rowling
+OL23919A
+
+# Milton Friedman
+OL403122A
+
+# Harry Adam Knight
+OL3487940A
+
+# Graham Masterton
+OL60759A
+
+# Paweł Sariel Kmieć
+OL7330300A
+
+# Friedrich Nietzsche
+# main
+OL20157A
+OL7881642A
+OL7389797A
+
+# Ignacy Jan Paderewski
+OL602104A
+
+# Wolfgang Amadeus Mozart
+OL5017833A
+
+# Donald Trump
+# main
+OL500499A
+OL7483449A
+OL3577152A
+
+# Zofia Nałkowska
+OL31466A
+
+# Remigiusz Mróz
+# main
+OL7434435A
+OL7925018A
+
+# Joseph Stalin
+OL7411649A
+
+# Simon Beckett
+OL579379A

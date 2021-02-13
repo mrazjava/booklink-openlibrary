@@ -1,5 +1,9 @@
-# SA (s)econdary (a)uthors - a different author mapped to works for which primary author is listed
-# works for secondary authors are not fetched
+# SA (s)econdary (a)uthors - works can have more than one author. 
+# Typically a work has a primary author and it can have one or 
+# more secondary authors. ID prefixed with SA: indicates to the 
+# import to also fetch those authors, but work and edition handler 
+# would not fetch their records for those (secondary) authors.
+# 
 SA:OL5631454A
 SA:OL5796598A
 SA:OL1368A

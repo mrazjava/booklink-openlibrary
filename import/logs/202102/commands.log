@@ -1,0 +1,19 @@
+# Data dumps for February 2021 seem corrupted. For example, author dump contains records 
+# of another type (works, editions), and works dump is unusually small (235mb) whereas 
+# normally it's in the range of gigabytes. The imports from those dumps, as expected 
+# generated mostly garbage quality database. February import was repeated with January 2021 
+# data. 
+#
+# Nonetheless, first are commands used to import off Febrary 2021 data dump:
+#
+# authors scan
+# (used -DBOOKLINK_DI_START_WITH_RECORD= as well until line-exclusion-filter.txt was constructed)
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_MONGO_PORT=27117"
+#
+# authors import (requires ../filters/line-exclusion-filter.author-202102)
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/authors.json -DBOOKLINK_DI_IMG_DIR=/media/azimowski/booklink-500GB-e/openlibrary/authors -DBOOKLINK_DI_PERSIST=true -DBOOKLINK_DI_PERSIST_OVERRIDE=true -DBOOKLINK_DI_IMAGE_PULL=true -DBOOKLINK_DI_WITH_MONGO_IMGS=true -DBOOKLINK_MONGO_PORT=27117"
+#
+# works scan
+mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/works.json -DBOOKLINK_MONGO_PORT=27117 -DBOOKLINK_DI_START_WITH_RECORD=1"
+#
+# works import
