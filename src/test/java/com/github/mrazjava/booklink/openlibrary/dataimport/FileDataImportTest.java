@@ -1,6 +1,7 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -21,6 +22,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.LineExclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 
 @BooklinkTestPropertySource
@@ -38,6 +40,9 @@ public class FileDataImportTest {
 
     @MockBean
     private AbstractImportHandler<BaseSchema> handler;
+    
+    @MockBean
+    private LineExclusionFilter lineExclusionFilter;
 
     @BeforeEach
     void prepare() {
@@ -60,6 +65,7 @@ public class FileDataImportTest {
         when(iterator.next()).thenReturn(mockSource[0], mockSource[1], mockSource[2]);
         when(handler.toRecord(anyString())).thenReturn(record);
         when(handler.toText(eq(record))).thenReturn("{MOCK}");
+        when(lineExclusionFilter.exists(anyLong())).thenReturn(false);
 
         importer.setFrequencyCheck(1);
         importer.runImport(jsonSource);
