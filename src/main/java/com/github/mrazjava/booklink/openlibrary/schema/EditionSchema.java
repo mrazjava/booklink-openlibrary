@@ -55,6 +55,9 @@ public class EditionSchema extends BaseSchemaEnhanced {
 
     @TextIndexed(weight = 5)
     private String description;
+    
+    @JsonProperty("displayname")
+    private String displayName;
 
     private List<String> isbn;
 
@@ -126,6 +129,8 @@ public class EditionSchema extends BaseSchemaEnhanced {
 
     @JsonProperty("download_url")
     private List<String> downloadUrl;
+    
+    private List<String> website;
 
     private String name;
 
@@ -179,6 +184,12 @@ public class EditionSchema extends BaseSchemaEnhanced {
 
     @JsonProperty("author_names")
     private List<String> authorNames;
+    
+    @JsonProperty("personal_name")
+    private String personalName;
+    
+    @JsonProperty("alternate_names")
+    private List<String> authorAlternateNames;
 
     @JsonAlias("work_title")
     @JsonProperty("work_titles")
@@ -303,6 +314,23 @@ public class EditionSchema extends BaseSchemaEnhanced {
         }
     }
 
+    @JsonSetter
+    public void setWebsite(JsonNode json) {
+        if(json != null) {
+            if(CollectionUtils.isEmpty(website)) {
+                website = new LinkedList<>();
+            }
+            if(json.isTextual()) {
+                website.add(json.asText());
+            }
+            else {
+                for (JsonNode jn : json) {
+                    website.add(jn.asText());
+                }
+            }
+        }
+    }
+    
     @JsonSetter("ia_box_id")
     public void setIaBoxIds(JsonNode json) {
         if(json != null) {

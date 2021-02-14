@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-@JsonIgnoreProperties({"m", "type"})
+@JsonIgnoreProperties({"m", "type", "dewry_decimal_class"})
 @Data
 @EqualsAndHashCode(callSuper = true)
 public abstract class BaseSchemaEnhanced extends BaseSchema {

@@ -282,6 +282,8 @@ public class Identifiers {
     @JsonProperty("apple_ibook_store")
     private List<String> appleIbookStore;
 
+    @JsonAlias("lulu_id")
+    @JsonProperty
     private List<String> lulu;
 
     @JsonAlias("barnes_and_noble_-_bn.com")
