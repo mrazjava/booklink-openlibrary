@@ -2,7 +2,7 @@
 # Typically a work has a primary author and it can have one or 
 # more secondary authors. ID prefixed with SA: indicates to the 
 # import to also fetch those authors, but work and edition handler 
-# would not fetch their records for those (secondary) authors.
+# would not fetch their records.
 # 
 SA:OL5631454A
 SA:OL5796598A
@@ -146,6 +146,12 @@ OL7389797A
 # Ignacy Jan Paderewski
 OL602104A
 
+# Charles Bukowski
+OL31084A
+
+# Bram Stoker
+OL31727A
+
 # Wolfgang Amadeus Mozart
 OL5017833A
 
@@ -168,3 +174,7 @@ OL7411649A
 
 # Simon Beckett
 OL579379A
+
+# B.F. Skinner
+OL7781222A
+OL198302A

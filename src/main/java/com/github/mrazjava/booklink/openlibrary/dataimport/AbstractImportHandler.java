@@ -96,7 +96,7 @@ abstract class AbstractImportHandler<R extends BaseSchema> implements ImportHand
     }
 
     @Override
-    public void conclude(File dataSource) {
+    public void conclude(File workingDirectory) {
         if(log.isInfoEnabled() && imageDownloader.isEnabled()) {
             Set<String> failedDownloads = imageDownloader.getFailedImageDownloads();
             StringBuilder urls = new StringBuilder();
