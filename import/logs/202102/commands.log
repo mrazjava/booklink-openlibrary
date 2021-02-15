@@ -29,9 +29,15 @@ mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FIL
 mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="-DBOOKLINK_DI_DUMP_FILE=/media/azimowski/booklink-500GB-e/openlibrary/editions.json -DBOOKLINK_DI_IMAGE_PULL=true -DBOOKLINK_DI_WITH_MONGO_IMGS=true -DBOOKLINK_DI_IMG_DIR=/media/azimowski/booklink-500GB-e/openlibrary/covers/ -DBOOKLINK_DI_PERSIST=true -DBOOKLINK_DI_PERSIST_OVERRIDE=true -DBOOKLINK_MONGO_PORT=27117"
 
 #
-# 202102 mongo db
+# 202102 mongo db (~14mb)
 #
 docker exec b78367fb1c41 sh -c 'mongodump --username root --password pass123 --db openlibrary --authenticationDatabase admin --gzip --archive' > /tmp/bl/openlibrary-mongo.archive
 #
 # from /booklink/sandbox/persistence/
 docker build -f Dockerfile.mongo -t mrazjava/booklink-mongo:202102-4.4.0 --label "DUMP_SOURCE=https://archive.org/download/ol_dump_2021-01-31" --label "COMMENT=dump source incomplete" .
+#
+# 202102v2 mongo db (~453mb) - this version is generated off archive.org december 2020 dump which is not broken
+#
+docker exec 4382369733ef sh -c 'mongodump --username root --password pass123 --db openlibrary --authenticationDatabase admin --gzip --archive' > /tmp/bl/openlibrary-mongo.archive
+#
+docker build -f Dockerfile.mongo -t mrazjava/booklink-mongo:202102v2-4.4.0 --label "DUMP_SOURCE=https://archive.org/download/ol_dump_2020-12-31" --label "COMMENT=dump source OK" .
