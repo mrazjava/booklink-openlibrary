@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
  * covers are like this.
  */
 @Component
-public class PlainWorkCoverFilter extends AbstractIdFilter {
+public class PlainWorkCoverFilter extends AbstractIdFilter<String> {
 
     public static final String FILTER_NAME = "WORK-PLAIN-COVER-FILTER";
 
@@ -19,7 +19,7 @@ public class PlainWorkCoverFilter extends AbstractIdFilter {
 
 
     PlainWorkCoverFilter() {
-        super(FILTER_NAME);
+        super(FILTER_NAME, line -> line);
     }
 
     @Override

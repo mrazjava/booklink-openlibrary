@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -93,6 +94,9 @@ public class WorkSchema extends BaseSchema {
 
     @JsonProperty("table_of_contents")
     private List<TableOfContent> toc;
+    
+    @JsonIgnore
+    private Object works;
 
 
     @JsonSetter("description")
@@ -125,6 +129,23 @@ public class WorkSchema extends BaseSchema {
     public String getFirstSentence() {
         return firstSentence;
     }
+    
+    @JsonSetter("subject_people")
+    public void setSubjectPeople(JsonNode json) {
+        if(json != null) {
+            if(CollectionUtils.isEmpty(subjectPeople)) {
+                subjectPeople = new LinkedList<>();
+            }
+            if(!json.isArray()) {
+                subjectPeople.add(fetchValue(json));
+            }
+            else {
+                for(JsonNode jn : json) {
+                    subjectPeople.add(fetchValue(jn));
+                }
+            }
+        }
+    }    
 
     @JsonSetter("excerpts")
     public void setJsonExcerpts(JsonNode json) {

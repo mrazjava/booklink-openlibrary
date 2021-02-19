@@ -10,6 +10,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.mrazjava.booklink.openlibrary.dataimport.OpenLibraryImportException;
+
 import lombok.extern.slf4j.Slf4j;
 
 import static java.util.Optional.ofNullable;
@@ -20,23 +22,27 @@ import static java.util.Optional.ofNullable;
  * default no file will be present.
  */
 @Slf4j
-public abstract class AbstractIdFilter implements IdFilter {
+public abstract class AbstractIdFilter<T> implements IdFilter<T> {
 
-    protected Set<String> allowedIds = new HashSet<>();
+    protected Set<T> allowedIds = new HashSet<>();
 
     private File filterFile;
     
     /**
-     * Transform (or not) ID defined in a filter file prior to loading it into a filter
+     * Transform ID defined in a filter file prior to loading it into a filter
      */
-    private Function<String, String> idTransformer;
+    private Function<String, T> idTransformer;
 
 
-    AbstractIdFilter(String filterFilename) {
+    AbstractIdFilter(String filterFilename, Function<String, T> idTransformer) {
         filterFile = new File(filterFilename);
+        this.idTransformer = idTransformer;
     }
     
-    public void setIdTransformer(Function<String, String> idTransformer) {
+    /**
+     * @param idTransformer to override which may have been set via constructor
+     */
+    public void setIdTransformer(Function<String, T> idTransformer) {
     	this.idTransformer = idTransformer;
     }
 
@@ -46,23 +52,23 @@ public abstract class AbstractIdFilter implements IdFilter {
         filterFile = new File(workingDirectory.getAbsolutePath() + File.separator + filterFile.getName());
 
         if(isEnabled()) {
-            log.info("[{} FILTER] detected ID file: {}", getFilterName(), filterFile.getAbsoluteFile());
+            log.info("{} FILTER detected ID file: {}", getFilterName(), filterFile.getAbsoluteFile());
             try {
                 LineIterator iterator = FileUtils.lineIterator(filterFile, "UTF-8");
                 while(iterator.hasNext()) {
                     final String line = iterator.next();
                     if(StringUtils.isNotBlank(line) && !line.startsWith("#")) {
-                        allowedIds.add(ofNullable(idTransformer).map(t -> t.apply(line)).orElse(line));
+                        allowedIds.add(ofNullable(idTransformer).map(t -> t.apply(line)).orElseThrow(() -> new OpenLibraryImportException("transformer error")));
                     }
                 }
-                log.info("[{} FILTER] loaded {} IDs:\n{}", getFilterName(), allowedIds.size(), allowedIds);
+                log.info("{} FILTER loaded {} IDs:\n{}", getFilterName(), allowedIds.size(), allowedIds);
             } catch (IOException e) {
-                log.error("[{} FILTER] problem loading id file [{}]: {}", getFilterName(), filterFile.getAbsolutePath(), e.getMessage());
+                log.error("{} FILTER problem loading id file [{}]: {}", getFilterName(), filterFile.getAbsolutePath(), e.getMessage());
                 allowedIds.clear();
             }
         }
         else {
-            log.info("[{} FILTER] - DISABLED", getFilterName());
+            log.info("{} FILTER: - DISABLED", getFilterName());
         }
     }
 
@@ -72,7 +78,7 @@ public abstract class AbstractIdFilter implements IdFilter {
     }
 
     @Override
-    public boolean exists(String id) {
+    public boolean exists(T id) {
         return allowedIds.contains(id);
     }
 

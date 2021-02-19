@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AbstractIdFilter;
-import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdInclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.dataimport.filter.WorkIdFilter;
 import com.github.mrazjava.booklink.openlibrary.repository.EditionRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.EditionSchema;
@@ -112,10 +112,10 @@ public class EditionHandler extends AbstractImportHandler<EditionSchema> {
         }
     }
 
-    private String runAuthorIdFilter(EditionSchema record, AbstractIdFilter filter, long sequenceNo) {
+    private String runAuthorIdFilter(EditionSchema record, AbstractIdFilter<String> filter, long sequenceNo) {
 
         String matchedId = null;
-        Set<String> ids = AuthorIdFilter.FILTER_NAME.equals(filter.getFilterName()) ?
+        Set<String> ids = AuthorIdInclusionFilter.FILTER_NAME.equals(filter.getFilterName()) ?
                 record.getAuthors() : record.getWorks();
 
         if(filter.isEnabled() && !CollectionUtils.isEmpty(ids)) {

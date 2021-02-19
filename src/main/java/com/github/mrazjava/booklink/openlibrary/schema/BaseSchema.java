@@ -45,7 +45,6 @@ public abstract class BaseSchema implements DefaultImageSupport  {
     @JsonProperty("latest_revision")
     private Integer latestRevision;
 
-    @JsonProperty
     @TextIndexed(weight = 1)
     private List<String> subjects;
 
@@ -124,6 +123,23 @@ public abstract class BaseSchema implements DefaultImageSupport  {
             }
         }
     }
+    
+    @JsonSetter("subjects")
+    public void setSubjects(JsonNode json) {
+        if(json != null) {
+            if(CollectionUtils.isEmpty(subjects)) {
+                subjects = new LinkedList<>();
+            }
+            if(!json.isArray()) {
+                subjects.add(fetchKey(json));
+            }
+            else {
+                for(JsonNode jn : json) {
+                    subjects.add(fetchKey(jn));
+                }
+            }
+        }
+    }
 
     @JsonSetter("key")
     public void setKey(JsonNode jsonNode) {
@@ -132,8 +148,16 @@ public abstract class BaseSchema implements DefaultImageSupport  {
     }
 
     protected String fetchKey(JsonNode json) {
-        String text = json.has("key") ? json.get("key").asText() : json.asText();
-        return text.contains("/") ? text.substring(text.lastIndexOf("/") + 1) : text;
+        return fetchField(json, "key");
+    }
+    
+    protected String fetchValue(JsonNode json) {
+        return fetchField(json, "value");
+    }
+    
+    protected String fetchField(JsonNode json, String fieldName) {
+        String text = json.has(fieldName) ? json.get(fieldName).asText() : json.asText();
+        return text.contains("/") ? text.substring(text.lastIndexOf("/") + 1) : text;        
     }
 
     @Override

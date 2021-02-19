@@ -1,17 +1,23 @@
 package com.github.mrazjava.booklink.openlibrary.dataimport;
 
-import static java.util.Optional.ofNullable;
 import static com.github.mrazjava.booklink.openlibrary.BooklinkUtils.extractSampleText;
+import static java.util.Optional.ofNullable;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdInclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.dataimport.filter.PlainWorkCoverFilter;
 import com.github.mrazjava.booklink.openlibrary.repository.WorkRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
@@ -27,12 +33,14 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
     private WorkRepository repository;
 
     @Autowired
-    private AuthorIdFilter authorIdFilter;
+    private AuthorIdInclusionFilter authorIdFilter;
     
     @Autowired
     private PlainWorkCoverFilter plainCoverFilter;
 
     private int authorMatchCount = 0;
+    
+    private Set<String> secondaryAuthors = new HashSet<>();
 
 
     @Override
@@ -40,7 +48,7 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
 
         super.prepare(workingDirectory);
         imageDownloader.setCoverDirectory("works");
-        plainCoverFilter.load(workingDirectory);
+        plainCoverFilter.load(workingDirectory);        
     }
 
     @Override
@@ -68,6 +76,12 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
             Optional<String> matchedId = record.getAuthors().stream()
                     .filter(id -> authorIdFilter.exists(id))
                     .findFirst();
+            
+            if(matchedId.isPresent()) {
+                secondaryAuthors.addAll(record.getAuthors().stream()
+                    .filter(id -> !authorIdFilter.exists(id))
+                    .collect(Collectors.toSet()));
+            }
 
             if(matchedId.isPresent()) {
                 if(log.isDebugEnabled()) {
@@ -95,6 +109,25 @@ public class WorkHandler extends AbstractImportHandler<WorkSchema> {
             enhanceData(record);
             repository.save(record);
             savedCount++;
+        }
+    }
+
+    @Override
+    public void conclude(File workingDirectory) {
+        super.conclude(workingDirectory);
+        log.info("found {} secondary authors", secondaryAuthors.size());
+        if(!secondaryAuthors.isEmpty()) {
+        File secondaryAuthorsFile = new File(workingDirectory.getAbsolutePath() + File.separator + "secondary-author-ids.txt");
+            try {
+                FileUtils.write(
+                        secondaryAuthorsFile, 
+                        secondaryAuthors.stream().map(id -> String.format("SA:%s",  id)).collect(Collectors.joining("\n")), 
+                        StandardCharsets.UTF_8
+                        );
+            } catch (IOException e) {
+                log.warn("problem generating secondary authors file: {}", secondaryAuthorsFile.getAbsolutePath());
+                e.printStackTrace();
+            }
         }
     }
 

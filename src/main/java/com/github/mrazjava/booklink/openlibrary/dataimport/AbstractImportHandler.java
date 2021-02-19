@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdInclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorImgExclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.schema.BaseSchema;
 
@@ -56,7 +56,7 @@ abstract class AbstractImportHandler<R extends BaseSchema> implements ImportHand
     protected File imageDirectoryLocation;
 
     @Autowired
-    protected AuthorIdFilter authorIdFilter;
+    protected AuthorIdInclusionFilter authorIdFilter;
 
     @Autowired
     private AuthorImgExclusionFilter authorImgExclusionFilter;
@@ -96,7 +96,7 @@ abstract class AbstractImportHandler<R extends BaseSchema> implements ImportHand
     }
 
     @Override
-    public void conclude(File dataSource) {
+    public void conclude(File workingDirectory) {
         if(log.isInfoEnabled() && imageDownloader.isEnabled()) {
             Set<String> failedDownloads = imageDownloader.getFailedImageDownloads();
             StringBuilder urls = new StringBuilder();

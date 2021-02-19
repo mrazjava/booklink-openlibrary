@@ -29,7 +29,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdFilter;
+import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorIdInclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.dataimport.filter.AuthorImgExclusionFilter;
 import com.github.mrazjava.booklink.openlibrary.repository.AuthorRepository;
 import com.github.mrazjava.booklink.openlibrary.schema.AuthorSchema;
@@ -56,7 +56,7 @@ public class AuthorHandlerTest {
     private ImageDownloader imageDownloader;
 
     @MockBean
-    private AuthorIdFilter authorIdFilter;
+    private AuthorIdInclusionFilter authorIdFilter;
 
     @MockBean
     private AuthorImgExclusionFilter authorImgExclusionFilter;

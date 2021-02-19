@@ -71,7 +71,7 @@ public class ImageDownloader {
 
     final static int MINIMUM_VALID_IMAGE_BYTE_SIZE = 850;
 
-    private IdFilter imgIdFilter;
+    private IdFilter<String> imgIdFilter;
 
     private String coverDirectory;
 
@@ -90,7 +90,7 @@ public class ImageDownloader {
         this.throttleMs = throttleMs;
     }
 
-    public void setImageIdFilter(IdFilter imgIdFilter) {
+    public void setImageIdFilter(IdFilter<String> imgIdFilter) {
         this.imgIdFilter = imgIdFilter;
     }
 
